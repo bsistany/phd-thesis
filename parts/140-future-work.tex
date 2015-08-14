@@ -1,0 +1,156 @@
+%======================================================================
+\chapter{Proposed Future Work}
+%======================================================================
+
+%----------------------------------------------------------------------
+\section{Summary}
+
+We started off by looking at \ac{drel}s and specifically at \ac{odrl} and considered its formal semantics as captured by~\cite{pucella2006}. We presented the encodings and semantics of the constructs for a significant subset of \ac{odrl} in Coq and then defined what queries looked like and what the decision problem was in this context. We have also encoded the decision algorithms as presented in~\cite{pucella2006} in Coq in order to perform formal verification of theorems of interest. We noted the common thread between \ac{rel}s and policy languages for access control systems such as those between \ac{odrl} and \ac{selinux}. We discussed the goal of generalizing the concept of a policy language from strictly representing subsets of \ac{odrl}, to representing (subsets of) both \ac{odrl} and \ac{selinux} policy languages with the goal of applying the decision algorithms to both types of policies, in a unified manner.
+%----------------------------------------------------------------------
+
+
+\section{Machine-Checked Proof of Decidability of Queries}
+
+By defining formal semantics for \ac{odrl} authors of~\cite{pucella2006} were able to show some important results. First result is that answering the question of whether a set of ODRL statements imply a permission, denial or other possibilities is decidable and also that its complexity is NP-hard.
+
+The authors of~\cite{pucella2006} then prove that by removing the construct $not[policySet]$ from \ac{odrl}'s syntax answering the same query remains decidable and efficient (polynomial time complexity). 
+
+We will prove equivalent results as above starting with the decidability result of answering a query in ODRL0 (which does not include $not[policySet]$). The theorem in listing~\ref{lst:decidabilityodrl0coq} states that for all environments, all single agreements, all subjects, all actions and all assets, either permission is granted, permission is denied, permission is unregulated or query is inconsistent. 
+
+\lstset{language=Coq, frame=single, caption={Environments and Counts},label={lst:decidabilityodrl0coq}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Theorem queriesAreDecidable: forall (e:environment), 
+                forall (agr: agreement),
+                forall (s:subject),
+                forall (action:act),
+                forall (a:asset),
+
+(permissionGranted e [agr] s action a) \/
+(permissionDenied e [agr] s action a)  \/
+(queryInconsistent e [agr] s action a) \/
+(permissionUnregulated e [agr] s action a).
+
+\end{lstlisting}
+\end{minipage}
+
+We will then augment ODRL0 with the constructs we omitted from the full ODRL (resulting in what we have earlier called ODRL1 or ODRL2) including the troublesome construct $not[policySet]$ and attempt to prove that the decidability results remain intact. There is a chance that a proof is not possible due to particulars of the Coq encoding we have used, in in which case, we will adjust our encoding.
+
+\section{SELinux}
+ 
+We started out by looking at \ac{drel}s and specifically \ac{odrl} where rights expressions are used to arbitrate access to assets under conditions. Recall that the main construct in \ac{odrl} is the agreement which specifies users, asset(s) and policies (as part of policy sets) whereby controls on users' access to the assets are described. This is reminiscent of how access control conditions are expressed in access control policy languages such as \ac{xacml} and \ac{selinux}.
+
+While \ac{xacml} is a high-level and platform independent access control system \ac{selinux} is platform dependent (e.g. Linux based) and low-level. \ac{selinux} enhances the \ac{DAC} that most unix based systems employ by \ac{MAC} where designed access control policies are applied throughout the system possibly overriding whatever \ac{DAC} is in place by the system users. 
+
+\ac{selinux} uses Linux's extended file attributes to attach a \emph{security context} to passive entities (e.g. files, directories, sockets) and also to each active entity typically a Linux user space process. Security context is a data structure that is composed of a user, a role and a domain (or type). While users can map directly to ordinary user names they can also be defined separately. Roles are meant to group users and add flexibility when assigning permissions and are the basis for \ac{RBAC}. Finally domains or types are the basis for defining common access control requirements for both passive and active entities. 
+
+
+The enforcement of \ac{selinux} policies are performed by the \emph{security server}. Whenever a security operation is requested from user space by a system call, the security server is invoked to arbitrate the operation and either allow the operation or to deny it. Each operation is identified by two pieces of information: an object class (e.g. file) and a permission (e.g. read, write). When an operation is requested to be performed on an object, the class and the permissions associated with the object along with security contexts of the source (typically the source entity is a process) and the object are passed to the security server. The security server consults the loaded policy (loaded at boot time) and allows or denies the access request~\cite{Sarna}.
+
+\section{SELinux Policy Language}
+
+The \ac{selinux} policy has four different kinds of statements: declarations, rules, constraints and assertions~\cite{ArcherLP03}. Assertions are compile time checks that the \emph{checkpolicy} tool performs at compile time. The other three kinds of statements however are evaluated at run-time. 
+
+Declaration statements are used to declare a type, a role and a type. First types are declared using a type declaration statement. Roles are declared and authorized for particular domains (types) through role declarations, and finally user declarations are used to define each user and to specify the set of authorized roles for each of these users (see~\ref{lst:declsselinux}). Note that in the listings below we will present a simplified and modified version of the official \ac{selinux} syntax in order to (re-)use the \ac{odrl} Coq framework.
+
+\lstset{language=selinux}
+\begin{lstlisting}[frame=single, caption={Declarations},label={lst:declsselinux}]
+
+'type' T ';' &\Comment{; type T}&
+
+'role' R T ';' &\Comment{; role R is associated with type T }&
+
+'user' U R ';' &\Comment{; user U is associated with role R }&
+
+\end{lstlisting}
+
+Rule statements define access vector rules. Access vector (AV) rules (see listing~\ref{lst:avruleselinux}) specify which operations are allowed and whether to audit (log). Any operation not covered by AV rules are denied and all denied operations are logged. The semantics of the AV rule with avkind \emph{allow} is: processes with type \emph{T1} are allowed to perform operations in \emph{P} on objects with class \emph{C} and type \emph{T2} (with avkind=\emph{deny} meaning not to allow). 
+
+\lstset{language=selinux}
+\begin{lstlisting}[frame=single, caption={AV Rule},label={lst:avruleselinux}]
+
+<avRule> -> <avkind> T1 T2:C P ';'
+
+<avkind> -> 'allow' | 'deny'
+\end{lstlisting}
+
+When a process changes security context, the role may change, assuming a \emph{role transition} exists relating the old and the new roles. There is a related AV rule called the \emph{type transition} rule where a process with type T1 is allowed/denied to transition to type T2 when C=process and P=transition (see~\ref{lst:typeAndroletransselinux}).
+
+\lstset{mathescape, language=AST} 
+\begin{lstlisting}[frame=single, caption={Type Transition and Role-Allow Rules},label={lst:typeAndroletransselinux}]
+
+<avkind> T1 T2:process transition ';'
+
+<role_transition_rule> -> <avkind> R1 R2 ';' &\Comment{; when a process changes security contexts this rule must hold }&
+
+\end{lstlisting}
+
+Constraints are additional conditions on permissions in the form of boolean expressions that must hold in order for the specified permissions to be allowed (see listing~\ref{lst:constrainselinux}. Whenever a permission is requested on an object class C, the security server checks that the constraints hold.
+
+\lstset{language=selinux}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Constrain Rule},label={lst:constrainselinux}]
+
+<constraint> -> 'constrain' C, P, <expr> ';'
+
+<expr> -> 'not' <expr> | <expr> 'and' <expr> | <expr> or <expr> | U1 <op> U2 | T1 <op> T2 | R1 <op> R2
+
+<op> -> '==' | '!='
+ 
+\end{lstlisting}
+\end{minipage}
+
+\section{Agreements in \ac{selinux}}
+
+As with \ac{odrl} we will start by limiting the policy language to only allow AV rules. As mentioned earlier an operation not covered by a allow rule is denied by \ac{selinux}. We will make up explicit \emph{deny} rules therefore an agreement is defined to be a combination of allow and deny rules. Allow and deny rules as mappings are defined in listing~\ref{lst:allowmappingastselinux}.
+
+\lstset{language=AST}
+\begin{lstlisting}[frame=single, caption={'allow'/'deny' Rule as a Mapping},label={lst:allowmappingastselinux}]
+AV rule : $T \times (T \times C) \rightarrow 2^{P}$
+\end{lstlisting}
+
+\lstset{language=AST}
+\begin{lstlisting}[frame=single, caption={\ac{selinux} Agreement},label={lst:agreementastselinux}]
+<agreement> ::= <avRule> ';' <agreement> 
+\end{lstlisting}
+
+
+\section{Environments}
+
+Environments are collections of \emph{role-type} and \emph{user-role} relations. A role-type relation $role(R, T)$ simply associates a role with a type. A user-role relation $user(U, R)$ associates a user with a role. An environment is consistent with respect to a security context $<T, R, U>$, if and only if $role(R, T)$ and $user(U, R)$ relations hold in the environment. 
+
+\section{Queries in \ac{selinux}}
+
+The decision problem in \ac{selinux} access control is whether an entity with security context $<T1, R1, U1>$ may perform action $P1$ to entity with object class $C1$ with security context $<T2, R2, U2>$.
+
+To answer such queries we use the authorization relation \emph{auth(C, P, T1, R1, U1, T2, R2, U2)} which is equivalent to the $Permitted$ predicate we saw earlier for \ac{odrl}.
+
+\lstset{mathescape, language=AST} 
+\begin{lstlisting}[frame=single, caption={$f^{+}_q$ for \ac{selinux}},label={lst:fqplussel}]
+
+$allow (T1, T2, C, P)$ $\land$ $(E$ $consistent$ $wrt$ <T1, R1, U1> $\land$ <T2, R2, U2>) $\land$ $(((C,P)==(process, transition))$ $\implies$ $allow (R1, R2))$ $\implies auth(C, P, T1, R1, U1, T2, R2, U2)$ 
+
+\end{lstlisting}
+
+\lstset{mathescape, language=AST} 
+\begin{lstlisting}[frame=single, caption={$f^{-}_q$ for \ac{selinux}},label={lst:fqminussel}]
+
+$deny (T1, T2, C, P)$ $\lor$ $\lnot (E$ $consistent$ $wrt$ <T1, R1, U1> $\land$ <T2, R2, U2>) $\lor$ $(((C,P)==(process, transition))$ $\implies$ $deny (R1, R2))$ $\implies \lnot auth(C, P, T1, R1, U1, T2, R2, U2)$ 
+
+\end{lstlisting}
+
+\section{Decidability of Queries in \ac{selinux}}
+
+In this thesis we will be investigating the question of decidability for answering queries in \ac{selinux} policies based on the same four outcomes we encountered earlier in~\ref{sec:answerqueriesodrl} namely error, permitted, denied and ``not applicable''. We will first state a decidability theorem similar to the theorem in listing~\ref{lst:decidabilityodrl0coq} (minor adjustments may be needed to allow for differences with \ac{selinux} policy language) and present a proof for it in Coq. The literature in the \ac{selinux} implies only two outcomes are possible: permitted or denied. We will next attempt to prove this conjecture in Coq. Finally we will add constraint relations (see listing~\ref{lst:fqplusconstsel} and listing~\ref{lst:fqminusconstsel}) to \ac{selinux} policies (which we have not included so far) and prove the same decidability results again for the augmented policy.
+
+\lstset{mathescape, language=AST} 
+\begin{lstlisting}[frame=single, caption={$f^{+}_q$ for \ac{selinux}},label={lst:fqplusconstsel}]
+$allow (T1, T2, C, P)$ $\land$ $constrain (C, P, T1, R1, U1, T2, R2, U2)$ $\land$ $(E$ $consistent$ $wrt$ <T1, R1, U1> $\land$ <T2, R2, U2>) $\land$ $(((C,P)==(process, transition))$ $\implies$ $allow (R1, R2))$ $\implies auth(C, P, T1, R1, U1, T2, R2, U2)$ 
+
+\end{lstlisting}
+
+\lstset{mathescape, language=AST} 
+\begin{lstlisting}[frame=single, caption={$f^{-}_q$ for \ac{selinux}},label={lst:fqminusconstsel}]
+$deny (T1, T2, C, P)$ $\lor$ $\lnot$ $constrain (C, P, T1, R1, U1, T2, R2, U2)$ $\lor$ $\lnot (E$ $consistent$ $wrt$ <T1, R1, U1> $\land$ <T2, R2, U2>) $\lor$ $(((C,P)==(process, transition))$ $\implies$ $deny (R1, R2))$ $\implies \lnot auth(C, P, T1, R1, U1, T2, R2, U2)$ 
+
+\end{lstlisting}
