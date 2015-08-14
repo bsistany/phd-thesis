@@ -1,0 +1,79 @@
+\documentclass{beamer}
+%\input{thesis-preamble}
+\usepackage{coqdoc}
+\usepackage{color}
+\usepackage{listings,lstautogobble}
+\usepackage{etoolbox}
+\usepackage{fixltx2e}
+\usepackage{syntax}
+\usepackage{lstcoq}
+\usepackage{url}
+\usepackage{acro}
+
+\definecolor{maroon}{rgb}{0.5,0,0}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[frenchb]{babel}
+\usepackage{setspace}
+\usepackage{color}
+\usepackage{listings}
+
+\usetheme{Copenhagen}
+\title{The title of the paper}
+\author{Bahman Sistany}
+\date{\today}
+\begin{document}
+%% title frame
+\begin{frame}
+\titlepage
+\end{frame}
+
+%% normal frame 1
+\begin{frame}{First Slide}
+\begin{itemize}
+   \item Digital Rights Management (DRM):
+   \begin{itemize}
+      \item Digital management of rights associated with the access or usage of digital assets.
+   \end{itemize}
+
+   \item DRM is Concerned with Four Areas:
+     \begin{itemize}
+	\item Defining Rights
+	\item Distributing/Acquiring Rights
+	\item Enforcing Rights
+	\item Tracking Usage.
+     \end{itemize}
+\end{itemize}
+\end{frame}
+%% normal frame 2
+\begin{frame}[fragile]{Second Slide}
+\lstset{language=Coq}
+\begin{lstlisting}
+Inductive agreement : Set :=
+  | Agreement : prin -> asset -> policySet -> agreement.
+
+Definition prin := nonemptylist subject.
+
+Definition asset := nat.
+
+Definition subject := nat.
+
+Definition act := nat.
+
+Definition policyId := nat.
+
+Inductive policySet : Set :=
+  | PrimitivePolicySet : preRequisite -> policy -> policySet 
+  | PrimitiveExclusivePolicySet : preRequisite -> policy  -> policySet 
+  | AndPolicySet : nonemptylist policySet -> policySet.
+
+Inductive policy : Set :=
+  | PrimitivePolicy : preRequisite -> policyId -> act -> policy 
+  | AndPolicy : nonemptylist policy -> policy.
+
+\end{lstlisting}
+\end{frame}
+
+\end{document}
