@@ -95,7 +95,8 @@ The top level ODRL0 production is the \emph{agreement}. An agreement expresses w
 % agreement
 \lstset{language=AST}
 \begin{lstlisting}[frame=single, caption={agreement},label={lst:agreementast}]
-<agreement> ::= 'agreement' 'for' <prin> 'about' <asset> 'with' <policySet> 
+<agreement> ::= 
+     'agreement' 'for' <prin> 'about' <asset> 'with' <policySet> 
 \end{lstlisting}
 
 Principals or prins are composed of \emph{subjects} which are specified based on the application e.g. Alice, Bob, etc.

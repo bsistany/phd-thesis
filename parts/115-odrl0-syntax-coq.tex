@@ -1,5 +1,5 @@
 %======================================================================
-\chapter{ODRL0 Syntax In Coq}\label{chap:odrl0syntaxcoq}
+\chapter{YACPL Syntax In Coq}\label{chap:odrl0syntaxcoq}
 %======================================================================
 
 % ---------------------------------- COQ -----------------------
@@ -7,17 +7,17 @@
 
 Coq is known first and foremost as a proof-assistant. The underlying formal language that Coq uses is a much more expressive version of typed lambda calculus called \ac{cic} where proofs and programs can both be represented. For example, \ac{cic} adds polymorphism (terms depending on types), type operators (types depending on types) and dependent types (types depending on terms).
 
-Specifications of programs in Coq may be expressed using the specification language \emph{Gallina}~\cite{gallinaref}. Coq is then used to develop proofs to show that a program's run-time behavior satisfies its specification. Such programs are called \emph{certified} because they are formally verified and confirmed to conform to their specifications~\cite{BC04}.
+Specifications of programs in Coq may be expressed using the specification language \emph{Gallina}~\cite{gallinaref}. Coq is then used to develop proofs to show that a program's run-time behaviour satisfies its specification. Such programs are called \emph{certified} because they are formally verified and confirmed to conform to their specifications~\cite{BC04}.
 
 Assertions or propositions are statements about values in Coq such as $3<8$ or $8<3$ that may be true, false or even be only conjectures. To verify that a proposition is true a proof needs to constructed. While paper-proofs use a combination of mathematics and natural language to describe their proofs, Coq provides a formal (and therefore unambiguous) language that is based on proof-theory to develop proofs in. Verification of complex proofs is possible because one can verify the intermediate proofs or sub-goals in steps, each step being derived from the previous by following precise derivation rules. The Coq proof engine solves successive goals by using predefined \emph{tactics}. Coq tactics are commands to manipulate the local context and to decompose a goal into simpler goals or sub-goals~\cite{BC04}.
 
-\section{ODRL0 Syntax}\label{sec:agreementConstructor}
+\section{YACPL Syntax}\label{sec:agreementConstructor}
 
-ODRL0 productions were presented as high level abstract syntax in ~\ref{sec:productionast}. Below we present the corresponding encodings in Coq. 
+YACPL productions were presented as high level abstract syntax in ~\ref{sec:productionast}. Below we present the corresponding encodings in Coq. 
 
 An agreement is a new inductive type in Coq by the same name. The constructor $Agreement$ takes a $prin$, an $asset$ and a $policySet$. $prin$ is defined to be a non empty list of $subject$s (see listing~\ref{lst:agreementcoq}). 
 
-Types $asset$, $subject$, $act$ and $policyId$ are simply defined as $nat$ which is the datatype of natural numbers defined in coq's library module $Coq.Init.Datatypes$ ($nat$ is itself an inductive datatype). We use Coq constants to refer to specific objects of each type. For example, the subject 'Alice' is defined as $Definition Alice:subject := 101.$ and the act 'Play' as $Definition Play : act := 301.$. For each ``nat'' type in ODRL0 we have also used constants that play the role of ``Null'' objects (see ``Null Object Pattern''~\cite{martin1998pattern}), for example $NullSubject$. This is needed partly because of the way ODRL0 language elements are defined which corresponds to the need to use $nonemptylist$ exclusively even though at intermediate stages during the various algorithms Coq's $list$ is a better fit because it allows empty lists.
+Types $asset$, $subject$, $act$ and $policyId$ are simply defined as $nat$ which is the datatype of natural numbers defined in coq's library module $Coq.Init.Datatypes$ ($nat$ is itself an inductive datatype). We use Coq constants to refer to specific objects of each type. For example, the subject 'Alice' is defined as $Definition Alice:subject := 101.$ and the act 'Play' as $Definition Play : act := 301.$. For each ``nat'' type in YACPL we have also used constants that play the role of ``Null'' objects (see ``Null Object Pattern''~\cite{martin1998pattern}), for example $NullSubject$. This is needed partly because of the way YACPL language elements are defined which corresponds to the need to use $nonemptylist$ exclusively even though at intermediate stages during the various algorithms Coq's $list$ is a better fit because it allows empty lists.
 
 Next we define the $policySet$ datatype. Note the close/one-to-one mapping to its counterpart in listing~\ref{lst:policySetast}. There are three ways a $policySet$ can be constructed (see listing~\ref{lst:policySetast}) corresponding to three constructors: $PrimitivePolicySet$, $PrimitiveExclusivePolicySet$ and $AndPolicySet$. Both $PrimitivePolicySet$ and $PrimitiveExclusivePolicySet$ take a $preRequisite$ and a $policy$ as parameters. Finally $AndPolicySet$ takes a non empty list of $policySet$s.
 
@@ -102,4 +102,4 @@ Inductive constraint : Set :=
 \end{lstlisting}
 \end{minipage}
 
-We started with the encoding of the agreement for Mary Smith in chapter~\ref{chap:odrl0syntax}/listing~\ref{lst:marysmithagreementcoq} but we deferred the definition of the Coq constructs used to define that agreement. All the definitions needed to encode the agreement for Mary Smith except for the prerequisite $PrePay$ (which is not part of ODRL0) have now been defined. More agreement examples will be given in Chapter~\ref{chap:examples}.
+We started with the encoding of the agreement for Mary Smith in chapter~\ref{chap:odrl0syntax}/listing~\ref{lst:marysmithagreementcoq} but we deferred the definition of the Coq constructs used to define that agreement. All the definitions needed to encode the agreement for Mary Smith except for the prerequisite $PrePay$ (which is not part of YACPL) have now been defined. More agreement examples will be given in Chapter~\ref{chap:examples}.
