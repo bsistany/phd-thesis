@@ -105,36 +105,165 @@ Inductive policy : Set :=
 \end{frame}
 %% slide 5
 \begin{frame}[fragile]{ODRL and Rights Expressions: Syntax}
+\lstset{language=XML}
+\begin{lstlisting}[caption={Syntax of Policies in XML}]
+<agreement> 
+<asset> Terminator </asset> 
+	<permission>   <watch> </watch>  
+		<requirement>   
+			<payment> 5.00$ </payment>
+		</requirement> 
+	</permission> 
+<party> Anyone </party>
+</agreement>
+\end{lstlisting}
 \end{frame}
 %% slide 6
 \begin{frame}[fragile]{ODRL and Rights Expressions: Semantics}
+\Large
+\begin{itemize}
+\item Formal Methods ensure a System behaves wrt the Specification of Desired Property
+\item The Specification of Desired Behavior is called the Semantics of the System
+\item Precise and Formal Semantics are needed to make Reasoning about the system Properties possible
+\item Current RELs use Natural Language (e.g. English) for Semantics
+   \begin{itemize}
+    \item Which doesn`t help with Analysis and Reasoning because policies are Ambiguous and Open to Interpretation
+    \end{itemize}    
+\end{itemize}
 \end{frame}
 %% slide 7
 \begin{frame}[fragile]{ODRL and Rights Expressions: Formal Semantics}
+\LARGE
+\begin{itemize}
+\item Several approaches to Formalizing the Semantics of RELs and ODRL:
+   \begin{itemize}
+      \item Logic Based
+      \item Finite Automata
+      \item Operational Semantics and Interpreter based
+      \item Web Ontology
+    \end{itemize}
+\item We are not surprisingly interested in Logic Based approach
+\end{itemize}
 \end{frame}
 %% slide 8
 \begin{frame}[fragile]{A Formal Foundation for ODRL: \newline Riccardo Pucella and Vicky Weissman}
+\Large
+\begin{itemize}
+\item Semantics of ODRL is described in English
+   \begin{itemize}
+      \item Example: Alice owns two Printers but wants to allow Bob to Use the Printers as well. 
+      \item Alice writes the agreement as ``Bob may use printer One or Two''
+      \item Alice chooses Printer One Since Agreement doesn?t say she CANNOT
+      \item Bob also chooses Printer One Since Agreement Implies he Could
+      \item Alice and Bob clearly understand the meaning of the Agreement differently
+      \item Such Agreements are Possible to write in ODRL and the English specifications of ODRL does NOT address the ambiguity
+    \end{itemize}
+
+\item Weissman and Pucella proposed a Formal Semantics for a representative subset of ODRL
+\item Based on Many-Sorted-Logic
+\item They used their Semantics to Determine Precisely when an Agreement Implies a Permission
+\item They Also Showed that Answering Such Questions is Decidable but NP-Hard.
+\item Finally They Identify A Problematic Construct in ORDL and Show that without it the Decision Problem can be Answered Efficiently
+
+\end{itemize}
 \end{frame}
 %% slide 9
 \begin{frame}[fragile]{Paper-Proofs}
+\begin{itemize}
+\item Pucella et al. use their defined semantics to Declare and Prove some Important Theorems about their ODRL subset
+\begin{itemize}
+\item Their Focus being on stating and proving algorithm Complexity results
+\end{itemize}
+\item However As with many Paper-Proofs, the Language used to do the proofs while Mathematical in nature, uses many Intuitive Justifications to show the proofs
+\item As a Result the Proofs are Hard to Verify and to ?derive? (or reproduce)
+\begin{itemize}
+\item Furthermore the proofs CANNOT be used Directly to render a Decision on a sample Policy (allow or deny access to an asset)
+\item Although One Can Carefully Construct Programs based on these paper-proofs, there is no way to Certify these Programs Even Assuming the Original Proofs were indeed Correct
+\end{itemize}
+\item We Need Machine-Checked Proofs
+\end{itemize}
 \end{frame}
 %% slide 10
 \begin{frame}[fragile]{ODRL0}
+\begin{itemize}
+\item Started with encoding and representing Pucella et al?s ODRL subset Including their Semantics in Coq
+\item Reduced and modified by Allowing only One Kind of Environmental Fact (e.g. Counts)
+   \begin{itemize}
+      \item The other two Facts are NOT particularly interesting in terms of provability 
+   \end{itemize}
+\item Made other changes in the Grammar to accommodate Coq?s requirement for Clearly Terminating Recursion
+    \begin{itemize}
+        \item ForEachMember is a direct PreRequisite
+        \item As Opposed to being a Constraint (which is a PreRequisite)
+    \end{itemize}
+\item This is what we had called ODRL0 at Proposal time
+\end{itemize}
 \end{frame}
 %% slide 11
 \begin{frame}[fragile]{Coq: Why Coq?}
+\small
+\begin{itemize}
+\item Coq is known first and foremost as a proof-assistant.
+\item Coq uses a much more expressive version of typed lambda calculus called CIC (Calculus of Inductive Constructions) as its logical foundation
+    \begin{itemize}
+       \item Where proofs and programs can both be represented.
+       \item CIC adds polymorphism (terms depending on types), type operators (types depending on types) and dependent types (types depending on terms).
+       \item Assertions or propositions are statements about values in Coq such as `3<8` or `8<3` that may be true, false or even be only conjectures. 
+       \item Only those propositions are considered to be true, which are provable constructively, i.e., by providing an explicit proof term, that inhabits them.
+       \item Verification of complex proofs is possible because one can verify the intermediate proofs or sub-goals in steps, each step being derived from the previous by following precise derivation rules. 
+       \item The Coq proof engine solves successive goals by using tactics. Coq tactics are commands to manipulate the local context and to decompose a goal into simpler goals or sub-goals
+   \end{itemize}
+\end{itemize}
 \end{frame}
 %% slide 12
 \begin{frame}[fragile]{Queries}
+\begin{itemize}
+\item Policy Statements describing an Agreement are used to Enforce those Agreements 
+\item To Enforce Policy, Access Queries are asked from the Policy Engine
+    \begin{itemize}
+       \item Access is Granted or Denied based on the Answer.
+       \item A Query encodes the Question of Whether a set of Agreements Imply that a subject may Perform an Action on an Asset given an Environment.
+     \end{itemize}
+\item Answering Queries in Pucella et al?s ODRL subset are Decidable
+\item We set out to develop a proof in Coq on whether Answering Queries in ODRL0 was also Decidable
+\item The idea was to use Pucella et al`s decidablity Algorithm to Answer Queries
+\end{itemize}
 \end{frame}
 %% slide 13
 \begin{frame}[fragile]{Closed World Assumption: CWA}
+\begin{itemize}
+\item We certainly expected we had to modify ODRL0 as presented at the Proposal -- to arrive at Decidability results in Coq
+\item However the modifications were thought to be minor
+\item ODRL0 even though a subset of Pucella et al`s ODRL in minor ways, maintained the central semantic definitions
+\item Including ``Closed World Assumptions'' where the semantics only specify explicitly Permitted and ~Permitted answers
+\item Therefore the semantics as stated by Pucella et al. are not Complete
+\item Major modifications had to be done to repair the Semantics of ODRL0 and consequently to Pucella et al`s ODRL to make the proofs possible
+\item We will therefore refer to the resulting language as ``(Yet Another) Core Policy Language''  --YACPL and not ODRL0 
+\end{itemize}
 \end{frame}
 %% slide 14
 \begin{frame}[fragile]{ACPL: A Core Policy Language}
+\small
+\begin{itemize}
+\item DRM can be seen as a Domain Specific Access-Control Mechanism
+    \begin{itemize}
+       \item ODRL vs XACML
+   \end{itemize}
+\item We Can Attempt to use ACPL as the Basis for a Core Policy Language suitable for both DRM and general-purpose Access-Control
+\item Lesson Learned: Design of Certifiable Policy languages cannot be done in isolation
+\item Certifiability/Provability of the language derives the design one way while expressiveness requirements of the language usually drive it in an opposite direction
+\item Certifiability/Provability cannot be a post-design activity as the changes it will impose are often fundamental changes
+\end{itemize}
 \end{frame}
 %% slide 15
-\begin{frame}[fragile]{Defining Rights}
+\begin{frame}[fragile]{Conclusion}
+\Large
+\begin{itemize}
+\item A Core Policy Language Potentially Suitable for both DRM and general purpose Access-Control systems with 
+\item Formal Semantics 
+\item Where Answering a Query is Certifiably Decidable
+\item Executable Programs can be Extracted from the Proof and used to Answer Queries for specific Policies.
+\end{itemize}
 \end{frame}
 %% slide 16
 \begin{frame}[fragile]{Defining Rights}
