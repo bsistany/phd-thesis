@@ -496,3 +496,81 @@ Fixpoint trans_count
   running_total < n.
 \end{lstlisting}
 \end{minipage}
+
+\section{Decision Procedures}
+\label{sec:decisionProcs}  
+
+
+\lstset{language=Coq, frame=single, caption={Translation of count TEMP},label={lst:transcountCoq123}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+
+Theorem double_neg_constraint:
+ forall (e:environment)(x:subject)
+ (const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
+  (trans_constraint e x const IDs prin_u) ->
+   ~~(trans_constraint e x const IDs prin_u).
+Proof.
+intros e x const IDs prin_u.
+intros H. unfold not. intros H'. apply H'. exact H. Qed.
+
+Theorem trans_negation_constraint_dec :
+forall (e:environment)(x:subject)
+(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
+     {~trans_constraint e x const IDs prin_u} + 
+     {~~trans_constraint e x const IDs prin_u}.
+
+Proof.
+intros e x const IDs prin_u.
+pose (j:= trans_constraint_dec e x const IDs prin_u). 
+destruct j. apply double_neg_constraint in t. right. exact t. left. exact n. Defined.
+
+Theorem trans_notCons_dec :
+forall (e:environment)(x:subject)
+(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
+   {trans_notCons e x const IDs prin_u} + 
+   {~ trans_notCons e x const IDs prin_u}.
+Proof.
+intros e x const IDs prin_u. 
+unfold trans_notCons. apply trans_negation_constraint_dec. Defined.
+  
+Theorem trans_preRequisite_dec :
+  forall (e:environment)(x:subject)
+    (prq:preRequisite)(IDs:nonemptylist policyId)(prin_u:prin),
+       {trans_preRequisite e x prq IDs prin_u} +
+       {~ trans_preRequisite e x prq IDs prin_u}.
+Proof.
+intros e x prq IDs prin_u.
+induction prq.
+simpl. auto.
+simpl. apply trans_constraint_dec.
+simpl. apply trans_notCons_dec.
+simpl. auto.
+simpl. auto.
+simpl. auto.
+Qed. 
+
+
+Theorem subject_in_prin_dec :
+    forall (a:subject) (l:prin), {is_subject_in_prin a l} + {~ is_subject_in_prin a l}.
+
+Proof.
+induction l as [| a0 l IHl].
+apply eq_nat_dec.
+destruct (eq_nat_dec a0 a); simpl; auto.
+destruct IHl; simpl; auto.
+right; unfold not; intros [Hc1| Hc2]; auto.
+Defined.
+
+
+Theorem trans_prin_dec :
+   forall (x:subject)(p: prin),
+     {trans_prin x p} + {~trans_prin x p}.
+
+Proof.
+
+apply subject_in_prin_dec.
+Defined.
+\end{lstlisting}
+%\end{minipage}
+
