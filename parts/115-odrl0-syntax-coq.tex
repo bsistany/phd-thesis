@@ -27,7 +27,7 @@ The data type $nonemptylist$ reflects the definition of ``policy conjunction'' i
 
 \lstset{language=Coq}
 \begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Coq Version of Agreement},label={lst:agreementcoq}]
+\begin{lstlisting}[frame=single, caption={ODRL0: Coq Version of Agreement},label={lst:agreementcoq}]
 Inductive agreement : Set :=
   | Agreement : prin -> asset -> policySet -> agreement.
 
@@ -53,6 +53,43 @@ Inductive policy : Set :=
 \end{lstlisting}
 \end{minipage}
 
+\lstset{language=Coq}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={ACPL: Coq Version of Agreement},label={lst:agreementcoqACPL}]
+Inductive agreement : Set :=
+  | Agreement : prin -> asset -> policySet -> agreement.
+
+Definition prin := nonemptylist subject.
+
+Definition asset := nat.
+
+Definition subject := nat.
+
+Definition act := nat.
+
+Definition policyId := nat.
+
+Inductive primPolicy : Set :=
+  | PrimitivePolicy : preRequisite -> policyId -> act -> primPolicy.
+
+Inductive policy : Set :=
+  | Policy : nonemptylist primPolicy -> policy.
+
+Inductive primInclusivePolicySet : Set :=
+  | PrimitiveInclusivePolicySet : preRequisite -> policy -> primInclusivePolicySet.
+
+Inductive primExclusivePolicySet : Set :=
+  | PrimitiveExclusivePolicySet : preRequisite -> policy  -> primExclusivePolicySet.
+
+Inductive primPolicySet : Set :=
+  | PIPS : primInclusivePolicySet -> primPolicySet
+  | PEPS : primExclusivePolicySet -> primPolicySet.
+
+Inductive policySet : Set :=
+  | PPS : primPolicySet -> policySet.
+
+\end{lstlisting}
+\end{minipage}
 
 
 \lstset{language=Coq, frame=single, caption={nonemptylist},label={lst:nonemptylistcoq}}
@@ -87,7 +124,6 @@ Principal constraint takes a $prin$ to match. For example, the constraint of the
 Inductive preRequisite : Set :=
   | TruePrq : preRequisite
   | Constraint : constraint -> preRequisite 
-  | ForEachMember : prin  -> nonemptylist constraint -> preRequisite
   | NotCons : constraint -> preRequisite 
   | AndPrqs : nonemptylist preRequisite -> preRequisite
   | OrPrqs : nonemptylist preRequisite -> preRequisite
