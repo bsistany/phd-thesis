@@ -19,8 +19,19 @@
 \usepackage{color}
 \usepackage{listings}
 
+\lstdefinelanguage{AST}
+{
+  basicstyle=\ttfamily,
+  breaklines=true,
+  morekeywords={
+    agreement, prin, asset, subject, policySet, policy, act, policyId, preRequisite 
+  }
+  tabsize=1,
+}
+
+
 \usetheme{Copenhagen}
-\title{The title of the paper}
+\title{YACPL: Yet Another Core Policy Language}
 \author{Bahman Sistany}
 \date{\today}
 \setbeamertemplate{frametitle}[default][center]
@@ -33,7 +44,7 @@
 \end{frame}
 
 %% normal frame 1
-\begin{frame}{First Slide}
+\begin{frame}{DRM}
 \begin{itemize}
    \item Digital Rights Management (DRM):
    \begin{itemize}
@@ -48,34 +59,6 @@
 	\item Tracking Usage.
      \end{itemize}
 \end{itemize}
-\end{frame}
-%% normal frame 2
-\begin{frame}[fragile]{Second Slide}
-\lstset{language=Coq}
-\begin{lstlisting}
-Inductive agreement : Set :=
-  | Agreement : prin -> asset -> policySet -> agreement.
-
-Definition prin := nonemptylist subject.
-
-Definition asset := nat.
-
-Definition subject := nat.
-
-Definition act := nat.
-
-Definition policyId := nat.
-
-Inductive policySet : Set :=
-  | PrimitivePolicySet : preRequisite -> policy -> policySet 
-  | PrimitiveExclusivePolicySet : preRequisite -> policy  -> policySet 
-  | AndPolicySet : nonemptylist policySet -> policySet.
-
-Inductive policy : Set :=
-  | PrimitivePolicy : preRequisite -> policyId -> act -> policy 
-  | AndPolicy : nonemptylist policy -> policy.
-
-\end{lstlisting}
 \end{frame}
 %% slide 3
 \begin{frame}[fragile]{Defining Rights}
@@ -142,7 +125,7 @@ Inductive policy : Set :=
       \item Operational Semantics and Interpreter based
       \item Web Ontology
     \end{itemize}
-\item We are not surprisingly interested in Logic Based approach
+\item Not surprisingly we are interested in the Logic Based approach
 \end{itemize}
 \end{frame}
 %% slide 8
@@ -153,7 +136,7 @@ Inductive policy : Set :=
    \begin{itemize}
       \item Example: Alice owns two Printers but wants to allow Bob to Use the Printers as well. 
       \item Alice writes the agreement as ``Bob may use printer One or Two''
-      \item Alice chooses Printer One Since Agreement doesn?t say she CANNOT
+      \item Alice chooses Printer One Since Agreement doesn`t say she CANNOT
       \item Bob also chooses Printer One Since Agreement Implies he Could
       \item Alice and Bob clearly understand the meaning of the Agreement differently
       \item Such Agreements are Possible to write in ODRL and the English specifications of ODRL does NOT address the ambiguity
@@ -175,31 +158,15 @@ Inductive policy : Set :=
 \item Their Focus being on stating and proving algorithm Complexity results
 \end{itemize}
 \item However As with many Paper-Proofs, the Language used to do the proofs while Mathematical in nature, uses many Intuitive Justifications to show the proofs
-\item As a Result the Proofs are Hard to Verify and to ?derive? (or reproduce)
+\item As a Result the Proofs are Hard to Verify and to ``derive'' (or reproduce)
 \begin{itemize}
 \item Furthermore the proofs CANNOT be used Directly to render a Decision on a sample Policy (allow or deny access to an asset)
-\item Although One Can Carefully Construct Programs based on these paper-proofs, there is no way to Certify these Programs Even Assuming the Original Proofs were indeed Correct
+\item Although one can Carefully construct programs based on these paper-proofs, there is no way to Certify these programs even assuming the Original Proofs were indeed Correct
 \end{itemize}
 \item We Need Machine-Checked Proofs
 \end{itemize}
 \end{frame}
 %% slide 10
-\begin{frame}[fragile]{ODRL0}
-\begin{itemize}
-\item Started with encoding and representing Pucella et al?s ODRL subset Including their Semantics in Coq
-\item Reduced and modified by Allowing only One Kind of Environmental Fact (e.g. Counts)
-   \begin{itemize}
-      \item The other two Facts are NOT particularly interesting in terms of provability 
-   \end{itemize}
-\item Made other changes in the Grammar to accommodate Coq?s requirement for Clearly Terminating Recursion
-    \begin{itemize}
-        \item ForEachMember is a direct PreRequisite
-        \item As Opposed to being a Constraint (which is a PreRequisite)
-    \end{itemize}
-\item This is what we had called ODRL0 at Proposal time
-\end{itemize}
-\end{frame}
-%% slide 11
 \begin{frame}[fragile]{Coq: Why Coq?}
 \small
 \begin{itemize}
@@ -215,6 +182,35 @@ Inductive policy : Set :=
    \end{itemize}
 \end{itemize}
 \end{frame}
+%% slide 10.5
+\begin{frame}[fragile]{Coq: Why Coq? The Real Reasons :-)}
+\Large
+\begin{itemize}
+\item Familiarity with Coq 
+\item A very active community and the Coq mailing lists
+\item A wealth of information on Coq such as tutorials and several books, meant that:
+   \begin{itemize}
+       \item Coq was quite suitable or formal program verification
+       \item And in particular for developing Certified Policies and Policy Languages
+   \end{itemize}
+\end{itemize}
+\end{frame}
+%% slide 11
+\begin{frame}[fragile]{ODRL0}
+\begin{itemize}
+\item Started with encoding and representing Pucella et al`s ODRL subset Including their Semantics in Coq
+\item Reduced and modified by Allowing only one kind of Environmental Fact (e.g. Counts)
+   \begin{itemize}
+      \item The other two Facts are similar to Counts and don`t add anything significant or interesting in terms of provability 
+   \end{itemize}
+\item Made other changes in the Grammar to accommodate Coq`s requirement for Clearly Terminating Recursion
+    \begin{itemize}
+        \item ForEachMember is a direct PreRequisite
+        \item As Opposed to being a Constraint (which is a PreRequisite)
+    \end{itemize}
+\item This is what we had called ODRL0 at Proposal time
+\end{itemize}
+\end{frame}
 %% slide 12
 \begin{frame}[fragile]{Queries}
 \begin{itemize}
@@ -224,7 +220,7 @@ Inductive policy : Set :=
        \item Access is Granted or Denied based on the Answer.
        \item A Query encodes the Question of Whether a set of Agreements Imply that a subject may Perform an Action on an Asset given an Environment.
      \end{itemize}
-\item Answering Queries in Pucella et al?s ODRL subset are Decidable
+\item Answering Queries in Pucella et al`s ODRL subset are Decidable
 \item We set out to develop a proof in Coq on whether Answering Queries in ODRL0 was also Decidable
 \item The idea was to use Pucella et al`s decidablity Algorithm to Answer Queries
 \end{itemize}
@@ -255,7 +251,221 @@ Inductive policy : Set :=
 \item Certifiability/Provability cannot be a post-design activity as the changes it will impose are often fundamental changes
 \end{itemize}
 \end{frame}
-%% slide 15
+% slide 15
+\begin{frame}[fragile]{ODRL0 Syntax}
+\lstset{language=Coq}
+\begin{lstlisting}
+Inductive agreement : Set :=
+  | Agreement : prin -> asset -> policySet -> agreement.
+
+Inductive policySet : Set :=
+  | PrimitivePolicySet : preRequisite -> policy -> policySet 
+  | PrimitiveExclusivePolicySet : preRequisite -> policy  -> policySet 
+  | AndPolicySet : nonemptylist policySet -> policySet.
+
+Inductive policy : Set :=
+  | PrimitivePolicy : preRequisite -> policyId -> act -> policy 
+  | AndPolicy : nonemptylist policy -> policy.
+
+\end{lstlisting}
+\end{frame}
+% slide 16
+\begin{frame}[fragile]{ODRL0 Semantics: trans\_ps}
+\lstset{language=Coq}
+\begin{lstlisting}
+
+    match ps with
+    | PrimitivePolicySet prq p => 
+          forall x, (((trans_prin x prin_u) /\ 
+                  (trans_preRequisite e x prq (getId p) prin_u)) -> 
+                              (trans_policy_positive e x p prin_u a))  
+    | PrimitiveExclusivePolicySet prq p => 
+          forall x, ((((trans_prin x prin_u) /\ 
+                  (trans_preRequisite e x prq (getId p) prin_u)) -> 
+                           (trans_policy_positive e x p prin_u a)) /\ ((not (trans_prin x prin_u)) -> 
+                              (trans_policy_negative e x p a)))                  
+    | AndPolicySet ps_list => 
+    end.
+\end{lstlisting}
+\end{frame}
+% slide 17
+\begin{frame}[fragile]{ODRL0 Semantics: trans\_policy\_positive}
+\lstset{language=Coq}
+\begin{lstlisting}
+
+  match p with
+    | PrimitivePolicy prq policyId action => ((trans_preRequisite e x prq (Single policyId) prin_u) ->
+                                              (Permitted x action a))
+    | AndPolicy p_list => 
+  end.
+\end{lstlisting}
+\end{frame}
+
+% slide 18
+\begin{frame}[fragile]{ODRL0 Semantics: trans\_policy\_negative}
+\lstset{language=Coq}
+\begin{lstlisting}
+match p with
+    | PrimitivePolicy prq policyId action => not (Permitted x action a)
+    | AndPolicy p_list => 
+  end.
+\end{lstlisting}
+\end{frame}
+% slide 19
+\begin{frame}[fragile]{YACPL Syntax (1)}
+\lstset{language=Coq}
+\begin{lstlisting}
+Inductive agreement : Set :=
+  | Agreement : prin -> asset -> policySet -> agreement.
+
+Inductive primPolicy : Set :=
+  | PrimitivePolicy : preRequisite -> policyId -> act -> primPolicy.
+
+Inductive policy : Set :=
+  | Policy : nonemptylist primPolicy -> policy.
+\end{lstlisting}
+\end{frame}
+% slide 20
+\begin{frame}[fragile]{YACPL Syntax (2)}
+\lstset{language=Coq}
+\begin{lstlisting}
+Inductive primInclusivePolicySet : Set :=
+  | PrimitiveInclusivePolicySet : preRequisite -> policy -> primInclusivePolicySet.
+
+Inductive primExclusivePolicySet : Set :=
+  | PrimitiveExclusivePolicySet : preRequisite -> policy  -> primExclusivePolicySet.
+
+Inductive primPolicySet : Set :=
+  | PIPS : primInclusivePolicySet -> primPolicySet
+  | PEPS : primExclusivePolicySet -> primPolicySet.
+
+Inductive policySet : Set :=
+  | PPS : primPolicySet -> policySet.
+
+\end{lstlisting}
+\end{frame}
+
+% slide 21
+\begin{frame}[fragile]{YACPL Semantics: trans\_ps (1)}
+\lstset{language=Coq}
+\begin{lstlisting}
+if (eq_nat_dec asset_from_query a)
+then (* asset_from_query = a *)  
+    match ps with
+      | PPS pps => process_single_ps pps
+    end
+else (* asset_from_query <> a *)
+       (Single 
+          (makeResult 
+             Unregulated subject_from_query action_from_query asset_from_query)).
+
+\end{lstlisting}
+\end{frame}
+% slide 22
+\begin{frame}[fragile]{YACPL Semantics: trans\_ps (2)}
+\lstset{language=Coq}
+\begin{lstlisting}
+
+ match pps with 
+    | PIPS pips => 
+        match pips with 
+          | PrimitiveInclusivePolicySet prq p => 
+            (trans_policy_PIPS e prq p subject_from_query prin_u a action_from_query)                
+        end
+    | PEPS peps => 
+        match peps with 
+          | PrimitiveExclusivePolicySet prq p => 
+            (trans_policy_PEPS e prq p subject_from_query prin_u a action_from_query)
+        end  
+   end
+\end{lstlisting}
+\end{frame}
+% slide 23
+\begin{frame}[fragile]{YACPL Semantics: trans\_policy\_PIPS}
+\lstset{language=Coq}
+\begin{lstlisting}
+if (trans_prin_dec x prin_u)
+    then (* prin *)
+      if (trans_preRequisite_dec e x prq (getId p) prin_u)
+      then (* prin /\ prq *)
+        (trans_policy_positive e x p prin_u a action_from_query)                           
+      else (* prin /\ ~prq *)
+        (trans_policy_unregulated e x p a action_from_query)
+    else (* ~prin *)
+      (trans_policy_unregulated e x p a action_from_query).
+
+\end{lstlisting}
+\end{frame}
+
+% slide 24
+\begin{frame}[fragile]{YACPL Semantics: trans\_policy\_PEPS}
+\lstset{language=Coq}
+\begin{lstlisting}
+  if (trans_prin_dec x prin_u)
+  then (* prin *)
+    if (trans_preRequisite_dec e x prq (getId p) prin_u)
+    then (* prin /\ prq *)
+      (trans_policy_positive e x p prin_u a action_from_query)
+    else (* prin /\ ~prq *)
+      (trans_policy_unregulated e x p a action_from_query)
+  else (* ~prin *)
+    (trans_policy_negative e x p a action_from_query).
+
+\end{lstlisting}
+\end{frame}
+
+% slide 25
+\begin{frame}[fragile]{ODRL0 Semantics: trans\_policy\_positive}
+\lstset{language=Coq}
+\begin{lstlisting}
+match pp with
+    | PrimitivePolicy prq' policyId action =>
+        if (trans_preRequisite_dec e x prq' (Single policyId) prin_u)
+        then (* prin /\ prq /\ prq' *)
+          if (eq_nat_dec action_from_query action)
+          then
+            (Single 
+              (makeResult Permitted x action_from_query a))
+          else
+            (Single 
+              (makeResult Unregulated x action_from_query a))
+               else (* prin /\ prq /\ ~prq' *)
+          (Single 
+              (makeResult Unregulated x action_from_query a))
+      end.
+\end{lstlisting}
+\end{frame}
+% slide 26
+\begin{frame}[fragile]{ODRL0 Semantics: trans\_policy\_negative}
+\lstset{language=Coq}
+\begin{lstlisting}
+match pp with
+    | PrimitivePolicy prq' policyId action =>
+ 
+          if (eq_nat_dec action_from_query action)
+          then
+            (Single 
+              (makeResult NotPermitted x action_from_query a))
+          else
+            (Single 
+              (makeResult Unregulated x action_from_query a))
+
+  end.
+
+\end{lstlisting}
+\end{frame}
+% slide 27
+\begin{frame}[fragile]{ODRL0 Semantics: trans\_policy\_unregulated}
+\lstset{language=Coq}
+\begin{lstlisting}
+match pp with
+    | PrimitivePolicy prq' policyId action =>
+        (Single (makeResult Unregulated x action_from_query a))
+  end.
+\end{lstlisting}
+\end{frame}
+
+%% slide 25
 \begin{frame}[fragile]{Conclusion}
 \Large
 \begin{itemize}
