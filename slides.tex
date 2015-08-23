@@ -344,8 +344,46 @@ Inductive policySet : Set :=
 
 \end{lstlisting}
 \end{frame}
-
 % slide 21
+\begin{frame}[fragile]{Decision Procedures and the sumbool type}
+\lstset{language=Coq}
+\begin{lstlisting}
+Inductive sumbool (A B:Prop) : Set :=
+  | left : A -> {A} + {B}
+  | right : B -> {A} + {B}
+ where "{ A } + { B }" := (sumbool A B) : type_scope.
+\end{lstlisting}
+\begin{itemize}
+\item sumbool is a boolean type equipped with the justification of their value, which really helps with proofs
+\item Like bool and other 2-constructor inductive types, one can use the ``if then else'' construct to select the case. 
+\item See ahead the trans\_policy\_PIPS slide and others for an example of how ``if then else'' is used
+\item trans\_prin\_dec has been defined as below and proven in the source code
+\end{itemize}
+\lstset{language=Coq}
+\begin{lstlisting}
+Theorem trans_prin_dec : 
+    forall (x:subject)(p: prin), {trans_prin x p} + {~trans_prin x p}.
+\end{lstlisting}
+\end{frame}
+% slide 22
+\begin{frame}[fragile]{answer and result types}
+\Large
+\lstset{language=Coq}
+\begin{lstlisting}
+
+Inductive answer : Set :=
+  | Permitted : answer
+  | Unregulated : answer
+  | NotPermitted : answer.
+
+
+
+Inductive result : Set :=
+  | Result : answer -> subject -> act -> asset -> result.
+\end{lstlisting}
+\end{frame}
+
+% slide 23
 \begin{frame}[fragile]{YACPL Semantics: trans\_ps (1)}
 \lstset{language=Coq}
 \begin{lstlisting}
@@ -361,7 +399,7 @@ else (* asset_from_query <> a *)
 
 \end{lstlisting}
 \end{frame}
-% slide 22
+% slide 24
 \begin{frame}[fragile]{YACPL Semantics: trans\_ps (2)}
 \lstset{language=Coq}
 \begin{lstlisting}
@@ -380,7 +418,7 @@ else (* asset_from_query <> a *)
    end
 \end{lstlisting}
 \end{frame}
-% slide 23
+% slide 25
 \begin{frame}[fragile]{YACPL Semantics: trans\_policy\_PIPS}
 \lstset{language=Coq}
 \begin{lstlisting}
@@ -397,7 +435,7 @@ if (trans_prin_dec x prin_u)
 \end{lstlisting}
 \end{frame}
 
-% slide 24
+% slide 26
 \begin{frame}[fragile]{YACPL Semantics: trans\_policy\_PEPS}
 \lstset{language=Coq}
 \begin{lstlisting}
@@ -414,8 +452,8 @@ if (trans_prin_dec x prin_u)
 \end{lstlisting}
 \end{frame}
 
-% slide 25
-\begin{frame}[fragile]{ODRL0 Semantics: trans\_policy\_positive}
+% slide 27
+\begin{frame}[fragile]{YACPL Semantics: trans\_policy\_positive}
 \lstset{language=Coq}
 \begin{lstlisting}
 match pp with
@@ -435,8 +473,8 @@ match pp with
       end.
 \end{lstlisting}
 \end{frame}
-% slide 26
-\begin{frame}[fragile]{ODRL0 Semantics: trans\_policy\_negative}
+% slide 28
+\begin{frame}[fragile]{YACPL Semantics: trans\_policy\_negative}
 \lstset{language=Coq}
 \begin{lstlisting}
 match pp with
@@ -454,8 +492,8 @@ match pp with
 
 \end{lstlisting}
 \end{frame}
-% slide 27
-\begin{frame}[fragile]{ODRL0 Semantics: trans\_policy\_unregulated}
+% slide 29
+\begin{frame}[fragile]{YACPL Semantics: trans\_policy\_unregulated}
 \lstset{language=Coq}
 \begin{lstlisting}
 match pp with
@@ -464,8 +502,7 @@ match pp with
   end.
 \end{lstlisting}
 \end{frame}
-
-%% slide 25
+%% slide 35
 \begin{frame}[fragile]{Conclusion}
 \Large
 \begin{itemize}
