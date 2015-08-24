@@ -502,7 +502,93 @@ match pp with
   end.
 \end{lstlisting}
 \end{frame}
-%% slide 35
+% slide 30
+\begin{frame}[fragile]{Policy Languages}
+\begin{itemize}
+\item In general a policy language is a tuple $L = (P, Q, G, N, \left\langle\left\langle . \right\rangle\right\rangle)$ where
+    \begin{itemize}
+        \item P is a set of policies
+        \item Q is a set of requests or queries
+        \item G is the granting decisions
+         \item N is the non-granting decisions
+         \item $\left\langle\left\langle . \right\rangle\right\rangle$ is a function taking a policy $p \in P$ to a relation between Q and $G \cup N$ where $G \cap N = \emptyset$
+               \begin{itemize}
+                    \item Let $D$ represent $G \cup N$ 
+                    \item Policy $p$ assigns a decision of $d \in D$ to the query $q \in Q$
+                \end{itemize}
+          \item $L$ also defines a partial order on decisions such that $d < d'$ if either $d, d' \in N$ or $d, d' \in G$ or $d \in N$ and $d' \in G$, so for example $NotPermitted < Permitted$ in YACPL
+    \end{itemize}
+\end{itemize}
+\end{frame}
+% slide 31
+\begin{frame}[fragile]{Common Features to Policy Languages}
+\begin{itemize}
+\item A policy language must provide a way to express a query
+\item In general, a query is made up of four distinct parts:
+   \begin{itemize}
+       \item Subject: performs actions
+       \item Object: actions are performed on objects
+       \item Action: specific actions that a subject may perform on an object
+       \item Environments: any relevant information such as time of day, location or some history of the previous actions, or in the case of ODRL0 and YACPL the Count of how many times each principal has used a policy to perform an action
+       \end{itemize}
+\end{itemize}
+\end{frame}
+
+% slide 32
+\begin{frame}[fragile]{Decisions}
+\begin{itemize}
+\item In general a policy language must provide decisions to indicate whether a request is granted or denied
+\item Some languages only provide two: a $permit$ and a $deny$ 
+\item However in this case whenever a request cannot be granted, a default $deny$ is returned as decision (to err on the side of safety)
+\item This will include cases where neither $permit$ or $deny$ really applies
+\item This strategy makes difficult the composition of policies where policies` don`t care becomes a $deny$. 
+\item Some languages therefore include a explicit ``Don`t Care'' or ``Unregulated'' decision (this is the case for YACPL) 
+\end{itemize}
+\end{frame}
+% slide 33
+\begin{frame}[fragile]{Policy Combinators: Composing policies or Primitive Policies}
+\begin{itemize}
+\item Some languages such as YACPL provide a single combinator (Conjunction of Policies)
+\item While others may have multiple combinators.
+\item Some languages such as ODRL and ODRL0 have nested policies and sub-policies in which case a different combinator may be applied at each different layer
+\item In YACPL, we use a variation on the `ALL SEEN` combinator where a set containing all decisions reached by all policies are returned
+     \begin{itemize}
+         \item Since we prove that `Permit' and `Deny' are mutually exclusive in YACPL, we take the existence of a single `Permit' or `Deny' to make the decision for that query a `Permit' or `Deny'
+         \item If no `Permit' or `Deny' is seen in the set of decisions that are returned, this means that the decision is `Unregulated'
+     \end{itemize}
+\end{itemize}
+\end{frame}
+% slide 34
+\begin{frame}[fragile]{Main Decidability Theorem Proved}
+
+\lstset{language=Coq}
+\begin{lstlisting}
+Theorem trans_agreement_dec:
+  forall (e:environment)(ag:agreement)(action_from_query:act)
+   (subject_from_query:subject)(asset_from_query:asset),
+   
+ (isResultInQueryResult
+    (Result Permitted subject_from_query action_from_query asset_from_query) (trans_agreement)
+\/
+ (isResultInQueryResult
+    (Result NotPermitted subject_from_query action_from_query asset_from_query) (trans_agreement)
+\/
+ (isResultInQueryResult
+    (Result Unregulated subject_from_query action_from_query asset_from_query) (trans_agreement)
+\end{lstlisting}
+\end{frame}
+% slide 35
+\begin{frame}[fragile]{Other Theorems proved}
+\Large
+\begin{itemize}
+\item $(Permitted) \implies  \neg (NotPermitted) $
+\item $(NotPermitted) \implies  \neg (Permitted) $
+\item $(\neg Permitted \land \neg NotPermitted) \implies Unregulated$
+\item $\neg (Permitted \land NotPermitted)$
+\end{itemize}
+\end{frame}
+
+% slide 40
 \begin{frame}[fragile]{Conclusion}
 \Large
 \begin{itemize}
@@ -513,36 +599,15 @@ match pp with
 \item You can access the source code at https://github.com/bsistany/yacpl.git
 \end{itemize}
 \end{frame}
-%% slide 16
-\begin{frame}[fragile]{Defining Rights}
+
+
+% slide 41
+\begin{frame}[fragile]{Q/A and Thank You!}
+\Large
+\begin{itemize}
+\item Questions?
+\end{itemize}
 \end{frame}
-%% slide 17
-\begin{frame}[fragile]{Defining Rights}
-\end{frame}
-%% slide 18
-\begin{frame}[fragile]{Defining Rights}
-\end{frame}
-%% slide 19
-\begin{frame}[fragile]{Defining Rights}
-\end{frame}
-%% slide 20
-\begin{frame}[fragile]{Defining Rights}
-\end{frame}
-%% slide 21
-\begin{frame}[fragile]{Conclusion}
-\end{frame}
-%% slide 22
-\begin{frame}[fragile]{Questions?}
-\end{frame}
-
-
-
-
-
-
-
-
-
 
 
 
