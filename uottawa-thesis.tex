@@ -57,12 +57,57 @@
 %
 % 2) change the value assigned below to the boolean variable
 % "PrintVersion" from "false" to "true".
+\newcommand{\Title}{A Certified Core Policy Language}
+\newcommand{\Author}{Bahman Sistany}
+% Acknowledgements (small sentence)
+\newcommand{\SmallAcknowledgements}[1]{
+    %\vspace*{5.4cm}                             % Skip some vertical space
+    \begin{flushright}{#1}\end{flushright}      % Text right justified
+
+    \thispagestyle{empty}                       % Disable the page number for this page only
+    \newpage                                    % Add a new page
+}
+
+% Title page
+\newcommand{\CoverPage}{
+
+    \begin{titlepage}
+    \begin{center}
+
+        \vfill
+        \begin{LARGE}\textbf{{\Title}}\end{LARGE}
+
+        \vfill
+        \begin{large}{\Author}\end{large}
+
+        \vfill
+        Thesis submitted to the Faculty of Graduate and Postdoctoral Studies \\
+        In partial fulfillment of the requirements for the degree of Doctor of Philosophy in \\
+        Computer Science
+
+        \vfill
+        Ottawa-Carleton Institute for Computer Science \\
+        School of Information Technology and Engineering \\
+        University of Ottawa, \\
+        Ottawa, Canada
+
+        \vfill
+        \textcopyright~\Author, Ottawa, Canada, \the\year
+    \end{center}
+    \end{titlepage}
+
+
+    \newpage                                    % Add a new page
+
+    %\SectionStylePre
+}
 
 % --------------------- Start of Document Preamble -----------------------
 
 % Specify the document class, default style attributes, and page dimensions
 % For hyperlinked PDF, suitable for viewing on a computer, use this:
 \documentclass[letterpaper,12pt,titlepage,oneside,final]{book}
+
  
 % For PDF, suitable for double-sided printing, change the PrintVersion variable below
 % to "true" and use this \documentclass line instead of the one above:
@@ -102,21 +147,28 @@
 %----------------------------------------------------------------------
 %
 % C O V E R  P A G E
-% ------------------
-\newcommand{\thesisauthor}{Bahman Sistany}
-\newcommand{\thesisadvisor}{Amy Felty}
-\newcommand{\thesistitlecoverpage}{%
-  A Certified Core Policy Language
+\CoverPage
+
+\SmallAcknowledgements{
+Acknowledgements that\\
+appear on the right.
 }
-\newcommand{\degree}{Ph.D.} % possible values are:
-                            
-\newcommand{\nameofprogram}{Computer Science}
-\newcommand{\academicunit}{School of Electrical Engineering and Computer Science}
-\newcommand{\faculty}{Faculty of Engineering}
-\newcommand{\graduationyear}{2015}
+
+% ------------------
+%\newcommand{\thesisauthor}{Bahman Sistany}
+%\newcommand{\thesisadvisor}{Amy Felty}
+%\newcommand{\thesistitlecoverpage}{%
+%  A Certified Core Policy Language
+%}
+%\newcommand{\degree}{Ph.D.} % possible values are:
+%                            
+%\newcommand{\nameofprogram}{Computer Science}
+%\newcommand{\academicunit}{School of Electrical Engineering and Computer Science}
+%\newcommand{\faculty}{Faculty of Engineering}
+%\newcommand{\graduationyear}{2015}
 %
 
-\input{private/00-frontpage}
+%\input{private/00-frontpage}
 %
 %
 % R E S T  O F  F R O N T  P A G E S
