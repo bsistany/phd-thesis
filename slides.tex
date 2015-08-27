@@ -1,4 +1,6 @@
 \documentclass{beamer}
+\usepackage{beamerthemesplit}
+
 \usepackage{coqdoc}
 \usepackage{color}
 \usepackage{listings,lstautogobble}
@@ -19,6 +21,10 @@
 \usepackage{color}
 \usepackage{listings}
 
+%\usepackage{hyperref}
+%\hypersetup{pdfpagemode=FullScreen}
+%\hypersetup{pdfstartview={Fit}}
+
 \lstdefinelanguage{AST}
 {
   basicstyle=\ttfamily,
@@ -31,6 +37,7 @@
 
 
 \usetheme{Copenhagen}
+
 \title{YACPL: Yet Another Core Policy Language}
 \author{Bahman Sistany}
 \date{\today}
@@ -50,7 +57,6 @@
    \begin{itemize}
       \item Digital management of rights associated with the access or usage of digital assets.
    \end{itemize}
-
    \item DRM is Concerned with Four Areas:
      \begin{itemize}
 	\item Defining Rights
@@ -62,7 +68,6 @@
 \end{frame}
 %% slide 3
 \begin{frame}[fragile]{Defining Rights}
-%% \tiny \small \normalsize \large \Large \LARGE \huge \Huge
 \LARGE
 \begin{itemize}
 \item Rights Expressions
