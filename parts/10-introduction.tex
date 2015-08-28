@@ -2,6 +2,13 @@
 \chapter{Introduction}
 %======================================================================
 
+\section{A Core Policy Language for Access-Control} 
+
+Does there exist a suitable policy language that can be used both for expressing general access-control and digital rights expressions? How about \ac{xacml}, \ac{odrl}~\cite{odrloneone} or \ac{xrml}~\cite{Wang}? All are well known, full-blown and custom languages that suffer from a lack of formal semantics. Furthermore all of these languages cover much more than policy expressions leading to access decisions; they also address enforcement of the policies (\ac{odrl} and \ac{xrml} specifically and \ac{drm} in general distinguish themselves from general access-control languages by additionally addressing enforcement of policies beyond where the policies were generated. The term usage-control (UCON) is used to describe this aspect of \ac{rel}s). A third reason that made these custom languages unsuitable as a core policy language was the fact that they are limited in terms of what can be built on top of them; for example expressing hierarchical role-based access-control  in \ac{xacml} requires a fairly complex encoding~\cite{Tschantz}.
+
+A policy language that was based on some sort of logic with formal semantics and also one that was minimal and extendible was clearly needed. We started by looking at Lithium and subsequently Pucella's subset of \ac{odrl}  as potential core languages. 
+
+
 \section{Digital Rights} 
 
 \ac{drm} refers to the digital management of rights associated with the access or usage of digital assets. There are various aspects of rights management however. According to the authors of the white paper ``A digital rights management ecosystem model for the education community,''(~\cite{collier})
@@ -11,7 +18,7 @@
 
 \ac{rel}s, or more precisely \ac{drel}s when dealing with digital assets deal with the ``rights definition'' aspect of the \ac{drm} ecosystem. A \ac{drel}, allows the expression and definition of digital asset usage rights such that other areas of the \ac{drm} ecosystem, namely the enforcement mechanism and the usage tracking components can function correctly.
 
-Currently the most popular \ac{rel}s are the \ac{xrml}\cite{Wang}, and the \ac{odrl}~\cite{odrloneone}. Both of these languages are XML based and are considered declarative languages. \ac{xrml} has been selected to be the REL for \emph{MPEG-21} which is an ISO standard for multimedia applications. \ac{odrl} is also a standards based \ac{rel} which has been accepted as part of the W3C community with the mandate of standardizing how rights and policies, related to the usage of digital content on the Open Web Platform, \emph{OWP}~\cite{openwebplatform}, are expressed. \ac{odrl} 2.0 supports expression of rights and also privacy rules for social media while \ac{odrl} 1.0 was only dealing with the mobile ecosystem -- \ac{odrl} 1.0 was adopted by the Open Mobile Alliance, \emph{OMA} in 2000.
+Currently the most popular \ac{rel}s are the \ac{xrml}, and the \ac{odrl}. Both of these languages are XML based and are considered declarative languages. \ac{xrml} has been selected to be the REL for \emph{MPEG-21} which is an ISO standard for multimedia applications. \ac{odrl} is also a standards based \ac{rel} which has been accepted as part of the W3C community with the mandate of standardizing how rights and policies, related to the usage of digital content on the Open Web Platform, \emph{OWP}~\cite{openwebplatform}, are expressed. \ac{odrl} 2.0 supports expression of rights and also privacy rules for social media while \ac{odrl} 1.0 was only dealing with the mobile ecosystem -- \ac{odrl} 1.0 was adopted by the Open Mobile Alliance, \emph{OMA} in 2000.
 
 As popular as both \ac{xrml} and \ac{odrl} are, their adoption and usage is still somewhat limited in practice. Both Apple and Microsoft for example have defined their own lightweight \ac{rel}s~\cite{problemwithrels} in \emph{Fair Play}~\cite{fairplay} and in \emph{PlayReady}~\cite{playready}. The authors of~\cite{problemwithrels} argue that both these \ac{rel}s (\ac{xrml} and \ac{odrl}) and others are simply too complex to be used effectively (for expressing rights) since they also try to cover much of the the enforcement and tracking aspects of \ac{drm}s.
 
