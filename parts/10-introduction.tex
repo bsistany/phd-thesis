@@ -6,7 +6,7 @@
 
 Does there exist a suitable policy language that can be used both for expressing general access-control and digital rights expressions? How about \ac{xacml}, \ac{odrl}~\cite{odrloneone} or \ac{xrml}~\cite{Wang}? All are well known, full-blown and custom languages that suffer from a lack of formal semantics. Furthermore all of these languages cover much more than policy expressions leading to access decisions; they also address enforcement of the policies (\ac{odrl} and \ac{xrml} specifically and \ac{drm} in general distinguish themselves from general access-control languages by additionally addressing enforcement of policies beyond where the policies were generated. The term usage-control (UCON) is used to describe this aspect of \ac{rel}s). A third reason that made these custom languages unsuitable as a core policy language was the fact that they are limited in terms of what can be built on top of them; for example expressing hierarchical role-based access-control  in \ac{xacml} requires a fairly complex encoding~\cite{Tschantz}.
 
-A policy language that was based on some sort of logic with formal semantics and also one that was minimal and extendible was clearly needed. We started by looking at Lithium and subsequently Pucella's subset of \ac{odrl}  as potential core languages. 
+A policy language that was based on some sort of logic with formal semantics and also one that was minimal and extendible was clearly needed. We started by looking at Lithium~\cite{Halpern2008} and subsequently Pucella et al`s subset of \ac{odrl}~\cite{pucella2006} as potential core languages. 
 
 
 \section{Digital Rights} 
