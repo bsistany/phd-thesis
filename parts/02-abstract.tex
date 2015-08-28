@@ -3,13 +3,9 @@
 
 \begin{center}\textbf{Abstract}\end{center}
 
+We present a \ac{ACCPL} that can be used to express access-control rules in a minimal way. Full-blown access-control policy languages such as \ac{xacml} already exist however because access rules in such languages are often expressed in a declarative manner using fragments of a natural language like English, it isn't always clear what the intended behaviour of the system encoded in the access rules should be. To remedy this ambiguity, formal specification of how an access-control mechanism should behave is typically given in some sort of logic, often a subset of first order logic. To show that an access-control system actually behaves correctly with respect to its specification, proofs are needed, however the proofs that are often presented in the literature are hard or impossible to formally verify. The verification difficulty is partly due to the fact that the language used to do the proofs while mathematical in nature, utilizes intuitive justifications to derive the proofs. 
 
-Digital asset usage rights are expressed and defined using \ac{rel}s. A rule in such languages expresses the access rights of users when accessing a resource. However because of the fact that access rules are expressed using fragments of a natural language like English, it isn't always clear what the intended behavior of the system encoded in the access rules should be. Even when the behavior is formally specified, typically using a subset of predicate logic, proofs that certain properties of the system hold, are hard to formally verify. The verification difficulty is partly due to the fact that the language used to do the proofs while mathematical in nature, utilizes intuitive justifications to derive the proofs. 
-
-In this research, the Coq proof assistant is used to encode and model the behavior of a \ac{rel} called \ac{odrl}. Decidablity criteria are expressed and proofs are developed in Coq for a subset of \ac{odrl}. Programs will then be extracted from the proofs that can be used directly to render a decision on a sample policy (e.g. whether to allow or deny access to an asset). 
-
-The \ac{odrl} encodings and the formal behavior model will be adapted and used to investigate whether decidablity results hold for a policy language of a different class, namely \ac{selinux} policy language, which is a fine-grained access-control policy language.
-
+In this thesis, we describe the design and implementation of \ac{ACCPL} in Coq. The Coq proof assistant is used to encode and model the behaviour of \ac{ACCPL}. We will use certain properties described in~\cite{Tschantz} to study how amenable to analysis and reasoning \ac{ACCPL} policies are with respect to other access-control policy languages and how the design choices that were made contributed to this ease of reasoning. In particular decidability criteria for \ac{ACCPL} are expressed and proofs are developed in Coq for \ac{ACCPL}.
 
 \cleardoublepage
 %\newpage
