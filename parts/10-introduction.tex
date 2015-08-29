@@ -8,6 +8,30 @@ Does there exist a suitable policy language that can be used both for expressing
 
 A policy language that was based on some sort of logic with formal semantics and also one that was minimal and extendible was clearly needed. We started by looking at Lithium~\cite{Halpern2008} and subsequently Pucella et al`s subset of \ac{odrl}~\cite{pucella2006} as potential core languages. 
 
+\section{Access-Control Models~\cite{nist}}
+Authorization refers to the process of rendering a decision to allow access to a resource or asset of interest. By the same token all unauthorized access requests to resources must be controlled and ultimately denied, hence the term ``access-control''. 
+
+Various access-control models exist and below we give a short summary of some of the most important ones leading up to our own core language, \ac{ACCPL}.
+
+\subsection{~\ac{acl}}
+
+Access Control Lists are perhaps the oldest and the most basic access-control model. A list of subjects along with their rights are kept per resource or object of interest. Every time a subject makes an access request on an object, the \ac{acl} of the object is consulted and access is either granted or denied to the requester based on whether the use is listed in the \ac{acl} and has the correct set of rights.
+
+\subsection{Capabilities}
+Capabilities based access-control works based on a list of objects and some associated rights. The list of objects and the associated rights comprise an ``unforgeable'' ticket that a reference monitor checks to allow access (or not). Capabilities based systems don't need to authenticate users as \ac{acl} based systems do.
+
+\subsection{\ac{rbac}}
+
+In \ac{rbac} systems a requester`s role determines whether access is granted to denied. In this model users belong to roles and rights are associated with roles so no direct association between users and rights exist. Roles are meant to group users and add flexibility when assigning rights. \ac{rbac} systems naturally solve the problem of assigning \ac{acl}`s for a large group of users and manage the administration cost of changing users' rights in \ac{acl} based systems.
+
+\subsection{\ac{abac}}
+
+Despite many advantages of \ac{rbac} systems, some disadvantages also exist. Often a role needs to be decomposed into sub-roles based on the type of resource to be administered, and perhaps also based on the location that the resource serves~\cite{nist}. Basically \ac{rbac} suffers from a lack of a sub-typing mechanism whereby individual members of a group/role may be differentiated and access is granted or denied based on a more granular set of attributes. \ac{abac} model was proposed to fulfill this granularity requirement. In \ac{abac} access control decisions are made based on a set of attributes, associated with the subject making the request, the environment, and/or the resource itself~\cite{nist}. 
+
+\subsection{\ac{pbac}}
+In order to harmonize access control in large environments with many subjects and objects and disparate attributes, \ac{pbac} model has been proposed~\cite{nist}. \ac{pbac} allows for a more uniform access-control model across the system. \ac{pbac} systems help create and enforce policies
+that define who should have access to what resources, and under what circumstances~\cite{nist}.
+There is also a need for large organizations to put in place mechanisms such that access-control rules can be easily audited. This calls for a data-driven approach to access-control where the data, in this case the access-control rules, is available to read and analyze.
 
 \section{Digital Rights} 
 
