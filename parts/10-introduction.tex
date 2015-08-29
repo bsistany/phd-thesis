@@ -4,7 +4,7 @@
 
 \section{A Core Policy Language for Access-Control} 
 
-Does there exist a suitable policy language that can be used both for expressing general access-control and digital rights expressions? How about \ac{xacml}, \ac{odrl}~\cite{odrloneone} or \ac{xrml}~\cite{Wang}? All are well known, full-blown and custom languages that suffer from a lack of formal semantics. Furthermore all of these languages cover much more than policy expressions leading to access decisions; they also address enforcement of the policies (\ac{odrl} and \ac{xrml} specifically and \ac{drm} in general distinguish themselves from general access-control languages by additionally addressing enforcement of policies beyond where the policies were generated. The term usage-control (UCON) is used to describe this aspect of \ac{rel}s). A third reason that made these custom languages unsuitable as a core policy language was the fact that they are limited in terms of what can be built on top of them; for example expressing hierarchical role-based access-control  in \ac{xacml} requires a fairly complex encoding~\cite{Tschantz}.
+Does there exist a suitable policy language that can be used both for expressing general access-control and digital rights expressions? How about \ac{xacml}, \ac{odrl}~\cite{odrloneone} or \ac{xrml}~\cite{Wang}? All are well known, full-blown and custom languages that suffer from a lack of formal semantics. Furthermore all of these languages cover much more than policy expressions leading to access decisions; they also address enforcement of the policies (\ac{odrl} and \ac{xrml} specifically and \ac{drm} in general distinguish themselves from general access-control languages by additionally addressing enforcement of policies beyond where the policies were generated. The term usage-control (UCON) is used to describe this aspect of \ac{rel}). A third reason that made these custom languages unsuitable as a core policy language was the fact that they are limited in terms of what can be built on top of them; for example expressing hierarchical role-based access-control  in \ac{xacml} requires a fairly complex encoding~\cite{Tschantz}.
 
 A policy language that was based on some sort of logic with formal semantics and also one that was minimal and extendible was clearly needed. We started by looking at Lithium~\cite{Halpern2008} and subsequently Pucella et al`s subset of \ac{odrl}~\cite{pucella2006} as potential core languages. 
 
@@ -13,16 +13,16 @@ Authorization refers to the process of rendering a decision to allow access to a
 
 Various access-control models exist and below we give a short summary of some of the most important ones leading up to our own core language, \ac{ACCPL}.
 
-\subsection{~\ac{acl}}
+\subsection{Access Control Lists}
 
-Access Control Lists are perhaps the oldest and the most basic access-control model. A list of subjects along with their rights are kept per resource or object of interest. Every time a subject makes an access request on an object, the \ac{acl} of the object is consulted and access is either granted or denied to the requester based on whether the use is listed in the \ac{acl} and has the correct set of rights.
+\ac{acl} is perhaps the oldest and the most basic access-control model. A list of subjects along with their rights are kept per resource or object of interest. Every time a subject makes an access request on an object, the \ac{acl} of the object is consulted and access is either granted or denied to the requester based on whether the requester is listed in the \ac{acl} and has the correct set of rights.
 
 \subsection{Capabilities}
-Capabilities based access-control works based on a list of objects and some associated rights. The list of objects and the associated rights comprise an ``unforgeable'' ticket that a reference monitor checks to allow access (or not). Capabilities based systems don't need to authenticate users as \ac{acl} based systems do.
+Capabilities based access-control works based on a list of objects and associated rights. The list of objects and the associated rights comprise an ``unforgeable'' ticket that a reference monitor checks to allow access (or not). Capabilities based systems don't need to authenticate users as \ac{acl} based systems do.
 
-\subsection{\ac{rbac}}
+\subsection{RBAC}
 
-In \ac{rbac} systems a requester`s role determines whether access is granted to denied. In this model users belong to roles and rights are associated with roles so no direct association between users and rights exist. Roles are meant to group users and add flexibility when assigning rights. \ac{rbac} systems naturally solve the problem of assigning \ac{acl}`s for a large group of users and manage the administration cost of changing users' rights in \ac{acl} based systems.
+In \ac*{rbac} systems a requester`s role determines whether access is granted or denied. In this model users belong to roles and rights are associated with roles so no direct association between users and rights exist. Roles are meant to group users and add flexibility when assigning rights. \ac{rbac} systems naturally solve the problem of assigning \ac{acl}s for a large group of users and manage the administration cost of changing users' rights in \ac{acl} based systems.
 
 \subsection{\ac{abac}}
 
