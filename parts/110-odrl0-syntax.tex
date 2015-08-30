@@ -1,11 +1,11 @@
 %======================================================================
-\chapter{ODRL0 Syntax}
+\chapter{ACCPL Syntax}
 \label{chap:odrl0syntax}
 %======================================================================
 
 \section{Introduction}
 
-Authors of~\cite{pucella2006} use abstract syntax instead of XML (ODRL 2.0 can also be encoded in \emph{JSON} and \emph{RDF/OWL Ontology}) to express statements in the \ac{odrl} language. Abstract syntax is a more compact representation than XML in which \ac{odrl} policies may be written in and furthermore abstract syntax simplifies specifying the semantics as we shall see later. As an example the agreement ``If Mary Smith pays five dollars, then she is allowed to print the eBook 'Treasure Island' twice and she is allowed to display it on her computer as many times as she likes'' written in \ac{odrl}'s XML encoding is illustrated in Listing~\ref{lst:agreementxml}~\cite{pucella2006}. 
+We follow the style of~\cite{pucella2006} by using abstract syntax to express policy statements in \ac{ACCPL}. Abstract syntax is a more compact representation than XML which is what all the XML-based policy languages such \ac{odrl} use. Furthermore abstract syntax simplifies specifying the semantics as we shall see later. As an example the agreement ``If Mary Smith pays five dollars, then she is allowed to print the eBook 'Treasure Island' twice and she is allowed to display it on her computer as many times as she likes'' written in \ac{odrl}'s XML encoding is illustrated in Listing~\ref{lst:agreementxml}~\cite{pucella2006}. 
 
 
 \lstset{language=XML}
@@ -46,51 +46,19 @@ agreement
 
 
 % \emph{prin\textsubscript{u}}
-In the following we will cover the \emph{abstract syntax} of a subset of ODRL that we later express using Coq's constructs such as \emph{Inductive Types} and Definitions. We will call this subset \emph{ODRL0} both because it is a variation of Pucella's ODRL language and also because it is missing some constructs from Pucella's ODRL (and hence from ODRL proper). 
+In the following we will cover the \emph{abstract syntax} of \ac{ACCPL} that we later express using Coq's constructs such as \emph{Inductive Types} and Definitions. 
 
-\section{ODRL0}\label{sec:odrl0}
-In ODRL0, agreements and facts (i.e. environments) will only contain the number of times each policy has been used to justify an action. In ODRL0 agreements and facts will not contain: \begin{enumerate}
-  \item Which payments have been made
-  \item Which acknowledgments have been made
-\end{enumerate} 
+\section{Environmental Facts}\label{sec:odrl0}
+In \ac{ACCPL}, agreements and facts (i.e. environments) will refer to a count of how many times each policy should be and has been used to justify an action. This is the only fact that \ac{ACCPL} will cover although we conjecture adding other facts and the machinery to support those facts should not change verification goals and results so far of \ac{ACCPL}.
 
-This means \emph{Paid} and \emph{Attributed} predicates are not used in ODRL0. Also removed are related constructs \emph{prepay} and \emph{attribution}. We also had to remove two other constructs based on $prepay$ and $attribution$ out of ODRL0 in \emph{inSeq} and \emph{anySeq}. $prepay$, $attribution$, $inSeq$ and $anySeq$ make up what is called \emph{requirements} in ODRL.
+In \ac{ACCPL} a \emph{prerequisite} is either $true$, a $constraint$, the negative of a $constraint$ or a conjunction of $prerequisite$s. $true$ is the prerequisite that always holds. Constraints are facts that are outside of control of users. For example, there is nothing $Alice$ can do to satisfy the constraint ``user must be Bob''. 
 
-In ODRL a \emph{prerequisite} is either $true$, a $constraint$, a $requirement$ or a $condition$. $true$ is the prerequisite that always holds. Constraints are facts that are outside of control of users. For example, there is nothing $Alice$ can do to satisfy the constraint ``user must be Bob''. Requirements are facts that are in users' control~\cite{pucella2006}. For example, $Alice$ may satisfy the requirement ``The user must pay 5 dollars''. Finally conditions are constraints that must not hold. The listing~\ref{lst:agreementpucella2006}'s Coq version is illustrated in listing~\ref{lst:marysmithagreementcoq}. Note that the constructs used in listing~\ref{lst:marysmithagreementcoq} will be defined later in chapter~\ref{chap:odrl0syntaxcoq}.
+We will describe \ac{ACCPL} in a \emph{BNF} grammar that looks more like Pucella and Weissman`s subset grammar~\cite{pucella2006}. BNF style grammars are more abstract as they only give suggestions about the surface syntax of expressions without getting into lexical analysis and parsing related aspects such as precedence order of operators~\cite{piercesf2011}. The Coq version in contrast is more formal and could be directly used for building compilers and interpreters. We will present both the BNF version and the Coq version for each construct of \ac{ACCPL}. 
 
-
-\lstset{language=Coq}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Coq Version of Agreement for Mary Smith},label={lst:marysmithagreementcoq}]
-
-Agreement (Single MarySmith) Treasure Island 
- (PrimitivePolicySet (Constraint (PrePay 5.00))
-  (AndPolicy 
-   (NewList (PrimitivePolicy (Constraint 
-                              (Principal 
-                               (Single MarysComputer))) id1 Display)
-   (Single (PrimitivePolicy (Constraint (Count 2)) id2 Print))))).
-\end{lstlisting}
-\end{minipage}
-
-
-
-In ODRL0, a prerequisite is either $true$, a $constraint$, or the negation of a $constraint$. So we have removed requirements from the picture and don't have explicit conditions. Conditions are replaced by a category called $NotCons$ directly in the production for prerequisites (see listing~\ref{lst:preRequisiteast}). Note that we have also removed the condition $not[policySet]$ from ODRL since the authors in~\cite{pucella2006} have shown the semantics of this component are not well-defined and including it leads to intractability results.
-
-We will add the missing pieces as described above making up what we will call \emph{ODRL1} and perhaps \emph{ODRL2} (the latter only if needed). We will also describe ODRL0 in a \emph{BNF} grammar that looks more like Pucella's ODRL grammar~\cite{pucella2006}. BNF style grammars are less formal as they give some suggestions about the surface syntax of expressions without getting into lexical analysis and parsing related aspects such as precedence order of operators~\cite{piercesf2011}. The Coq version in contrast is more formal and could be directly used for building compilers and interpreters. We will present both the BNF version and the Coq version for each construct of ODRL0. 
-
-%\coqdoceol
-%\coqdocvar{Agreement} (\coqdocvar{Single} \coqdocvar{Mary Smith}) \coqdocvar{Treasure Island} (\coqdocvar{PrimitivePolicySet} (\coqdocvar{Constraint} (\coqdocvar{PrePay} 5.00))\coqdoceol
-%\coqdocindent{0.50em}
-%(\coqdocvar{AndPolicy} (\coqdocvar{NewList} (\coqdocvar{PrimitivePolicy} (\coqdocvar{Constraint} (\coqdocvar{Principal} (\coqdocvar{Single} \coqdocvar{Mary's Computer}))) \coqdocvar{id1} \coqdocvar{Display})\coqdoceol
-%\coqdocindent{6.00em}
-%(\coqdocvar{Single} (\coqdocvar{PrimitivePolicy} (\coqdocvar{Constraint} (\coqdocvar{Count} 2)) \coqdocvar{id2} \coqdocvar{Print}))))).\coqdoceol
-%\coqdocemptyline
-%\coqdocemptyline
 
 \section{Productions} \label{sec:productionast}
 
-The top level ODRL0 production is the \emph{agreement}. An agreement expresses what actions a set of subjects may perform on an object and under what conditions. Syntactically an agreement is composed of a set of subjects/users called a \emph{principal} or \emph{prin}, an \emph{asset} and a \emph{policySet}.
+The top level \ac{ACCPL} production is the \emph{agreement}. An agreement expresses what actions a set of subjects may perform on an object and under what conditions. Syntactically an agreement is composed of a set of subjects/users called a \emph{principal} or \emph{prin}, an \emph{asset} and a \emph{policySet}.
 
 % agreement
 \lstset{language=AST}
@@ -113,7 +81,7 @@ Principals or prins are composed of \emph{subjects} which are specified based on
 <subject> ::= N
 \end{lstlisting}
 
-Assets are also application specific but similar to subjects we will use specific ones for the DRM application (taken from \cite{pucella2006}). \emph{ebook}, \emph{The Report} and \emph{latestJingle} are examples of specific subjects we will be using throughout. Syntactically an asset is represented as a natural number (\emph{N}). Similarly for subjects.
+Assets are also application specific but similar to subjects we will continue using specific ones for the \ac{drm} application (taken from~\cite{pucella2006}). \emph{ebook}, \emph{The Report} and \emph{latestJingle} are examples of specific subjects we will be using throughout. Syntactically an asset is represented as a natural number (\emph{N}). Similarly for subjects.
 
 % asset
 \lstset{mathescape, language=AST}  
@@ -121,7 +89,7 @@ Assets are also application specific but similar to subjects we will use specifi
 <asset> ::= N
 \end{lstlisting}
 
-Agreements include policy sets. Each policy set specifies a \emph{prerequisite} and a \emph{policy}. In general if the prerequisite holds the policy is taken into consideration. Otherwise the policy will not be looked at. Some policy sets are specified as \emph{exclusive}. The \emph{Primitive Exclusive Policy Sets} are exclusive to agreement's users in that only those users may perform the actions specified in the policy set. The implication is that all other users who are not specified in the agreement's principal (prin) are forbidden from performing the specified actions. Finally policy sets could be grouped together in a \emph{conjunction} allowing a single agreement to be associated with many policy sets. 
+Agreements express who may perform an action on an asset. They include a set of subjects (i.e. a $prin$), an asset and a policy set. A policy set is a primitive policy set implying non-nested policy sets. Note that we could define various combining operators for policy sets such as conjunctions and disjunctions but we keep \ac{ACCPL}'s policy sets limited to the primitive kind but use a policy combining operator when it comes to dealing with policies later on. Each primitive policy set specifies a \emph{prerequisite} and a \emph{policy}. In general if the prerequisite ``holds'' the policy is taken into consideration. Otherwise the policy will not be looked at. Some primitive policy sets are specified as \emph{inclusive} as opposed to others that are explicitly specified as \emph{exclusive}. The \emph{Primitive Exclusive Policy Set}s are exclusive to agreement's users in that only those users may perform the actions specified in the policy set. The implication is that all other users who are not specified in the agreement's principal (prin) are forbidden from performing the specified actions, no matter whether the $prerequisite$ holds or not. Not surprisingly we also define \emph{Primitive Inclusive Policy Set}s that don`t enforce any exclusivity to the agreement's users.
 
 
 % policySet
@@ -129,20 +97,48 @@ Agreements include policy sets. Each policy set specifies a \emph{prerequisite} 
 \lstset{mathescape, language=AST, escapechar=\&}  
 \begin{lstlisting}[frame=single, caption={policySet},label={lst:policySetast}]
 <policySet> ::=  
-	<preRequisite> $\rightarrow$ <policy>	&\Comment{; primitive policy set }&
-	<preRequisite> $\mapsto$ <policy>		&\Comment{; primitive exclusive policy set }&
-	'and'[ <policySet$_{1}$>, ..., <policySet$_{m}$> ]	&\Comment{; conjunction }&
+   <primPolicySet>	&\Comment{; primitive policy set }&
 \end{lstlisting}
 
-A policy specifies an action to be performed on an asset, depending of whether the policy's prerequisite holds or not. If the prerequisite holds the agreement's user is permitted to perform the action on the agreement's asset; otherwise permission is denied. Similar to policy sets, policies could also be grouped together in a conjunction. The policy also includes a unique identifier. The policy identifier is added to help the translation (from agreements to formulas) but is optional in ODRL proper.
+% primitive policySet
+\lstset{mathescape, language=AST, escapechar=\&}  
+\begin{lstlisting}[frame=single, caption={primPolicySet},label={lst:primPolicySetast}]
+<primPolicySet> ::=  
+   <primInclusivePolicySet>	&\Comment{; primitive inclusive policy set }&
+   <primExclusivePolicySet>	&\Comment{; primitive exclusive policy set }&
+\end{lstlisting}
+
+% primInclusivePolicySet
+\lstset{mathescape, language=AST, escapechar=\&}  
+\begin{lstlisting}[frame=single, caption={primInclusivePolicySet},label={lst:primInclusivePolicySetast}]
+<primInclusivePolicySet> ::=  
+   <preRequisite> $\rightarrow$ <policy>	&\Comment{; primitive inclusive policy set }&
+\end{lstlisting}
+
+% primExclusivePolicySet
+\lstset{mathescape, language=AST, escapechar=\&}  
+\begin{lstlisting}[frame=single, caption={primExclusivePolicySet},label={lst:primExclusivePolicySetast}]
+<primExclusivePolicySet> ::=  
+   <preRequisite> $\mapsto$ <policy>	&\Comment{; primitive exclusive policy set }&
+\end{lstlisting}
+
+A primitive policy specifies an action to be performed on an asset, depending of whether the policy's prerequisite holds or not. If the prerequisite holds the agreement's user is permitted to perform the action on the agreement's asset; otherwise permission is denied. Pucella and Weissman`s subset of \ac{odrl}~\cite{pucella2006} specify a unique identifier for each policy to help the translation (from agreements to formulas). \ac{ACCPL} has maintained the identifier for future work and we include it here in our definition of the policy construct however as far as the proofs are concerned the policy identifier could be removed without a loss to the obtained results. Primitive policies could also be grouped together using the conjunction combining operator.
 
 % policy
 
 \lstset{mathescape, language=AST, escapechar=\&}  
 \begin{lstlisting}[frame=single, caption={policy},label={lst:policyast}]
 <policy> ::=  
-	<preRequisite> $\Rightarrow_{<policyId>}$ <act> &\Comment{; primitive policy}&
-	'and'[ <policy$_{1}$>, ..., <policy$_{m}$> ] &\Comment{; conjunction }&
+ 'and'[ <primPolicy$_{1}$>, ..., 
+                 <primPolicy$_{m}$> ]	&\Comment{; conjunction }&
+\end{lstlisting}
+
+% primitive policy
+
+\lstset{mathescape, language=AST, escapechar=\&}  
+\begin{lstlisting}[frame=single, caption={primPolicy},label={lst:primPolicyast}]
+<primPolicy> ::=  
+   <preRequisite> $\Rightarrow_{<policyId>}$ <act> 	&\Comment{; primitive policy}&
 \end{lstlisting}
 
 An \emph{Action} (\emph{act}) is represented as a natural number. Similar to assets and subjects, actions are application specific. Some example actions taken from \cite{pucella2006} are \emph{Display} and \emph{Print}.
@@ -161,7 +157,7 @@ A \emph{Policy Id} (\emph{policyId}) is a unique identifier specified as (increa
 <policyId> ::= N
 \end{lstlisting}
 
-In ODRL0 a \emph{prerequisite} is either true or it is a \emph{constraint}. The \emph{true} prerequisite always holds. A constraint is an intrinsic part of a policy and cannot be influenced by agreement's user. Minimum height requirements for popular attractions and rides are examples of we would consider a constraint. The constraint \emph{ForEachMember} is interesting in its expressive power but has complicated semantics as we shall see in the~\ref{chap:semantics} chapter. Roughly speaking, ForEachMember takes a prin (a list of subjects) and a list $L$ of constraints. The ForEachConstraint holds if each subject in prin satisfies each constraint in $L$.\emph{NotCons} is a negation of a constraint. The set of prerequisites are closed under conjunction (\emph{AndPrqs}), disjunction (\emph{OrPrqs}) and exclusive disjunction (\emph{XorPrqs}).
+In \ac{ACCPL} a \emph{prerequisite} is either true or it is a \emph{constraint}. The \emph{true} prerequisite always holds. A constraint is an intrinsic part of a policy and cannot be influenced by agreement's user. Minimum height requirements for popular attractions and rides are examples of what we would consider a constraint. \emph{NotCons} is a negation of a constraint. Finally the set of prerequisites are closed under conjunction operator (\emph{AndPrqs}).
 
 % prq
 
@@ -170,11 +166,8 @@ In ODRL0 a \emph{prerequisite} is either true or it is a \emph{constraint}. The 
 <preRequisite> ::=  
 	'True' &\Comment{; always true}&
 	<constraint>	 &\Comment{; constraint}&
-	'ForEachMember' [<prin> ; <constraint$_{1}$>, ..., <constraint$_{m}$> ]	&\Comment{; constraint distribution}&
 	'not' [ <constraint> ] &\Comment{; suspending constraint}&
 	'and'[ <preRequisite$_{1}$>, ..., <preRequisite$_{m}$> ] &\Comment{; conjunction }&
-	'or'[ <preRequisite$_{1}$>, ..., <preRequisite$_{m}$> ] &\Comment{; disjunction}&
-	'xor'[ <preRequisite$_{1}$>, ..., <preRequisite$_{m}$> ] &\Comment{; exclusive disjunction}&
 \end{lstlisting}
 
 Constraints are either \emph{Principal}, \emph{Count} or \emph{CountByPrin}. Principal constraints basically require matching to specified prins. For example, the user being Alice is a Principal constraint. A count constraint refers to a set of policies \emph{P} and specifies the number of times the user of an agreement has invoked the policies in P to justify her actions. If the count constraint is part of a policy then the set P is composed of the single policy. In the case that the count constraint is part of a policy set, the set P is the set of policies specified in the policy set.
