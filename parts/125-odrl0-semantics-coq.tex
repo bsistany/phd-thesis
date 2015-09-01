@@ -8,9 +8,9 @@
 \label{sec:envConsistentP}  
 
 % COQ
-The translation functions plus the auxiliary types and infrastructure which implement the semantics have been encoded in Coq. Translation functions build Coq terms of type $Prop$. Well-formed propositions (or $Prop$s) are assertions one can express about values such as mathematical objects or even programs (e.g. 3 < 8) in Coq. 
+The translation functions plus the auxiliary types and infrastructure which implement the semantics for \ac{ACCPL} have been encoded in Coq. Translation functions build Coq terms of type $Prop$ for the most part. Well-formed propositions (or $Prop$s) are assertions one can express about values such as mathematical objects or even programs (e.g. 3 < 8) in Coq. 
 
-Whether a permission is granted or denied depends on the agreements in question but also on the facts recorded in the environment. For ODRL0 those facts revolve around the number of times a policy has been used to justify an action (see section~\ref{sec:odrl0} for more details on odrl0). We encode this information in an \emph{environment} which is a conjunction of equalities of the form $count(s, policyId) = n$. 
+Whether a permission is granted or denied depends on the agreements in question but also on the facts recorded in the environment. For \ac{ACCPL} those facts revolve around the number of times a policy has been used to justify an action (see section~\ref{sec:odrl0} for more details on \ac{ACCPL}). We encode this information in an \emph{environment} which is a conjunction of equalities of the form $count(s, policyId) = n$. 
 
 % COQ
 The Coq version of the count equality is a new inductive type called \emph{count\_equality}. An environment is defined to be a non-empty list of $count\_equality$ objects (see listing~\ref{lst:environmentcoq}). Function $make\_count\_equality$ in listing~\ref{lst:environmentcoq} is simply a convenience function that builds $count\_equality$s. For an example of how environments are created see listing~\ref{lst:environmentusagecoq}.
@@ -43,7 +43,7 @@ Definition e1 : environment :=
 \end{minipage}
   
 
-We also define a \emph{getCount} function (see listing~\ref{lst:getCountcoq}) that given a pair consisting of a subject and policy id, looks for a corresponding count in the environment. Note the use of the keyword \emph{Fixpoint}. Fixpoint is the Coq keyword for recursive functions and we use it instead of 'Definition' when the function being defined is recursive such as is the case for function $getCount$. $getCount$ assumes the given environment is consistent, so it returns the first matched $count$ it sees for a $(subject, id)$ pair. If a $count$ for a $(subject, id)$ pair is not found it returns 0. 
+We also define a \emph{getCount} function (see listing~\ref{lst:getCountcoq}) that given a pair consisting of a subject and policy id, looks for a corresponding count in the environment. $getCount$ assumes the given environment is consistent (meaning it won`t return two different counts for the same pair of subject and policy id), so it returns the first matched $count$ it sees for a $(subject, id)$ pair. If a $count$ for a $(subject, id)$ pair is not found it returns 0. 
 
 
 \lstset{language=Coq, frame=single, caption={getCount Function},label={lst:getCountcoq}}
@@ -70,13 +70,121 @@ Fixpoint getCount
 \end{lstlisting}
 \end{minipage}
 
+\section{Decision Procedures and the sumbool type}
+
+sumbool is a boolean type defined in the Coq standard library module $Coq.Init.Specif$. sumbool is equipped with the justification of its value, which really helps with proofs. sumbool A B, which is written \{A\}+\{B\}, is the informative disjunction ``A or B'', where A and B are logical propositions. Its extraction is isomorphic to the type of booleans. A boolean is either true or false, and this is decidable~\cite{Coq:manual}. See listing~\ref{lst:sumbooltypeCoq} for the definition of $sumbool$ and $sumbool\_of\_bool$. With sumbools similar to bool and other 2-constructor inductive types, one can use the ``if then else'' construct to select the desired case when doing proofs which makes for much more readability of the given proofs.
+
+\lstset{language=Coq, frame=single, caption={sumbool type},label={lst:sumbooltypeCoq}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Inductive sumbool (A B:Prop) : Set :=
+  | left : A -> {A} + {B}
+  | right : B -> {A} + {B}
+ where "{ A } + { B }" := (sumbool A B) : type_scope.
+ 
+ Definition sumbool_of_bool : forall b:bool, {b = true} + {b = false}.
+\end{lstlisting}
+\end{minipage}
+
+We have used the sumbool type to declare and prove decision procedures that we have subsequently used in the semantics and also in the proofs. In the following we will list only the type declaration of each decision procedure and the accompanying functions. The individual decision procedures were used as a building block to make the final decidability proofs for \ac{ACCPL} possible. We will refer to these listings later when we discuss the translations.
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: eq_nat_dec~\cite{Coq:manual}},label={lst:eqnatdeccoq}}
+\begin{lstlisting}
+Theorem eq_nat_dec : forall n m, {n = m} + {n <> m}.
+\end{lstlisting}
+
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: is_subject_in_prin},label={lst:issubjectinprincoq}}
+\begin{lstlisting}
+Fixpoint is_subject_in_prin (s:subject)(p:prin): Prop :=
+  match p with
+  | Single s'  => s=s'
+  | NewList s' rest => s=s' \/ (is_subject_in_prin s rest)
+  end.
+
+Theorem subject_in_prin_dec :
+    forall (a:subject) (l:prin), {is_subject_in_prin a l} + {~ is_subject_in_prin a l}.
+
+\end{lstlisting}
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: trans_prin_dec},label={lst:transprindeccoq}}
+\begin{lstlisting}
+Theorem trans_prin_dec :
+   forall (x:subject)(p: prin), {trans_prin x p} + {~trans_prin x p}.
+\end{lstlisting}
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: trans_count_dec},label={lst:transcountdeccoq}}
+\begin{lstlisting}
+Theorem trans_count_dec :
+    forall (n:nat), {trans_count n} + {~trans_count n}.
+\end{lstlisting}
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: trans_constraint_dec},label={lst:transconstraintdeccoq}}
+\begin{lstlisting}
+Theorem trans_constraint_dec :
+    forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
+       {trans_constraint e x const IDs prin_u} + {~trans_constraint e x const IDs prin_u}.
+\end{lstlisting}
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: trans_negation_constraint_dec},label={lst:transnegationconstraintdeccoq}}
+\begin{lstlisting}
+Theorem double_neg_constraint:
+    forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
+       (trans_constraint e x const IDs prin_u) -> ~~(trans_constraint e x const IDs prin_u).
+  
+Theorem trans_negation_constraint_dec :
+    forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
+       {~trans_constraint e x const IDs prin_u} + {~~trans_constraint e x const IDs prin_u}.
+       
+\end{lstlisting}
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: trans_notCons_dec},label={lst:transnotConsdeccoq}}
+\begin{lstlisting}
+Theorem trans_notCons_dec :
+    forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
+       {trans_notCons e x const IDs prin_u} + {~ trans_notCons e x const IDs prin_u}.
+
+\end{lstlisting}
+
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: trans_preRequisite_dec},label={lst:transpreRequisitedeccoq}}
+\begin{lstlisting}
+Theorem trans_preRequisite_dec :
+    forall (e:environment)(x:subject)(prq:preRequisite)(IDs:nonemptylist policyId)(prin_u:prin),
+       {trans_preRequisite e x prq IDs prin_u} + {~ trans_preRequisite e x prq IDs prin_u}.
+\end{lstlisting}
+
+
+\section{answer and result types}
+
+The policy translation functions ultimately will return one of the following answers: Permitted, NotPermitted and Unregulated. Permitted answer signifies that the access request has been granted. The NotPermitted answer is when the access granted is denied. And finally the Unregulated answer is for all the times when neither Permitted or NotPermitted answers are applicable. The $answer$ type in the Coq listing~\ref{lst:answercoq} implements the answer concept. We wrap $answer$s in a $result$ type and add some context. Intuitively a result will tell us whether a subject may perform an action on an asset or not, or else that the request is unregulated.
+
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: },label={lst:answercoq}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+
+Inductive answer : Set :=
+  | Permitted : answer
+  | Unregulated : answer
+  | NotPermitted : answer.
+  
+Inductive result : Set :=
+  | Result : answer -> subject -> act -> asset -> result.
+\end{lstlisting}
+\end{minipage}
+
 \section{Translations}
 
-Translation of the top level $agreement$ element proceeds by case analysis on the structure of the agreement. However an agreement can only be built one way; by calling the constructor $Agreement$. The translation proceeds by calling the translation function for the corresponding $policySet$ namely the parameter to $Agreement$ called $ps$. See listing~\ref{lst:transagreement} which is the Coq implementation of~\ref{lst:transAgreementast}. The formal argument $e$ of type $environment$ is passed along many translation function but will only eventually be used to get the count information from the $getCount$ function.
 
+Translation of the top level $agreement$ element proceeds by case analysis on the structure of the agreement. However an agreement can only be built one way; by calling the constructor $Agreement$. The translation proceeds by calling the translation function for the corresponding $policySet$ namely the parameter to $Agreement$ called $ps$. See listing~\ref{lst:transagreement}. The formal argument $e$ of type $environment$ is passed along many translation function but will only eventually be used to get the count information from the $getCount$ function. Other formal arguments that are passed are the agreement itself to be translated, plus the subject, action and asset coming from a ``query'' or request for access: $action_from_query$, $subject_from_query$ and $asset_from_query$. Notice that the translation function for agreements returns a nonempty list of \emph{result}s.
+
+\subsection{Policy Combinators}
+
+The nonempty list of $result$s returned by the agreement translation function will have a result per $primPolicy$ in the agreement. As we will see later when we discuss the proofs, we have proven that results containing a Permitted answer and a NotPermitted answer are mutually exclusive. Therefore existence of a single (or more) Permitted type result in the nonempty list makes the set ``Permitted'' whereas the existence of a single (or more) NotPermitted type result makes the whole set "NotPermitted". When no Permitted or NotPermitted is seen in the set, we only have Unregulated results which would make the whole set "Unregulated". 
 
 \lstset{language=Coq, frame=single, caption={Translation of Agreement},label={lst:transagreement}}
-\begin{minipage}[c]{0.95\textwidth}
+%\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Definition trans_agreement
    (e:environment)(ag:agreement)(action_from_query:act)
@@ -87,32 +195,12 @@ Definition trans_agreement
        (trans_ps e action_from_query subject_from_query asset_from_query ps prin_u a)
    end.
 \end{lstlisting}
-\end{minipage}
+%\end{minipage}
 
 Translation of a $policySet$ (called $trans\_ps$ in listing~\ref{lst:transpsCoq}), takes as input $e$, the environment, $ps$, the policy set, $prin_{u}$, the agreement's user, and $a$, the asset, and proceeds by case analysis of different policySet constructors and recursing into translation functions for the composing elements. A policySet is either a $PrimitivePolicySet$, $PrimitiveExclusivePolicySet$ or a $AndPolicySet$. 
 
 Note that to implement the translation for an $AndPolicySet$ a local function $trans\_ps\_list$ has been defined where for a single $policySet$, $trans\_ps$ is called, and for a list of $policySet$s, the conjunction of $trans_ps$s are returned.
 
-\lstset{language=Coq, frame=single, caption={Query Answers and Results},
-    label={lst:transAnswersCoq}}
-%\begin{minipage}{\linewidth}
-\begin{lstlisting}
-
-
-Inductive answer : Set :=
-  | Permitted : answer
-  | Unregulated : answer
-  | NotPermitted : answer.
-
-Inductive result : Set :=
-  | Result : answer -> subject -> act -> asset -> result.
-
-Definition makeResult
-  (ans:answer)(s:subject)(ac:act)(ass:asset) : result := 
- (Result ans s ac ass).
-
-\end{lstlisting}
-%\end{minipage}
 
 
 
@@ -169,7 +257,7 @@ Fixpoint trans_policy_negative
 \end{lstlisting}
 %\end{minipage}
 
-\lstset{language=Coq, frame=single, caption={Translation of list of policies: positive, negative and unregualted use the same pattern},
+\lstset{language=Coq, frame=single, caption={Translation of list of policies: positive, negative and unregulated use the same pattern},
     label={lst:transListOfPositiveCoq}}
 \begin{lstlisting}
 Fixpoint trans_pp_list_trans_policy_<positive | negative | unregulated> 

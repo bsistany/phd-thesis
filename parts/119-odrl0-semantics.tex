@@ -1,5 +1,5 @@
 %======================================================================
-\chapter{ODRL0 Semantics}\label{chap:semantics}
+\chapter{ACCPL Semantics}\label{chap:semantics}
 %======================================================================
 
                   
@@ -7,37 +7,70 @@
 \section{Introduction}\label{sec:introsemantics}
 
 
-In this section, we describe the semantics of ODRL0 language by a translation from agreements to a subset of many-sorted first-order logic formulas with equality. The semantics will help answer queries of the form ``may subject \emph{s} perform action \emph{act} to asset \emph{a}?''. If the answer is yes, we say permission is granted. Otherwise permission is denied. Note that in the listings in this chapter we use $[\![]\!]$ (double square brackets) notation as a mapping of ODRL0 syntactic elements to their translations as many-sorted first-order logic formulas. $\triangleq$ are used between a translation and its corresponding formula to mean the translation is ``mapped to'' the formula. This translation is derived from the one in~\cite{pucella2006} mainly by adapting it to the ODRL0 subset and in particular syntax, which covered in chapter~\ref{chap:odrl0syntax}.
+In this section, we follow Pucella and Weissman`s subset of \ac{odrl}~\cite{pucella2006} lead on how to describe the semantics of the \ac{ACCPL}. The semantics of \ac{ACCPL} are described by a translation from agreements to a subset of many-sorted first-order logic formulas with equality. The semantics will help answer queries of the form ``may subject \emph{s} perform action \emph{act} to asset \emph{a}?''. If the answer is yes, we say permission is granted. Otherwise permission is denied. Note that in the listings in this chapter we use $[\![]\!]$ (double square brackets) notation as a mapping of \ac{ACCPL} syntactic elements to their translations as many-sorted first-order logic formulas. $\triangleq$ are used between a translation and its corresponding formula to mean the translation is ``mapped to'' the formula.
 
 Unless specifically mentioned, we use superscripts to denote parameters to translation mappings. However we make a distinction on whether the translation notation is used on the \ac{rhs} of a $\triangleq$ or the \ac{lhs}. The right side occurrence is similar to a function call where we pass actual parameters to the function call - here to the mapping. The left side occurrence is similar to function declarations/definitions where we define formal parameters - here when we define the translation for a construct for the first time. 
 
 \section{Agreement Translation}
 
-At a high-level, an agreement is translated into a conjunction of formulas of the form $\forall x ( prerequisites(x) \rightarrow P(x))$ where $P(x)$ itself is a conjunction of formulas of the form $ prerequisites(x) \rightarrow (\lnot) Permitted (x, act, a)$, where $Permitted (x, act, a)$ means the subject $x$ is permitted to perform action $act$ on asset $a$. More concretely, given an agreement and observing that the only way an agreement can be built is by passing a $prin$ (typically $prin_{u}$ the agreement's user(s)), an $asset$, and a $policySet$ to the constructor of the type agreement (see~\ref{sec:agreementConstructor}), the given agreement is translated by invoking the agreement translation mapping with the passed in arguments: $[\![agreement]\!]^{policySet, prin_{u}, a}$. 
+At a high-level, an agreement is translated into a formula of the form $\forall x ( prerequisites(x) \rightarrow P(x))$ where $P(x)$ itself is a conjunction of formulas of the form $ prerequisites(x) \rightarrow (\lnot) Permitted (x, act, a)$, where $Permitted (x, act, a)$ means the subject $x$ is permitted to perform action $act$ on asset $a$. More concretely, given an agreement and observing that the only way an agreement can be built is by passing a $prin$ (typically $prin_{u}$ the agreement's user(s)), an $asset$, and a $policySet$ to the constructor of the type agreement (see~\ref{sec:agreementConstructor}), the given agreement is translated by invoking the agreement translation mapping with the passed in arguments plus the subject, action and asset coming from a ``query'' or request for access: $[\![agreement]\!]^{policySet, prin_{u}, a, sub_{q}, act_{q}, ass_{q}}$. 
 
 
-The agreement translation mapping declares its three formal arguments as a $policySet$, a set of users, $prin$, and an asset, $a$ (see~\ref{lst:transAgreementast}).
+The agreement translation mapping declares its formal arguments as a $policySet$, a set of users, $prin$, an asset, $a$ and subject, action and asset coming from a query: $sub_{q}$, $ act_{q}$, $ass_{q}$. (see~\ref{lst:transAgreementast}).
 
 
 \lstset{mathescape, language=AST}  
 \begin{lstlisting}[frame=single, caption={Agreement Translation},label={lst:transAgreementast}]
-$[\![ agreement ]\!]^{policySet, prin, a}$ $\triangleq$ $[\![policySet]\!]^{prin, a}$
+$[\![ agreement ]\!]^{policySet, prin, a, sub_{q}, act_{q}, ass_{q}}$ $\triangleq$ $[\![policySet]\!]^{prin, a, sub_{q}, act_{q}, ass_{q}}$
 \end{lstlisting}
 
 \section{Policy Set Translation Definition}
-The translation for a $policySet$ declares two formal arguments: a set of users, $prin$ and an asset, $a$.
-The translation is defined by cases, one for each clause of the grammar in listing~\ref{lst:policySetast}. Recall that a $policySet$ is either a $PrimitivePolicySet$, a $\linebreak PrimitiveExclusivePolicySet$ or a $AndPolicySet$, a conjunction of policy sets (see~\ref{lst:transpolicysetdefinitionAST}).
+The translation for a $policySet$ declares the formal arguments: a set of users, $prin$ and an asset, $a$ and the subject, action and asset coming from a query. The translation is handled by the translation function for a $primPolicySet$. The translation for $primPolicySet$ is defined by cases, one for each clause of the grammar in listing~\ref{lst:primPolicySetast}. Recall that a $primPolicySet$ is either a $primInclusivePolicySet$ or a $\linebreak primExclusivePolicySet$.
 
 \lstset{mathescape, language=AST}  
 \begin{lstlisting}[frame=single, caption={Policy Set Translation Cases},label={lst:transpolicysetdefinitionAST}]
 
-$[\![policySet]\!]^{prin, a}$ $\triangleq$ 
+$[\![policySet]\!]^{prin, a, sub_{q}, act_{q}, ass_{q}}$ $\triangleq$ 
+   $ass_{q} = a \rightarrow$
+      $[\![primPolicySet]\!]^{prin, a, sub_{q}, act_{q}, ass_{q}}$&\Comment{; primitive policy set }&
+   $ass_{q} <> a \rightarrow$
+      $Unregulated (sub_{q}, [\![act_{q}]\!], ass_{q})$&\Comment{; this case in Unregulated }&
+\end{lstlisting}
+
+\lstset{mathescape, language=AST}  
+\begin{lstlisting}[frame=single, caption={Primitive Policy Set Translation Cases},label={lst:transpolicysetdefinitionAST}]
+
+$[\![primInclusivePolicySet]\!]^{prin, a, sub_{q}, act_{q}, ass_{q}}$ $\triangleq$ 
+   $[\![policy_{PIPS}]\!]^{prin, a, sub_{q}, act_{q}, ass_{q}}$&\Comment{; primitive inclusive policy set }&
+\end{lstlisting}
+
+\lstset{mathescape, language=AST}  
+\begin{lstlisting}[frame=single, caption={Primitive Policy Set Translation Cases},label={lst:transpolicysetdefinitionAST}]
+
+$[\![primExclusivePolicySet]\!]^{prin, a, sub_{q}, act_{q}, ass_{q}}$ $\triangleq$ 
+   $[\![policy_{PEPS}]\!]^{prin, a, sub_{q}, act_{q}, ass_{q}}$&\Comment{; primitive exclusive policy set }&
+\end{lstlisting}
+
+\lstset{mathescape, language=AST}  
+\begin{lstlisting}[frame=single, caption={Primitive Policy Set Translation Cases},label={lst:transpolicysetdefinitionAST}]
+
+$[\![policy_{PIPS}]\!]^{prin, a, sub_{q}, act_{q}, ass_{q}}$ $\triangleq$ 
         $[\![ preRequisite \rightarrow policy]\!]^{prin, a}$ &\Comment{; primitive policy set }&
         $[\![ preRequisite \mapsto policy]\!]^{prin, a}$ &\Comment{; primitive exclusive policy set }&
         $[\![ and [policySet_{1}, ..., policySet_{m}]]\!]^{prin, a}$ &\Comment{; conjunction }&
 
 \end{lstlisting}
 
+
+\lstset{mathescape, language=AST}  
+\begin{lstlisting}[frame=single, caption={Primitive Policy Set Translation Cases},label={lst:transpolicysetdefinitionAST}]
+
+$[\![primPolicySet]\!]^{prin, a, sub_{q}, act_{q}, ass_{q}}$ $\triangleq$ 
+        $[\![ preRequisite \rightarrow policy]\!]^{prin, a}$ &\Comment{; primitive policy set }&
+        $[\![ preRequisite \mapsto policy]\!]^{prin, a}$ &\Comment{; primitive exclusive policy set }&
+        $[\![ and [policySet_{1}, ..., policySet_{m}]]\!]^{prin, a}$ &\Comment{; conjunction }&
+
+\end{lstlisting}
 
 Each of the $policySet$ kinds has its own translation function, which will be defined in the next 3 subsections. See~\ref{sec:getIdtranslation} for the translation of $getId$ and~\ref{sec:acttranslation} for the translation of $act$ mentioned below.
 
