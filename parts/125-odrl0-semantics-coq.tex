@@ -1,5 +1,5 @@
 %======================================================================
-\chapter{ACCPL Semantics In Coq}
+\chapter{ACCPL Semantics In Coq}\label{chap:accplsemanticscoq}
 %======================================================================
 
 % ---------------------------------- COQ -----------------------
@@ -157,7 +157,7 @@ Theorem trans_preRequisite_dec :
 
 \section{answer and result types}
 
-The policy translation functions ultimately will return one of the following answers: Permitted, NotPermitted and Unregulated. Permitted answer signifies that the access request has been granted. The NotPermitted answer is when the access granted is denied. And finally the Unregulated answer is for all the times when neither Permitted or NotPermitted answers are applicable. The $answer$ type in the Coq listing~\ref{lst:answercoq} implements the answer concept. We wrap $answer$s in a $result$ type and add some context. Intuitively a result will tell us whether a subject may perform an action on an asset or not, or else that the request is unregulated.
+The policy translation functions ultimately will return one of the following answers: Permitted, NotPermitted or Unregulated. Permitted answer signifies that the access request has been granted. The NotPermitted answer is when the access granted is denied. And finally the Unregulated answer is for all the times when neither Permitted or NotPermitted answers are applicable. The $answer$ type in the Coq listing~\ref{lst:answercoq} implements the answer concept. We wrap $answer$s in a $result$ type and add some context. Intuitively a result will tell us whether a subject may perform an action on an asset or not, or else that the request is unregulated.
 
 
 \lstset{language=Coq, frame=single, caption={Decision Procedures: },label={lst:answercoq}}
@@ -177,7 +177,7 @@ Inductive result : Set :=
 \section{Translations}
 
 
-Translation of the top level $agreement$ element proceeds by case analysis on the structure of the agreement. However an agreement can only be built one way; by calling the constructor $Agreement$. The translation proceeds by calling the translation function for the corresponding $policySet$ namely the parameter to $Agreement$ called $ps$. See listing~\ref{lst:transagreement}. The formal argument $e$ of type $environment$ is passed along many translation function but will only eventually be used to get the count information from the $getCount$ function. Other formal arguments that are passed are the agreement itself to be translated, plus the subject, action and asset coming from a ``query'' or request for access: $action_from_query$, $subject_from_query$ and $asset_from_query$. Notice that the translation function for agreements returns a nonempty list of \emph{result}s.
+Translation of the top level $agreement$ element proceeds by case analysis on the structure of the agreement. However an agreement can only be built one way; by calling the constructor $Agreement$. The translation proceeds by calling the translation function for the corresponding $policySet$ namely the parameter to $Agreement$ called $ps$. See listing~\ref{lst:transagreement}. The formal argument $e$ of type $environment$ is passed along many translation function but will only eventually be used to get the count information from the $getCount$ function. Other formal arguments that are passed are the agreement itself to be translated, plus the subject, action and asset coming from a ``query'' or request for access: $action\_from\_query$, $subject\_from\_query$ and $asset\_from\_query$. Notice that the translation function for agreements returns a nonempty list of \emph{result}s.
 
 \subsection{Policy Combinators}
 
@@ -197,12 +197,23 @@ Definition trans_agreement
 \end{lstlisting}
 %\end{minipage}
 
-Translation of a $policySet$ (called $trans\_ps$ in listing~\ref{lst:transpsCoq}), takes as input $e$, the environment, $ps$, the policy set, $prin_{u}$, the agreement's user, and $a$, the asset, and proceeds by case analysis of different policySet constructors and recursing into translation functions for the composing elements. A policySet is either a $PrimitivePolicySet$, $PrimitiveExclusivePolicySet$ or a $AndPolicySet$. 
+Translation of a $policySet$ (called $trans\_ps$ in listing~\ref{lst:transpsCoq}), takes as input $e$, the environment, the subject, action and asset coming from a query: $action\_from\_query$, $subject\_from\_query$ and $asset\_from\_query$, $ps$, the policy set, $prin\_{u}$, the agreement's user, and $a$, the asset mentioned in the agreement. 
 
-Note that to implement the translation for an $AndPolicySet$ a local function $trans\_ps\_list$ has been defined where for a single $policySet$, $trans\_ps$ is called, and for a list of $policySet$s, the conjunction of $trans_ps$s are returned.
+The translation starts with checking that there is a proof for the equality of asset_from_query and a (the asset from the agreement). If so, the translation function recurses on the composing $primPolicySet$. Otherwise, a result of Unregulated is immediately is returned. Intuitively we are just explicitly saying that the semantics won`t apply to queries about assets that are not mentioned in the agreement. 
 
+A $primPolicySet$ was either constructed by a $PIPS$ or by a $PEPS$ which distinguish between $primInclusivePolicySet$ and $primExclusivePolicySet$ subtypes. The translation functions $trans\_policy\_PIPS$ and $trans\_policy\_PEPS$ are called in turn as the case may be (see listing~\ref{lst:transpipsAndpepsCoq}).
 
+$trans\_policy\_PIPS$ translation function for a $primInclusivePolicySet$ checks whether there is a proof for the subject in question, $x$, being in $prin\_u$. If so there is a check for whether the $preRequisite$ from the policySet holds or not. If so the translation function $trans\_policy\_positive$(~\ref{lst:transPositiveCoq}) is called. In all other cases $trans\_policy\_unregulated$(~\ref{lst:transUnregulatedCoq}) is called.
 
+$trans\_policy\_PEPS$ translation function for a $primExclusivePolicySet$ checks whether there is a proof for the subject in question, $x$, being in $prin\_u$. If not, the translation function $trans\_policy\_negative$ (~\ref{lst:transNegativeCoq}) is called since the policySet is exclusive to agreement`s users we expect that all subjects not in the $prin\_u$ are denied access. In case the check for $x$, being in $prin\_u$ succeeds, there is a check for whether the $preRequisite$ from the policySet holds or not. If so the translation function $trans\_policy\_positive$ is called, else $trans\_policy\_unregulated$ is returned.
+
+$trans\_policy\_positive$, $trans\_policy\_negative$ and $trans\_policy\_unregulated$ translation functions start by recursing on a list of $primPolicy$s where the results of processing each $primPolicy$ is appended to the rest of the set (see high level pseudocode in listing~\ref{lst:transListOfPositiveCoq}) for the common pattern). 
+
+$trans\_policy\_positive$ acting on a single $primPolicy$ (see process_single_pp_trans_policy_positive in listing~\ref{lst:transPositiveCoq}), first checks whether the $preRequisite$ from the policy holds or not. If so the translation function checks that there is a proof for the equality of action_from_query and action (the action from the agreement). If so, the translation function finally returns a result of Permitted. In all other cases, a result of Unregulated is returned. Intuitively we are just explicitly saying that the semantics won`t apply to queries about actions that are not mentioned in the agreement.
+
+$trans\_policy\_negative$ acting on a single $primPolicy$ (see process_single_pp_trans_policy_negative in listing~\ref{lst:transNegativeCoq}), first checks that there is a proof for the equality of action_from_query and action (the action from the agreement). If so, the translation function returns a result of NotPermitted. Otherwise, a result of Unregulated is returned. Note that compared to $trans\_policy\_positive$ we don`t check for whether $preRequisite$ from the policy holds or not since is only called for policy sets of type $primExclusivePolicySet$.
+
+$trans\_policy\_unregulated$ acting on a single $primPolicy$ (see process_single_pp_trans_policy_unregulated in listing~\ref{lst:transUnregulatedCoq}), returns a result of Unregulated.
 
 \lstset{language=Coq, frame=single, caption={Translation of unregulated policies},
     label={lst:transUnregulatedCoq}}
@@ -257,22 +268,6 @@ Fixpoint trans_policy_negative
 \end{lstlisting}
 %\end{minipage}
 
-\lstset{language=Coq, frame=single, caption={Translation of list of policies: positive, negative and unregulated use the same pattern},
-    label={lst:transListOfPositiveCoq}}
-\begin{lstlisting}
-Fixpoint trans_pp_list_trans_policy_<positive | negative | unregulated> 
-  (pp_list:nonemptylist primPolicy)(e:environment)(x:subject)
-  (prin_u:prin)(a:asset)(action_from_query: act){struct pp_list}:=
-   match pp_list with
-     | Single pp1 => process_single_pp_trans_policy_<positive | negative | unregulated> pp1 e x prin_u a action_from_query
-     | NewList pp pp_list' => app_nonempty
-	 (process_single_pp_trans_policy_<positive | negative | unregulated> pp e x prin_u a action_from_query) 
-	 (trans_pp_list_trans_policy_<positive | negative | unregulated> pp_list' e x prin_u a action_from_query)
-   end.
-\end{lstlisting}
-%\end{minipage}
-
-
 \lstset{language=Coq, frame=single, caption={Translation of positive policies},
     label={lst:transPositiveCoq}}
 %\begin{minipage}{\linewidth}
@@ -306,9 +301,25 @@ Definition trans_policy_positive
 \end{lstlisting}
 %\end{minipage}
 
+\lstset{language=Coq, frame=single, caption={Translation of list of policies: positive, negative and unregulated use the same pattern},
+    label={lst:transListOfPositiveCoq}}
+\begin{lstlisting}
+Fixpoint trans_pp_list_trans_policy_<positive | negative | unregulated> 
+  (pp_list:nonemptylist primPolicy)(e:environment)(x:subject)
+  (prin_u:prin)(a:asset)(action_from_query: act){struct pp_list}:=
+   match pp_list with
+     | Single pp1 => process_single_pp_trans_policy_<positive | negative | unregulated> pp1 e x prin_u a action_from_query
+     | NewList pp pp_list' => app_nonempty
+	 (process_single_pp_trans_policy_<positive | negative | unregulated> pp e x prin_u a action_from_query) 
+	 (trans_pp_list_trans_policy_<positive | negative | unregulated> pp_list' e x prin_u a action_from_query)
+   end.
+\end{lstlisting}
+%\end{minipage}
+
+
 \lstset{language=Coq, frame=single, caption={Translation of PIPS and PEPS},
     label={lst:transpipsAndpepsCoq}}
-%\begin{minipage}{\linewidth}
+\begin{minipage}{\linewidth}
 \begin{lstlisting}
 Definition trans_policy_PIPS
   (e:environment)(prq: preRequisite)(p:policy)(x:subject)
@@ -339,9 +350,8 @@ Definition trans_policy_PEPS
     (trans_policy_negative e x p a action_from_query).
 
 \end{lstlisting}
-%\end{minipage}
+\end{minipage}
 
-The listing~\ref{lst:transpsCoq} is the Coq implementation of~\ref{lst:transpolicysetdefinitionAST}.
 
 \lstset{language=Coq, frame=single, caption={Translation of Policy Set},label={lst:transpsCoq}}
 %\begin{minipage}{\linewidth}
@@ -383,8 +393,6 @@ else (* asset_from_query <> a *)
 
 % COQ
 Translation of a \emph{prin} (called $trans\_prin$ in listing~\ref{lst:transprinCoq}) takes as input $x$, the $subject$ in question, $p$, the principal or the $prin$,  and proceeds based on whether $p$ is a single subject or a list of subjects. If $p$ is a single subject, $s$, the $Prop$ $x=s$ is returned. Otherwise the disjunction of the translation of the first subject in $p$ ($s$) and the $rest$ of the subjects is returned.
-The listing~\ref{lst:transprinCoq} is the Coq implementation of~\ref{lst:transprindefinitionAST}.
-
 
 \lstset{language=Coq, frame=single, caption={Translation of a Prin},label={lst:transprinCoq}}
 \begin{lstlisting}
@@ -399,67 +407,10 @@ Fixpoint trans_prin
 \end{lstlisting}
 
 
-A positive translation for a policy (called $trans\_policy\_positive$ in listing~\ref{lst:transpolicypositiveCoq}) takes as input $e$, the $environment$, $x$, the $subject$, $p$, the $policy$ to translate, $prin_{u}$, the agreement's user, and $a$, the asset and proceeds based on whether we have a $PrimitivePolicy$ or a $AndPolicy$. If the policy is a $PrimitivePolicy$ an implication is returned which indicates $x$ is \emph{permitted} to do $action$ to $a$, if the $preRequisite$ holds. 
 
-$Permitted$ is a predicate specified as $Parameter Permitted : subject -> act -> asset -> Prop.$ So $Permitted$ predicate takes a $subject$, an $act$ (an action) and an $asset$ and builds a term of type $Prop$. 
+The translation of a $prerequisite$ (called $trans\_preRequisite$ in listing~\ref{lst:transpreRequisiteCoq}) takes as input $e$, the $environment$, $x$, the $subject$, $prq$, the $preRequisite$ to translate, $IDs$, the set of identifiers (of policies implied by the $prq$), $prin_{u}$, the agreement's user, and proceeds by case analysis on the structure of the $prerequisite$. A $prerequisite$ is either a $TruePrq$, a $Constraint$, a $NotCons$, or a $AndPrqs$. 
 
-Note that to implement the translation for an $AndPolicy$ a local function $trans\_p\_list$ has been defined where for a single $policy$, $trans\_policy\_positive$ is returned, and for a list of $policy$s, the conjunction of $trans\_policy\_positive$s are returned.
-
-The listing~\ref{lst:transpolicypositiveCoq} is the Coq implementation of~\ref{lst:transprimitivepolicyAST} and~\ref{lst:transAndpolicyAST} when $polarity=positive$.
-
-\lstset{language=Coq, frame=single, caption={Translation of a Positive Policy},label={lst:transpolicypositiveCoq}}
-\begin{lstlisting}
-
-Fixpoint trans_policy_positive
-  (e:environment)(x:subject)(p:policy)(prin_u:prin)(a:asset){struct p} : Prop :=
-
-let trans_p_list := (fix trans_p_list (p_list:nonemptylist policy)(prin_u:prin)(a:asset){struct p_list}:=
-                  match p_list with
-                    | Single p1 => trans_policy_positive e x p1 prin_u a
-                    | NewList p p_list' => 
-                        ((trans_policy_positive e x p prin_u a) /\ 
-                         (trans_p_list p_list' prin_u a))
-                  end) in
-
-
-  match p with
-    | PrimitivePolicy prq policyId action => ((trans_preRequisite e x prq (Single policyId) prin_u) ->
-                                              (Permitted x action a))
-    | AndPolicy p_list => trans_p_list p_list prin_u a
-  end.
-\end{lstlisting}
-
-A negative translation for a policy (called $trans\_policy\_negative$ in listing~\ref{lst:transpolicynegativeCoq}) takes as input $e$, the $environment$, $x$, the $subject$, $p$, the $policy$ to translate, and $a$ the asset and proceeds based on whether we have a $PrimitivePolicy$ or a $AndPolicy$. If the policy is a $PrimitivePolicy$ an implication is returned which indicates $x$ is forbidden to do $action$ to $a$ regardless of whether $preRequisite$ holds. As is the case for the positive translation, to implement the translation for an $AndPolicy$ a local function $trans\_p\_list$ has been defined where for a single $policy$, $trans\_policy\_negative$ is returned, and for a list of $policy$s, the conjunction of $trans\_policy\_negative$s are returned.
-
-The listing~\ref{lst:transpolicynegativeCoq} is the Coq implementation of~\ref{lst:transprimitivepolicyAST} and~\ref{lst:transAndpolicyAST} when $polarity=negative$.
-
-
-\lstset{language=Coq, frame=single, caption={Translation of a Negative Policy},label={lst:transpolicynegativeCoq}}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
-
-Fixpoint trans_policy_negative
-  (e:environment)(x:subject)(p:policy)(a:asset){struct p} : Prop :=
-let trans_p_list := (fix trans_p_list (p_list:nonemptylist policy)(a:asset){struct p_list}:=
-                  match p_list with
-                    | Single p1 => trans_policy_negative e x p1 a
-                    | NewList p p_list' => ((trans_policy_negative e x p a) /\ 
-                                            (trans_p_list p_list' a))
-                  end) in
-
-
-  match p with
-    | PrimitivePolicy prq policyId action => not (Permitted x action a)
-    | AndPolicy p_list => trans_p_list p_list a
-  end.
-\end{lstlisting}
-\end{minipage}
-
-The translation of a $prerequisite$ (called $trans\_preRequisite$ in listing~\ref{lst:transpreRequisiteCoq}) takes as input $e$, the $environment$, $x$, the $subject$, $prq$, the $preRequisite$ to translate, $IDs$, the set of identifiers (of policies implied by the $prq$), $prin_{u}$, the agreement's user, and proceeds by case analysis on the structure of the $prerequisite$. A $prerequisite$ is either a $TruePrq$, a $Constraint$, a $ForEachMember$, a $NotCons$, a $AndPrqs$, a $OrPrqs$ or a $XorPrqs$. 
-
-In listing~\ref{lst:transpreRequisiteCoq} the translation for $TruePrq$ is the Prop $True$, the translations for $Constraint$, $ForEachMember$ and $NotCons$ simply call respective translation functions for corresponding types $constraint$ and $forEachMember$ (namely $trans\_constraint$, $trans\_forEachMember$ and $trans\_notCons$). Note that the translation for $AndPrqs$, $OrPrqs$ and $XorPrqs$ have not yet been implemented but based on the their many-sorted-logic formulas' specifications (listing~\ref{lst:preRequisiteast}) they will be conjunctions, disjunctions and exclusive disjunctions of translations for each $prerequisite$.
-
-The listing~\ref{lst:transpreRequisiteCoq} is the Coq implementation of~\ref{lst:transprerequisitedefinitionAST}.
+In listing~\ref{lst:transpreRequisiteCoq} the translation for $TruePrq$ is the Prop $True$, the translations for $Constraint$, $NotCons$ and $AndPrqs$ simply call respective translation functions for corresponding types $constraint$ (namely $trans\_constraint$ and $trans\_notCons$ and $trans\_andPrqs$). 
 
 
 \lstset{language=Coq, frame=single, caption={Translation of a PreRequisite},label={lst:transpreRequisiteCoq}}
@@ -471,19 +422,14 @@ Definition trans_preRequisite
 
   match prq with
     | TruePrq => True
-    | Constraint const => trans_constraint e x const IDs prin_u 
-    | ForEachMember prn const_list => trans_forEachMember e x prn const_list IDs 
+    | Constraint const => trans_constraint e x const IDs prin_u  
     | NotCons const => trans_notCons e x const IDs prin_u 
-    | AndPrqs prqs => True 
-    | OrPrqs prqs => True 
-    | XorPrqs prqs => True 
+    | AndPrqs prqs =>  trans_andPrqs x prq IDs prin_u a
   end.
 \end{lstlisting}
 \end{minipage}
 
-The translation of a $constraint$ (called $trans\_constraint$ in listing~\ref{lst:transconstraintCoq}) takes as input $e$ the $environment$, $x$ the $subject$, $const$, the $constraint$ to translate, $IDs$, the set of identifiers (of policies implied by the parent $preRequisite$) and $prin_{u}$, the agreement's user and proceeds by case analysis on the structure of the $constraint$. A $constraint$ is either a $Principal$, a $Count$ or a $CountByPrin$. The translation for $Principal$ returns the translation function (namely $trans\_prin$) for the $prn$ (the $prin$ that accompanies the $const$ constraint). The translation for $Count$ and $CountByPrin$ return the translation function $trans\_count$. For $Count$ the $prin$ used is the agreement's user, whereas the $prin$ used is the one passed to $CountByPrin$ namely $prn$.
-
-The listing~\ref{lst:transconstraintCoq} is the Coq implementation of~\ref{lst:transpreRequisiteConstraint}.
+The translation of a $constraint$ (called $trans\_constraint$ in listing~\ref{lst:transconstraintCoq}) takes as input $e$ the $environment$, $x$ the $subject$, $const$, the $constraint$ to translate, $IDs$, the set of identifiers (of policies implied by the parent $preRequisite$) and $prin_{u}$, the agreement's user and proceeds by case analysis on the structure of the $constraint$. A $constraint$ is either a $Principal$, a $Count$ or a $CountByPrin$. The translation for $Principal$ returns the translation function (namely $trans\_prin$) for the $prn$ (the $prin$ that accompanies the $const$ constraint). The translation for $Count$ and $CountByPrin$ return the translation function $trans\_count$. 
 
 
 \lstset{language=Coq, frame=single, caption={Translation of a Constraint},label={lst:transconstraintCoq}}
@@ -495,7 +441,7 @@ Fixpoint trans_constraint
   match const with
     | Principal prn => trans_prin x prn
   
-    | Count n => trans_count e n IDs prin_u 
+    | Count n => trans_count e n IDs prin_u
 
     | CountByPrin prn n => trans_count e n IDs prn 
 
@@ -503,41 +449,8 @@ Fixpoint trans_constraint
   
 \end{lstlisting}
 
-The translation of a $forEachMember$ (called $trans\_forEachMember$ in listing~\ref{lst:transforEachMemberCoq}) takes as input $e$ the $environment$, $x$ the $subject$, $principals$, the set of subjects that override the agreement's user(s), $const\_list$ the set of constraints and $IDs$, the set of identifiers (of policies implied by the parent $preRequisite$).
-
-To implement the translation for a $forEachMember$ we start by calling an auxiliary function $process\_two\_lists$ that effectively returns a new list composed of pairs of members of the first list and the second list (the cross-product of the two input lists). In the case of a $forEachMember$ translation, the call is ``$process\_two\_lists$ $principals$ $const\_list$'' which returns a list of pairs of subject and constraint namely $prins\_and\_constraints$. $prins\_and\_constraints$ is then passed to a locally defined function \emph{ trans_forEachMember_Aux} where for a single pair of subject and constraint $trans\_constraint$ is called and for a list of pairs of subject and constraints, the conjunction of $trans\_constraint$s (for the first pair) and $trans\_forEachMember\_Aux$s (for the rest of the pairs) are returned.
-
-The listing~\ref{lst:transforEachMemberCoq} is the Coq implementation of~\ref{lst:transpreRequisiteForEachMember}.
-
-\lstset{language=Coq, frame=single, caption={Translation of forEachMember},label={lst:transforEachMemberCoq}}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
-
-Fixpoint trans_forEachMember
-         (e:environment)(x:subject)(principals: nonemptylist subject)(const_list:nonemptylist constraint)
-         (IDs:nonemptylist policyId){struct const_list} : Prop := 
-
-let trans_forEachMember_Aux   
-  := (fix trans_forEachMember_Aux
-         (prins_and_constraints : nonemptylist (Twos subject constraint))
-         (IDs:nonemptylist policyId){struct prins_and_constraints} : Prop :=
-
-      match prins_and_constraints with
-        | Single pair1 => trans_constraint e x (right pair1) IDs (Single (left pair1)) 
-        | NewList pair1 rest_pairs =>
-            (trans_constraint e x (right pair1) IDs (Single (left pair1))) /\
-            (trans_forEachMember_Aux rest_pairs IDs)
-      end) in
-
-      let prins_and_constraints := process_two_lists principals const_list in
-      trans_forEachMember_Aux prins_and_constraints IDs.
-
-\end{lstlisting}
-\end{minipage}
 
 The translation of a $NotCons$ (called $trans\_notCons$ in listing~\ref{lst:transnotConsCoq}) takes as input $e$ the $environment$, $x$ the $subject$, $const$, the $constraint$ to translate, $IDs$, the set of identifiers (of policies implied by the parent $preRequisite$) and $prin_{u}$, the agreement's user and proceeds to return the negation of $trans\_constraint$ (see listing~\ref{lst:transconstraintCoq}).
-
-The listing~\ref{lst:transnotConsCoq} is the Coq implementation of~\ref{lst:transpreRequisiteNotConstraint}.
 
 \lstset{language=Coq, frame=single, caption={Translation of NotCons},label={lst:transnotConsCoq}}
 \begin{lstlisting}
@@ -546,8 +459,6 @@ Definition trans_notCons
   (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin) : Prop :=
   ~ (trans_constraint e x const IDs prin_u).
 \end{lstlisting}
-
-
 
 
 The translation of a $Count$ or a $CountByPrin$ (called $trans\_count$ in listing~\ref{lst:transcountCoq}) takes as input $e$ the $environment$, $n$ the total number of times the subjects mentioned in $prin_{u}$ (last parameter) may invoke the policies identified by $IDs$ (third parameter).
@@ -560,14 +471,12 @@ A local variable $running_total$ has the value returned by $trans\_count\_aux$. 
 
 Note that the only difference between translations for a $Count$ and a $CountByPrin$ is the additional $prn$ parameter for $CountByPrin$ which allows for getting counts for subjects not necessarily the same as $prin_{u}$, the agreement's user(s).
 
-The listing~\ref{lst:transcountCoq} is the Coq implementation of~\ref{lst:transconstraintCount} and of~\ref{lst:transconstraintCountbyPrin}.
 
 \lstset{language=Coq, frame=single, caption={Translation of count},label={lst:transcountCoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Fixpoint trans_count 
-  (e:environment)(n:nat)(IDs:nonemptylist policyId)
-  (prin_u:prin) : Prop := 
+  (n:nat): Prop := 
 
   let trans_count_aux 
     := (fix trans_count_aux
@@ -584,81 +493,4 @@ Fixpoint trans_count
   running_total < n.
 \end{lstlisting}
 \end{minipage}
-
-\section{Decision Procedures}
-\label{sec:decisionProcs}  
-
-
-\lstset{language=Coq, frame=single, caption={Translation of count TEMP},label={lst:transcountCoq123}}
-%\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
-
-Theorem double_neg_constraint:
- forall (e:environment)(x:subject)
- (const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
-  (trans_constraint e x const IDs prin_u) ->
-   ~~(trans_constraint e x const IDs prin_u).
-Proof.
-intros e x const IDs prin_u.
-intros H. unfold not. intros H'. apply H'. exact H. Qed.
-
-Theorem trans_negation_constraint_dec :
-forall (e:environment)(x:subject)
-(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
-     {~trans_constraint e x const IDs prin_u} + 
-     {~~trans_constraint e x const IDs prin_u}.
-
-Proof.
-intros e x const IDs prin_u.
-pose (j:= trans_constraint_dec e x const IDs prin_u). 
-destruct j. apply double_neg_constraint in t. right. exact t. left. exact n. Defined.
-
-Theorem trans_notCons_dec :
-forall (e:environment)(x:subject)
-(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
-   {trans_notCons e x const IDs prin_u} + 
-   {~ trans_notCons e x const IDs prin_u}.
-Proof.
-intros e x const IDs prin_u. 
-unfold trans_notCons. apply trans_negation_constraint_dec. Defined.
-  
-Theorem trans_preRequisite_dec :
-  forall (e:environment)(x:subject)
-    (prq:preRequisite)(IDs:nonemptylist policyId)(prin_u:prin),
-       {trans_preRequisite e x prq IDs prin_u} +
-       {~ trans_preRequisite e x prq IDs prin_u}.
-Proof.
-intros e x prq IDs prin_u.
-induction prq.
-simpl. auto.
-simpl. apply trans_constraint_dec.
-simpl. apply trans_notCons_dec.
-simpl. auto.
-simpl. auto.
-simpl. auto.
-Qed. 
-
-
-Theorem subject_in_prin_dec :
-    forall (a:subject) (l:prin), {is_subject_in_prin a l} + {~ is_subject_in_prin a l}.
-
-Proof.
-induction l as [| a0 l IHl].
-apply eq_nat_dec.
-destruct (eq_nat_dec a0 a); simpl; auto.
-destruct IHl; simpl; auto.
-right; unfold not; intros [Hc1| Hc2]; auto.
-Defined.
-
-
-Theorem trans_prin_dec :
-   forall (x:subject)(p: prin),
-     {trans_prin x p} + {~trans_prin x p}.
-
-Proof.
-
-apply subject_in_prin_dec.
-Defined.
-\end{lstlisting}
-%\end{minipage}
 
