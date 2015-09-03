@@ -155,7 +155,7 @@ Theorem trans_preRequisite_dec :
 \end{lstlisting}
 
 
-\section{answer and result types}
+\section{answer and result types}\label{sec:answerandresulttypes}
 
 The policy translation functions ultimately will return one of the following answers: Permitted, NotPermitted or Unregulated. Permitted answer signifies that the access request has been granted. The NotPermitted answer is when the access granted is denied. And finally the Unregulated answer is for all the times when neither Permitted or NotPermitted answers are applicable. The $answer$ type in the Coq listing~\ref{lst:answercoq} implements the answer concept. We wrap $answer$s in a $result$ type and add some context. Intuitively a result will tell us whether a subject may perform an action on an asset or not, or else that the request is unregulated.
 
