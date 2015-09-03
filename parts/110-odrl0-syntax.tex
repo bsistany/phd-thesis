@@ -5,30 +5,25 @@
 
 \section{Introduction}
 
-We follow the style of~\cite{pucella2006} by using abstract syntax to express policy statements in \ac{ACCPL}. Abstract syntax is a more compact representation than XML which is what all the XML-based policy languages such \ac{odrl} use. Furthermore abstract syntax simplifies specifying the semantics as we shall see later. As an example the agreement ``If Mary Smith pays five dollars, then she is allowed to print the eBook 'Treasure Island' twice and she is allowed to display it on her computer as many times as she likes'' written in \ac{odrl}'s XML encoding is illustrated in Listing~\ref{lst:agreementxml}~\cite{pucella2006}. 
+We follow the style of~\cite{pucella2006} by using abstract syntax to express policy statements in \ac{ACCPL}. Abstract syntax is a more compact representation than XML which is what all the XML-based policy languages such \ac{odrl} use. Furthermore abstract syntax simplifies specifying the semantics as we shall see later. As an example the agreement ``the asset TheReport may be printed a total of 5 times by either Alice or Bob and twice more by Alice only'' written in \ac{odrl}'s XML encoding is illustrated in Listing~\ref{lst:agreementxml}~\cite{pucella2006}. 
 
 
 \lstset{language=XML}
 %\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[caption={Agreement for Mary Smith in XML},label={lst:agreementxml}]
+\begin{lstlisting}[caption={Agreement for Alice and Bob in XML},label={lst:agreementxml}]
 <agreement>
- <asset> <context> <uid> Treasure Island </uid> </context> </asset>
+ <asset> <context> <uid> The Report </uid> </context> </asset>
  <permission>
-   <display>
-    <constraint>
-     <cpu> <context> <uid> Mary's computer </uid> </context> </cpu>
-    </constraint>
-   </display>
    <print>
+    <constraint> <count> 5 </count> </constraint>
+   </print>
+   <print>
+    <constraint> <name> Alice </name> </constraint>
     <constraint> <count> 2 </count> </constraint>
    </print>
-  <requirement>
-   <prepay>
-    <payment> <amount currency="AUD"> 5.00</amount> </payment>
-   </prepay>
-  </requirement>
  </permission>
- <party> <context> <name> Mary Smith </name> </context> </party>
+ <party> <context> <name> Alice </name> </context> </party>
+ <party> <context> <name> Bob </name> </context> </party>
 </agreement>
 \end{lstlisting}
 %\end{minipage} 
@@ -38,22 +33,21 @@ The agreement in Listing~\ref{lst:agreementxml} is shown in~\ref{lst:agreementpu
 \lstset{language=Pucella2006}
 \begin{lstlisting}[frame=single, caption={Agreement for Mary Smith as BNF (as used in~\cite{pucella2006})},label={lst:agreementpucella2006}]
 agreement
- for Mary Smith 
- about Treasure Island 
- with prePay[5.00] -> and[cpu[Mary's Computer] => display,
-                                      count[2] => print].
+ for Alice and Bob 
+ about The Report 
+ with True -> and[count[5] => print], and[Alice, count[2] => print].
 \end{lstlisting}
 
 
 % \emph{prin\textsubscript{u}}
-In the following we will cover the \emph{abstract syntax} of \ac{ACCPL} that we later express using Coq's constructs such as \emph{Inductive Types} and Definitions. 
+In the following we will cover the \emph{abstract syntax} of \ac{ACCPL} that we later implement in Coq using constructs such as \emph{Inductive Types} and Definitions. 
 
 \section{Environmental Facts}\label{sec:odrl0}
 In \ac{ACCPL}, agreements and facts (i.e. environments) will refer to a count of how many times each policy should be and has been used to justify an action. This is the only fact that \ac{ACCPL} will cover although we conjecture adding other facts and the machinery to support those facts should not change verification goals and results so far of \ac{ACCPL}.
 
 In \ac{ACCPL} a \emph{prerequisite} is either $true$, a $constraint$, the negative of a $constraint$ or a conjunction of $prerequisite$s. $true$ is the prerequisite that always holds. Constraints are facts that are outside of control of users. For example, there is nothing $Alice$ can do to satisfy the constraint ``user must be Bob''. 
 
-We will describe \ac{ACCPL} in a \emph{BNF} grammar that looks more like Pucella and Weissman`s subset grammar~\cite{pucella2006}. BNF style grammars are more abstract as they only give suggestions about the surface syntax of expressions without getting into lexical analysis and parsing related aspects such as precedence order of operators~\cite{piercesf2011}. The Coq version in contrast is more formal and could be directly used for building compilers and interpreters. We will present both the BNF version and the Coq version for each construct of \ac{ACCPL}. 
+We will describe \ac{ACCPL} in a \emph{BNF} grammar that looks more like Pucella and Weissman`s subset grammar~\cite{pucella2006}. BNF style grammars are more abstract as they only give suggestions about the surface syntax of expressions without getting into lexical analysis and parsing related aspects such as precedence order of operators~\cite{piercesf2011}. The Coq version in contrast is the encodings of the BNF definitions which is tyically used for building compilers and interpreters. We will present both the BNF definition and its Coq encoding for each construct of \ac{ACCPL}. 
 
 
 \section{Productions} \label{sec:productionast}

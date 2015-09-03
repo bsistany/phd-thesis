@@ -13,11 +13,11 @@ Assertions or propositions are statements about values in Coq such as $3<8$ or $
 
 \section{ACCPL Syntax}\label{sec:agreementConstructor}
 
-YACPL productions were presented as high level abstract syntax in ~\ref{sec:productionast}. Below we present the corresponding encodings in Coq. 
+\ac{ACCPL} productions were presented as high level abstract syntax in ~\ref{sec:productionast}. Below we present the corresponding encodings in Coq. 
 
 An agreement is a new inductive type in Coq by the same name. The constructor $Agreement$ takes a $prin$, an $asset$ and a $policySet$. $prin$ is defined to be a non empty list of $subject$s (see listing~\ref{lst:agreementcoq}). 
 
-Types $asset$, $subject$, $act$ and $policyId$ are simply defined as $nat$ which is the datatype of natural numbers defined in coq's library module $Coq.Init.Datatypes$ ($nat$ is itself an inductive datatype). We use Coq constants to refer to specific objects of each type. For example, the subject 'Alice' is defined as $Definition Alice:subject := 101.$ and the act 'Play' as $Definition Play : act := 301.$. For each ``nat'' type in YACPL we have also used constants that play the role of ``Null'' objects (see ``Null Object Pattern''~\cite{martin1998pattern}), for example $NullSubject$. This is needed partly because of the way YACPL language elements are defined which corresponds to the need to use $nonemptylist$ exclusively even though at intermediate stages during the various algorithms Coq's $list$ is a better fit because it allows empty lists.
+Types $asset$, $subject$, $act$ and $policyId$ are simply defined as $nat$ which is the datatype of natural numbers defined in coq's library module $Coq.Init.Datatypes$ ($nat$ is itself an inductive datatype). We use Coq constants to refer to specific objects of each type. For example, the subject 'Alice' is defined as $Definition Alice:subject := 101.$ and the act 'Play' as $Definition Play : act := 301.$. For each ``nat'' type in \ac{ACCPL} we have also used constants that play the role of ``Null'' objects (see ``Null Object Pattern''~\cite{martin1998pattern}), for example $NullSubject$. This is needed partly because of the way \ac{ACCPL} language elements are defined which corresponds to the need to use $nonemptylist$ exclusively even though at intermediate stages during the various algorithms Coq's $list$ is a better fit because it allows empty lists.
 
 Next we define the $policySet$ datatype. Note the close/one-to-one mapping to its counterpart in listing~\ref{lst:policySetast}. A $policySet$ is constructed only one way: by calling the $PPS$ constructor which takes a $primPolicySet$ as input. There are two ways a $primPolicySet$ can be constructed (see listing~\ref{lst:primPolicySetast}) corresponding to two constructors: $PIPS$ and $PEPS$. 
 
@@ -148,4 +148,29 @@ Inductive constraint : Set :=
 \end{lstlisting}
 \end{minipage}
 
-We started with the encoding of the agreement for Mary Smith in chapter~\ref{chap:odrl0syntax} but we deferred the definition of the Coq constructs used to define that agreement. All the definitions needed to encode the agreement for Mary Smith except for the prerequisite $PrePay$ (which is not part of YACPL) have now been defined. More agreement examples will be given in Chapter~\ref{chap:examples}.
+We started with the encoding of the agreement for Mary Smith in chapter~\ref{chap:odrl0syntax} but we deferred the definition of the Coq constructs used to define that agreement. All the definitions needed to encode the agreement for Mary Smith except for the prerequisite $PrePay$ (which is not part of \ac{ACCPL}) have now been defined. More agreement examples will be given in Chapter~\ref{chap:examples}.
+
+\lstset{language=Coq}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={preRequisite},label={lst:preRequisitecoq}]
+Definition p1A1:primPolicySet :=
+  PIPS (PrimitiveInclusivePolicySet
+    TruePrq
+    (Policy (Single (PrimitivePolicy (Constraint (Count  5)) id1 Print)))).
+
+Definition p2A1prq1:preRequisite := (Constraint (Principal (Single Alice))).
+Definition p2A1prq2:preRequisite := (Constraint (Count 2)).
+
+Definition p2A1:primPolicySet :=
+  PIPS (PrimitiveInclusivePolicySet
+    TruePrq
+    (Policy 
+      (Single 
+        (PrimitivePolicy (AndPrqs (NewList p2A1prq1 (Single p2A1prq2))) id2 Print)))).
+
+
+Definition A1 := Agreement (NewList Alice (Single Bob)) TheReport (PPS p1A1).
+\end{lstlisting}	
+%\end{minipage}	
+
+
