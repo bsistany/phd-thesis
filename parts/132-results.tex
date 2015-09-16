@@ -7,7 +7,7 @@
 \section{Introduction}\label{sec:introresults}
 
 
-We had set out to prove formally that the \ac{ACCPL} language was decidable. \ac{ACCPL} started out as a reduced version of Pucella and Weissman`s subset of \ac{odrl}~\cite{pucella2006} but quickly morphed into something different based on the direction of the proof we were developing. An important lesson learned was that the process of designing a certifiable policy language cannot be done in isolation since while certifiability of the language derives the design one way, expressiveness requirements of the language usually drive it in the opposite direction. Certifiability cannot be a post-design activity as the changes it will impose are often fundamental ones.
+We had set out to prove formally that the \ac{ACCPL} language was decidable. \ac{ACCPL} started out as a reduced version of Pucella and Weissman`s subset of \ac{odrl}~\cite{pucella2006} but quickly morphed into a different language, based on the direction of the proof we were developing. An important lesson learned was that the process of designing a certifiable policy language cannot be done in isolation since while certifiability of the language derives the design one way, expressiveness requirements of the language usually drive it in the opposite direction. Certifiability cannot be a post-design activity as the changes it will impose are often fundamental ones.
 
 In the following section we will list the main theorems that we have proved and the supporting theorems that needed to be proved to lead up to the main results. In general however we will not show the actual proofs in the dissertation (with some exceptions) and instead refer the reader to the GitHub repository where the source code for \ac{ACCPL}, including the proofs, lives~\cite{BahmanSistany2015}.
 
@@ -212,7 +212,8 @@ Consider a query and a fact in English as: A subscriber to the Basic bundle requ
 \lstset{mathescape, language=AST}  
 \begin{lstlisting}[frame=single, caption={Basic Policy},label={lst:basicpolicyAST}]
 
-p1 = GoldBundle(s) -> Permitted(s, print, TheReport) p2 = BasicBundle(s) -> NotPermitted(s, print, TheReport) 
+p1 = GoldBundle(s) -> Permitted(s, print, TheReport) 
+p2 = BasicBundle(s) -> NotPermitted(s, print, TheReport) 
 p3 = ~GoldBundle(s) -> Permitted(s, play, Terminator)
 q1 = (s, play, Terminator) 
 e1 = BasicBundle(s)
