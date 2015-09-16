@@ -13,31 +13,63 @@ In the following section we will list the main theorems that we have proved and 
 
 \section{Decidability of ACCPL}\label{sec:maintheorems}
 
-The theorem $trans\_agreement\_dec$ is the declaration of the main decidability result for \ac{ACCPL}(see listing~\ref{lst:agreementdecidablecoq}). Together with other theorems we will describe below, we have ``certified'' the decidability of \ac{ACCPL}. In words, the nonempty list that the agreement translation function $trans\_agreement$ returns will return a set of results per each $primPolicy$. Most if not all of the results will be of type Unregulated. In the case where all the results are Unregulated we answer the access query with a result of Unregulated. However in the case where the whole set is not comprised of Unregulated results, we have two mutually exclusive cases. The first case is when the set has a at least one Permitted result; we answer the access query in this case with a result of Permitted. The second case is when the set has at least one NotPermitted; we answer the access query in this case with a result of NotPermitted (see answer and result types in~\ref{sec:answerandresulttypes}).
+The theorem $trans\_agreement\_dec$ is the declaration of the main decidability result for \ac{ACCPL} (see listing~\ref{lst:agreementdecidablecoq}). Together with other theorems we will describe below, we have ``certified'' the decidability of \ac{ACCPL}. In words, the nonempty list that the agreement translation function $trans\_agreement$ returns will return a set of results one per each $primPolicy$. Most if not all of the results will be of type Unregulated. In the case where all the results are Unregulated we answer the access query with a result of Unregulated. We show this case indirectly by showing that the set does not contain a Permitted result nor a NotPermitted result which implies in turn the existence of at least one Unregulated result (see~\ref{lst:impliesunregulatedcoq}).
+
+In the case where the whole set is not comprised of Unregulated results, we have two mutually exclusive cases. The first case is when the set has a at least one Permitted result; we answer the access query in this case with a result of Permitted. The second case is when the set has at least one NotPermitted; we answer the access query in this case with a result of NotPermitted (see answer and result types in~\ref{sec:answerandresulttypes}).
 
 
 \lstset{language=Coq, frame=single, caption={Agreement Translation is Decidable},label={lst:agreementdecidablecoq}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Theorem trans_agreement_dec:
+
+Theorem trans_agreement_dec2:
   forall
   (e:environment)(ag:agreement)(action_from_query:act)
    (subject_from_query:subject)(asset_from_query:asset),
+
 
  (isResultInQueryResult 
     (Result Permitted subject_from_query action_from_query asset_from_query)
     (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
 \/
+
  (isResultInQueryResult 
     (Result NotPermitted subject_from_query action_from_query asset_from_query)
     (trans_agreement e ag action_from_query subject_from_query asset_from_query))
 \/
- (isResultInQueryResult 
-    (Result Unregulated subject_from_query action_from_query asset_from_query)
-    (trans_agreement e ag action_from_query subject_from_query asset_from_query)).
+
+ (~(isResultInQueryResult 
+    (Result Permitted subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query)) /\
+  ~(isResultInQueryResult 
+    (Result NotPermitted subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query))).
+
 \end{lstlisting}
 %\end{minipage}
 
+\lstset{language=Coq, frame=single, caption={No Permitted and No NotPermitted Implies Unregulated},label={lst:impliesunregulatedcoq}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+
+Theorem trans_agreement_not_NotPerm_and_not_Perm_implies_Unregulated_dec:
+  forall
+    (e:environment)(ag:agreement)(action_from_query:act)
+    (subject_from_query:subject)(asset_from_query:asset),
+
+    (~(isResultInQueryResult
+      (Result Permitted subject_from_query action_from_query asset_from_query)
+        (trans_agreement e ag action_from_query subject_from_query asset_from_query)) /\
+
+    ~(isResultInQueryResult
+      (Result NotPermitted subject_from_query action_from_query asset_from_query)
+        (trans_agreement e ag action_from_query subject_from_query asset_from_query))) ->
+
+   (isResultInQueryResult
+      (Result Unregulated subject_from_query action_from_query asset_from_query)
+       (trans_agreement e ag action_from_query subject_from_query asset_from_query)).
+\end{lstlisting}
+%\end{minipage}
 
 The next three theorems establish the mutual exclusivity of Permitted and NotPermitted results. The $trans\_agreement\_perm\_implies\_not\_notPerm\_dec$ (see listing~\ref{lst:permimpliesnotnotperm}) says that the existence of a Permitted result in the set of results returned by $trans\_agreement$, excludes a NotPermitted result while  $trans\_agreement\_NotPerm\_implies\_not\_Perm\_dec$ (see listing~\ref{lst:notpermimpliesnotperm}) shows the inverse. Finally the proof for $trans\_agreement\_not\_Perm\_and\_ \newline NotPerm\_at\_once$ establishes that both Permitted and NotPermitted results cannot exist in the same set returned by $trans\_agreement$ (see listing~\ref{lst:permandnotpermmutualexclusive}). This result also establishes the fact that in \ac{ACCPL} conflicts are not possible.
 
@@ -181,7 +213,65 @@ Proof.
 
 \end{lstlisting}
 %\end{minipage}
+\subsection{Decidable As An Inductive Predicate}
 
+We encode the cases discussed in section~\ref{sec:maintheorems} in an inductively defined predicate called \emph{decidable} in listing~\ref{lst:inductivepredicatedecidablecoq}. Recall that the nonempty list that the agreement translation function $trans\_agreement$ returns will return a set of results one per each $primPolicy$.There are three cases. First when there is a NotPermitted result in the set, second when there is a Permitted result in the set, and third when there are no Permitted and no NotPermitted results in the set. We encode these three cases in three constructors for the type decidable. The constructors are: \emph{Denied}, \emph{Granted} and \emph{NotApplicable}.
+
+\lstset{language=Coq, frame=single, caption={Inductive Predicate decidable},label={lst:inductivepredicatedecidablecoq}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+
+Inductive decidable : environment -> agreement -> act -> subject -> asset -> Prop :=
+
+     | Denied : forall
+  (e:environment)(ag:agreement)(action_from_query:act)
+   (subject_from_query:subject)(asset_from_query:asset), 
+
+ (isResultInQueryResult 
+    (Result NotPermitted subject_from_query action_from_query asset_from_query)
+       (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+  -> decidable e ag action_from_query subject_from_query asset_from_query
+
+     | Granted : forall
+  (e:environment)(ag:agreement)(action_from_query:act)
+   (subject_from_query:subject)(asset_from_query:asset), 
+ (isResultInQueryResult 
+    (Result Permitted subject_from_query action_from_query asset_from_query)
+       (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+  -> decidable e ag action_from_query subject_from_query asset_from_query
+
+     | NonApplicable : forall
+  (e:environment)(ag:agreement)(action_from_query:act)
+   (subject_from_query:subject)(asset_from_query:asset), 
+
+  ~(isResultInQueryResult 
+    (Result Permitted subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+     ->
+  ~(isResultInQueryResult 
+    (Result NotPermitted subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+  -> decidable e ag action_from_query subject_from_query asset_from_query.
+\end{lstlisting}
+%\end{minipage}
+
+
+We have declared (and proven) the decidability of \ac{ACCPL} using the ``decidable'' type as seen in listing~\ref{lst:decidabletypecoq}.
+
+\lstset{language=Coq, frame=single, caption={Decidability Of Agreement Translation},label={lst:decidabletypecoq}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Theorem decidable_trans_agreement:
+  forall
+  (e:environment)(ag:agreement)(action_from_query:act)
+   (subject_from_query:subject)(asset_from_query:asset),
+     decidable e ag action_from_query subject_from_query asset_from_query.
+
+
+\end{lstlisting}
+%\end{minipage}
+
+ 
 \section{ACCPL in the Landscape of Policy-based Policy Languages}
 
 Tschantz and Krishnamurthi~\cite{Tschantz} argue for the need for formal means to compare and contrast policy-based access-control languages and they present a set of properties to analyze the behaviour of policies in light of additional and/or explicit environmental facts, policy growth and policy decomposition. Tschantz and Krishnamurthi apply their properties to two core policy languages and compare the results. One of the core policy languages they present is a simplified \ac{xacml} and the other is Lithium~\cite{Halpern2008}. In the following sections we will describe Tschantz and Krishnamurthi's properties and evaluate \ac{ACCPL} with respect to these properties.
