@@ -361,13 +361,28 @@ Theorem trans_agreement_dec:
 
 \subsection{Deterministic and Total}
 
-According to Tschantz and Krishnamurthi~\cite{Tschantz} a language $L$ is defined to be deterministic if 
-\begin{equation*}
- \text{$forall$ $p \in P$, $forall$ $q \in Q$, $forall$ $d, d' \in D$, $q \left\langle\left\langle p  \right\rangle\right\rangle d$ $\land$ $q \left\langle\left\langle p  \right\rangle\right\rangle d'$ $\implies$ $d = d'$}
-\end{equation*}
+According to Tschantz and Krishnamurthi~\cite{Tschantz} a language $L$ is defined to be deterministic if $forall$ $p \in P$, $forall$ $q \in Q$, $forall$ $d, d' \in D$, $q \left\langle\left\langle p  \right\rangle\right\rangle d$ $\land$ $q \left\langle\left\langle p  \right\rangle\right\rangle d'$ $\implies$ $d = d'$. A language $L$ is total if $forall$ $p \in P$, $forall$ $q \in Q$, $exists$ $d \in D$, s.t. $q \left\langle\left\langle p  \right\rangle\right\rangle d$. 
 
+We declare (and prove) the determinism of \ac{ACCPL} in the theorem listed in~\ref{lst:agreementisdeterministic}. \ac{ACCPL} is proved total by the fact that it is decidable (see~\ref{lst:decidabletypecoq}). 
 
+\lstset{language=Coq, frame=single, caption={Agreement Translation is Deterministic},label={lst:agreementisdeterministic}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
 
+Theorem trans_agreement_deterministic:
+  forall
+  (e:environment)(ag:agreement)(action_from_query:act)
+   (subject_from_query:subject)(asset_from_query:asset)(d: answer),
+
+   (isResultInQueryResult 
+    (Result d subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query)) ->
+
+   (isResultInQueryResult 
+    (Result d subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query)).
+\end{lstlisting}
+%\end{minipage}
 
 
 
