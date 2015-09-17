@@ -314,28 +314,28 @@ According to Tschantz and Krishnamurthi~\cite{Tschantz} at least three different
 
 \subsection{Possible Interpretations}\label{sec:threeinterpretations}
 \begin{itemize}
-\item Implicit: Grant access because of $p3$. This interpretation assumes that if a subject has a subscription to the Basic bundle, the subject does not have a subscription to the Basic bundle. This is an example of ``implicit'' knowledge and ``closed world assumptions''.
+\item Implicit: Grant access because of $p3$. This interpretation assumes that if a subject has a subscription to the Basic bundle, the subject does not have a subscription to the Gold bundle so the assumption is that there is a proof for $~GoldBundle(s)$. This is an example of ``implicit'' knowledge and ``closed world assumptions''.
 
-\item Explicit: The policy does not apply to the query. In other words, the query is ``Unregulated''. $p1$ and $p2$ don`t apply since the asset and the action in the request don`t match the ones in $p1$ and $p2$. $p3$ does not apply either since no fact exists to show that $~GoldBundle(s)$. This interpretation is similar to how \ac{ACCPL} would answer the query.
+\item Explicit: The policy does not apply to the query. In other words, the query is ``NotApplicable''. $p1$ and $p2$ don't apply since the asset and the action in the request don't match the ones in $p1$ and $p2$. $p3$ does not apply either since no proof exists to show that $~GoldBundle(s)$. This interpretation is similar to how \ac{ACCPL} would answer the query.
 
 \item Implicit with automatic proof capability: grants the query by automatically proving that $~GoldBundle(s)$. Under this interpretation, proof by contradiction is used to establish $~GoldBundle(s)$ since if $GoldBundle(s)$, then $p1$ and $p2$ would contradict.
 \end{itemize}
 
 \section{Policy Based Access-Control Languages}
 
-Tschantz and Krishnamurthi~\cite{Tschantz} define an access-control policy language as a tuple $L = (P, Q, G, N, \left\langle\left\langle . \right\rangle\right\rangle)$ where $P$ is a set of policies, $Q$ is a set of requests or queries, $G$ is the granting decisions, $N$ is the non-granting decisions, $\left\langle\left\langle . \right\rangle\right\rangle$ is a function taking a policy $p \in P$ to a relation between Q and $G \cup N$ where $G \cap N = \emptyset$. Let $D$ represent $G \cup N$. Policy $p$ assigns a decision of $d \in D$ to the query $q \in Q$. $L$ also defines a partial order on decisions such that $d <= d'$ if either $d, d' \in N$ or $d, d' \in G$ or $d \in N$ and $d' \in G$, so for example $NotPermitted <= Permitted$ in \ac{ACCPL}.
+Tschantz and Krishnamurthi~\cite{Tschantz} define an access-control policy language as a tuple $L = (P, Q, G, N, \left\langle\left\langle . \right\rangle\right\rangle)$ where $P$ is a set of policies, $Q$ is a set of requests or queries, $G$ is the granting decisions, $N$ is the non-granting decisions, $\left\langle\left\langle . \right\rangle\right\rangle$ is a function taking a policy $p \in P$ to a relation between Q and $G \cup N$ where $G \cap N = \emptyset$. Let $D$ represent $G \cup N$. Policy $p$ assigns a decision of $d \in D$ to the query $q \in Q$. $L$ also defines a partial order on decisions such that $d <= d'$ if either $d, d' \in N$ or $d, d' \in G$ or $d \in N$ and $d' \in G$, so for example $Denied <= Granted$ in \ac{ACCPL}.
 
 \section{Types of Decisions}
 
-Policy based access-control languages typically support at least the Permit and Deny decisions. When a decision for a query is not granted, one design choice for a language is to return a Deny. However in this case Deny stands for ``not Permit''. It is possible to have cases when the policy truly doesn't specify either Permit or Deny. In such cases arbitrarily returning the decision of Deny makes it difficult to compose policies and an explicit decision of NonApplicable or Unregulated is warranted. Some languages may decide to only have Permit decisions. In such languages lack of a Permit decision for a query signifies a Deny so Deny decisions are not explicit. Although the policies of these languages may be more readable than those with more explicit decisions but they result in ambiguity on whether a Deny decision was really intended or not. Finally some languages define an explicit decision of ``Error'' for cases such as when both Permit and Deny decisions are reached for the same query. An explicit Error decision is preferable to undefined behaviour because it can lead to improvements to policies and/or how the queries are built. 
+Policy based access-control languages typically support at least the Permit and Deny decisions. When a decision for a query is not granted, one design choice for a language is to return a Deny. However in this case Deny stands for ``not Permit''. It is possible to have cases when the policy truly doesn't specify either Permit or Deny. In such cases arbitrarily returning the decision of Deny makes it difficult to compose policies and in fact, an explicit decision of NonApplicable is warranted. Some languages may decide to only have Permit decisions. In such languages lack of a Permit decision for a query signifies a Deny so Deny decisions are not explicit. Although the policies of these languages may be more readable than those with more explicit decisions but they result in ambiguity on whether a Deny decision was really intended or not. Finally some languages define an explicit decision of ``Error'' for cases such as when both Permit and Deny decisions are reached for the same query. An explicit Error decision is preferable to undefined behaviour because it can lead to improvements to policies and/or how the queries are built. 
 
 \section{Policy Combinators}
 
-Primitive policies are often developed by independent entities within an organization therefore it is natural to want a way of combining them into a policy for the whole organization using policy combinators. Some languages such \ac{odrl} have nested sub-policies inside other policies. In such cases one design decision could be to allow for different combinators for different layers to make the language more expressive. Some examples of policy combinators are: conjunction, disjunction, exclusive disjunction, Permit override (if any of the primitive policies returns a Permit, return only Permit), Deny override (if any of the primitive policies returns a Deny, return only Deny).
+Primitive policies are often developed by independent entities within an organization therefore it is natural to want a way of combining them into a policy for the whole organization using policy combinators. Some languages such as \ac{odrl} have nested sub-policies inside other policies. In such cases one design decision could be to allow for different combinators for different layers to make the language more expressive. Some examples of policy combinators are: conjunction, disjunction, exclusive disjunction, Permit override (if any of the primitive policies returns a Permit, return only Permit), Deny override (if any of the primitive policies returns a Deny, return only Deny).
 
 \section{ACCPL}
 
-When designing \ac{ACCPL} and to make the decidability proofs possible, we sought out all the different combinations and cases possible (through interaction with the proof process) and explicitly enumerated them in translation functions. Once we made explicit all the different cases where a decision was possible, we assigned Permitted and NotPermitted decisions (equivalent to Permit and Deny decisions in this chapter) to two specific cases while every other enumerated case was rendered with an Unregulated (not applicable) decision. Explicit enumeration of all the different cases has been certified to be complete by the fact that we have the decidability results. For future work, one can modify the decision assignments to different cases, deciding for the semantics to give more Permit decisions for example or more Deny decisions or other changes in the same vein. One can also remove the Unregulated decisions from the translation functions and assign instead Permit or Deny depending on whether we want to make the language more permissive or more prohibitive. In this case however the current decidability theorem will no longer hold and the Unregulated case would have to be removed from the statement of the theorem and the proof to be modified (see listing~\ref{lst:agreementdecidablecoqSecond}).
+When designing \ac{ACCPL} and to make the decidability proofs possible, we sought out all the different combinations and cases possible (through interaction with the proof process) and explicitly enumerated them in the translation functions. Once we made explicit all the different cases where a decision was possible, we assigned Permitted and NotPermitted decisions (equivalent to Permit and Deny decisions in this chapter) to two specific cases while every other enumerated case was rendered with an Unregulated (not applicable) decision. Explicit enumeration of all the different cases has been certified to be complete by the fact that we have the decidability results. For future work, one can modify the decision assignments to different cases, deciding for the semantics to give more Permit decisions for example or more Deny decisions or other changes in the same vein. One can also remove the Unregulated decisions from the translation functions and assign instead Permit or Deny depending on whether we want to make the language more permissive or more prohibitive. In this case however the current decidability theorem will no longer hold and the Unregulated case would have to be removed from the statement of the theorem and the proof to be modified to look like~\ref{lst:agreementdecidablecoqSecond}.
 
 \lstset{language=Coq, frame=single, caption={Agreement Translation is Decidable (for Permitted or NotPermitted only)},label={lst:agreementdecidablecoqSecond}}
 %\begin{minipage}[c]{0.95\textwidth}
@@ -359,20 +359,12 @@ Theorem trans_agreement_dec:
 
 \section{Reasonability Properties for ACCPL}
 
+\subsection{Deterministic and Total}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+According to Tschantz and Krishnamurthi~\cite{Tschantz} a language $L$ is defined to be deterministic if 
+\begin{equation*}
+ \text{$forall$ $p \in P$, $forall$ $q \in Q$, $forall$ $d, d' \in D$, $q \left\langle\left\langle p  \right\rangle\right\rangle d$ $\land$ $q \left\langle\left\langle p  \right\rangle\right\rangle d'$ $\implies$ $d = d'$}
+\end{equation*}
 
 
 
