@@ -385,7 +385,15 @@ Theorem trans_agreement_deterministic:
 %\end{minipage}
 
 
+\subsection{Safety}
 
+As discussed in section~\ref{sec:threeinterpretations} policy interpretations could be implicit or explicit. Explicit interpretations distinguish between unknown information and information known to be absent. The explicit approach promotes verbose policies and requests and usually leads to too many Unregulated or NotApplicable decisions (in the absence of the right environmental facts). However the verbosity could be used to direct what additional facts are needed to make a granting and denying decision. Under the second interpretation in~\ref{sec:threeinterpretations} while the decision is NotApplicable, the system can direct the entity making the request provide a proof of $~GoldBundle(s)$ in order for a granting decision to be rendered. 
+
+Implicit interpretations may result in granting unintended access to protected resources because no explicit facts need be mentioned in the environment. Recall that the implicit approach works by making assumptions when facts are not explicitly mentioned. Such unintended assumptions lead to unintended permissions being granted.
+
+Tschantz and Krishnamurthi~\cite{Tschantz} define safety as $forall$ $p \in P$, $forall$ $q, q' \in Q$, $q$ $\leq$ $q'$ $\implies$ $q \left\langle\left\langle p  \right\rangle\right\rangle d$ $\leq$ $q \left\langle\left\langle p  \right\rangle\right\rangle d'$ which intuitively say that policies written in a safe language $L$, will not result in the leakage of permissions to unintended subjects. For example, incomplete information may unintentionally cause an access permission to be granted to an intruder. 
+
+Could we conclude that an access-control policy language with the explicit approach such as \ac{ACCPL} is also safe? in the design of \ac{ACCPL} and the translation functions in particular we only grant or deny access in specific cases. We grant access if the asset and the action in query are found in the agreement and $trans\_prin$ has a proof and $trans\_preRequisite$ for both policy set and policy have proofs. We deny an access request if the policy set is an exclusive policy set ($primExclusivePolicySet$) and $trans\_prin$ does not hold. In all other cases we render the decision of Unregulated. In other words, in the absence of necessary facts (proofs), we give the least decision (e.g. Unregulated), when there are more facts available in the environment (such as $trans\_preRequisite$ holding), we grant either deny or permit decisions. However when all the facts hold, corresponding to the greatest query in the definition of safety, we render a granting decision which is also the greatest decision in the lattice of decisions: Unregulated $\leq$ NotPermitted $\leq$ Permitted.
 
 
 
