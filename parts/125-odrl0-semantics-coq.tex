@@ -179,7 +179,7 @@ Inductive result : Set :=
 
 Translation of the top level $agreement$ element proceeds by case analysis on the structure of the agreement. However an agreement can only be built one way; by calling the constructor $Agreement$. The translation proceeds by calling the translation function for the corresponding $policySet$ namely the parameter to $Agreement$ called $ps$. See listing~\ref{lst:transagreement}. The formal argument $e$ of type $environment$ is passed along many translation function but will only eventually be used to get the count information from the $getCount$ function. Other formal arguments that are passed are the agreement itself to be translated, plus the subject, action and asset coming from a ``query'' or request for access: $action\_from\_query$, $subject\_from\_query$ and $asset\_from\_query$. Notice that the translation function for agreements returns a nonempty list of \emph{result}s.
 
-\subsection{Policy Combinators}
+\subsection{Policy Combinators}\label{subsec:policycombinators}
 
 The nonempty list of $result$s returned by the agreement translation function will have a result per $primPolicy$ in the agreement. As we will see later when we discuss the proofs, we have proven that results containing a Permitted answer and a NotPermitted answer are mutually exclusive. Therefore existence of a single (or more) Permitted type result in the nonempty list makes the set ``Permitted'' whereas the existence of a single (or more) NotPermitted type result makes the whole set "NotPermitted". When no Permitted or NotPermitted is seen in the set, we only have Unregulated results which would make the whole set "Unregulated". 
 

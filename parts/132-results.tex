@@ -318,7 +318,7 @@ According to Tschantz and Krishnamurthi~\cite{Tschantz} at least three different
 
 \item Explicit: The policy does not apply to the query. In other words, the query is ``NotApplicable''. $p1$ and $p2$ don't apply since the asset and the action in the request don't match the ones in $p1$ and $p2$. $p3$ does not apply either since no proof exists to show that $~GoldBundle(s)$. This interpretation is similar to how \ac{ACCPL} would answer the query.
 
-\item Implicit with automatic proof capability: grants the query by automatically proving that $~GoldBundle(s)$. Under this interpretation, proof by contradiction is used to establish $~GoldBundle(s)$ since if $GoldBundle(s)$, then $p1$ and $p2$ would contradict.
+\item Implicit with automatic proof capability: grants access to the query by automatically proving that $~GoldBundle(s)$. Under this interpretation, proof by contradiction is used to establish $~GoldBundle(s)$ since if $GoldBundle(s)$, then $p1$ and $p2$ would contradict.
 \end{itemize}
 
 \section{Policy Based Access-Control Languages}
@@ -391,9 +391,45 @@ As discussed in section~\ref{sec:threeinterpretations} policy interpretations co
 
 Implicit interpretations may result in granting unintended access to protected resources because no explicit facts need be mentioned in the environment. Recall that the implicit approach works by making assumptions when facts are not explicitly mentioned. Such unintended assumptions lead to unintended permissions being granted.
 
-Tschantz and Krishnamurthi~\cite{Tschantz} define safety as $forall$ $p \in P$, $forall$ $q, q' \in Q$, $q$ $\leq$ $q'$ $\implies$ $q \left\langle\left\langle p  \right\rangle\right\rangle d$ $\leq$ $q \left\langle\left\langle p  \right\rangle\right\rangle d'$ which intuitively say that policies written in a safe language $L$, will not result in the leakage of permissions to unintended subjects. For example, incomplete information may unintentionally cause an access permission to be granted to an intruder. 
+Tschantz and Krishnamurthi~\cite{Tschantz} define safety as $forall$ $p \in P$, $forall$ $q, q' \in Q$, \\$q$ $\leq$ $q'$ $\implies$ $q \left\langle\left\langle p  \right\rangle\right\rangle d$ $\leq$ $q \left\langle\left\langle p  \right\rangle\right\rangle d'$ which intuitively says that policies written in a safe language $L$, will not result in the leakage of permissions to unintended subjects. For example, incomplete information may unintentionally cause an access permission to be granted to an intruder. 
 
 Could we conclude that an access-control policy language with the explicit approach such as \ac{ACCPL} is also safe? in the design of \ac{ACCPL} and the translation functions in particular we only grant or deny access in specific cases. We grant access if the asset and the action in query are found in the agreement and $trans\_prin$ has a proof and $trans\_preRequisite$ for both policy set and policy have proofs. We deny an access request if the policy set is an exclusive policy set ($primExclusivePolicySet$) and $trans\_prin$ does not hold. In all other cases we render the decision of Unregulated. In other words, in the absence of necessary facts (proofs), we give the least decision (e.g. Unregulated), when there are more facts available in the environment (such as $trans\_preRequisite$ holding), we grant either deny or permit decisions. However when all the facts hold, corresponding to the greatest query in the definition of safety, we render a granting decision which is also the greatest decision in the lattice of decisions: Unregulated $\leq$ NotPermitted $\leq$ Permitted.
+
+
+\subsection{Independent Composition}
+
+As discussed in section~\ref{sec:threeinterpretations}, the third interpretation works by taking into account not only the third policy, $p3$, but also $p1$ and $p2$ to render a decision of granted. However each of the policies in isolation would result in the NotApplicable decision. 
+
+Taking into account all policies and rendering a decision that is not different from combining the decisions reached by each primitive policy in isolation, is a property called ``Independent Composition'' by Tschantz and Krishnamurthi~\cite{Tschantz}. The third interpretation in section~\ref{sec:threeinterpretations} is clearly not have this property. Formally, a language $L$ has the independent composition property, if $forall$ $p \in P$, $forall$ $q \in Q$, $forall$ $d, d^\ast \in D$, \\$\boxplus$ ($q \left\langle\left\langle p_{1}  \right\rangle\right\rangle d_{1}$, $q \left\langle\left\langle p_{2}  \right\rangle\right\rangle d_{2}$, ..., $q \left\langle\left\langle p_{n}  \right\rangle\right\rangle d_{n}$) $=$ $q \left\langle\left\langle (\oplus p_{1}, p_{2}, ..., p_{n}) \right\rangle\right\rangle d^\ast$, where $\oplus$ is a composition operator defined in the language and $\boxplus$ is the decision composition operator. For this definition to be well-defined, there is a requirement that complete environmental facts be available for each individual policy so that a decision can be rendered for each primitive policy with respect to the request, in isolation.
+
+Does \ac{ACCPL} have the independent composition property? As covered in chapter~\ref{chap:accplsemanticscoq} and subsection~\ref{subsec:policycombinators} the translation functions for \ac{ACCPL}, starting with $trans\_agreement$ all return sets of $result$s.  The set of $result$s returned by the agreement translation function will have a result per $primPolicy$ (type of primitive policies) in the agreement. Recall that results containing a Permitted answer and a NotPermitted answer are mutually exclusive and the existence of a single (or more) Permitted result in the set makes the whole set ``Permitted'' whereas the existence of a single (or more) NotPermitted result makes the whole set ``NotPermitted''. When no Permitted or NotPermitted is seen in the set, we only have Unregulated results which would make the whole set "Unregulated". This is the decision combination strategy we have designed for \ac{ACCPL}; the policy combination strategy \ac{ACCPL} simply preserves all individual decisions and returns the whole set for rendering a global decision. Below we consider the three different possible decisions that the decision combination strategy may reach and review whether the result of any individual policy may change as a result.
+
+\begin{enumerate}
+  \item Global decision is Permitted. Only possible results are Permitted or Unregulated. In this case, only the Unregulated results have been modified by the decision combination strategy. Permitted results coming from any individual primitive policy will have been preserved.
+  \item Global decision is NotPermitted. Only possible results are NotPermitted or Unregulated. In this case, similar to the first case, only the Unregulated results have been modified by the decision combination strategy. NotPermitted results coming from any individual primitive policy will have been preserved.
+   \item Global decision is Unregulated. Only possible results are Unregulated.  In this case, results coming from any individual primitive policy will have been preserved.
+\end{enumerate}
+
+We argue that \ac{ACCPL} has the independent composition property with respect to granting and denying policies only as detailed in the previous paragraphs. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
