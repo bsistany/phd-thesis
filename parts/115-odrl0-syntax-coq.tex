@@ -148,11 +148,21 @@ Inductive constraint : Set :=
 \end{lstlisting}
 \end{minipage}
 
-We started with the encoding of the agreement for Mary Smith in chapter~\ref{chap:odrl0syntax} but we deferred the definition of the Coq constructs used to define that agreement. All the definitions needed to encode the agreement for Mary Smith except for the prerequisite $PrePay$ (which is not part of \ac{ACCPL}) have now been defined. More agreement examples will be given in Chapter~\ref{chap:examples}.
+We started with the encoding of the agreement for Alice and Bob in chapter~\ref{chap:odrl0syntax} but we deferred the definition of the Coq constructs used to define that agreement. All the definitions needed to encode the agreement for Alice and Bob have now been defined so we show how that agreement looks like in \ac{ACCPL} in the listing~\ref{lst:agreementAliceAndBob}. We also repeat the listing of the agreement using the syntax from~\cite{pucella2006} from chapter~\ref{chap:odrl0syntax} in the listing~\ref{lst:agreementpucella2006two}.
+
+\lstset{language=Pucella2006}
+\begin{lstlisting}[frame=single, caption={Agreement for Alice and Bob as BNF},label={lst:agreementpucella2006two}]
+agreement
+ for Alice and Bob 
+ about The Report 
+ with True -> and[count[5] => print], and[Alice, count[2] => print].
+\end{lstlisting}
+
 
 \lstset{language=Coq}
 %\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={preRequisite},label={lst:preRequisitecoq}]
+\begin{lstlisting}[frame=single, caption={Agreement for Alice and Bob in \ac{ACCPL}},label={lst:agreementAliceAndBob}]
+
 Definition p1A1:primPolicySet :=
   PIPS (PrimitiveInclusivePolicySet
     TruePrq
