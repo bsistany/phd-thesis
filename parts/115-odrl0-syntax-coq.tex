@@ -21,11 +21,10 @@ Types $asset$, $subject$, $act$ and $policyId$ are simply defined as $nat$ which
 
 Next we define the $policySet$ datatype. Note the close/one-to-one mapping to its counterpart in listing~\ref{lst:policySetast}. A $policySet$ is constructed only one way: by calling the $PPS$ constructor which takes a $primPolicySet$ as input. There are two ways a $primPolicySet$ can be constructed (see listing~\ref{lst:primPolicySetast}) corresponding to two constructors: $PIPS$ and $PEPS$. 
 
-$PIPS$ takes a $primInclusivePolicySet$ as input while $PEPS$ takes a $primExclusivePolicySet$. Both  $primInclusivePolicySet$ and $primExclusivePolicySet$ types are constructed by taking a $preRequisite$ and a $policy$ as parameters (see listing~\ref{lst:primInclusivePolicySetast} and ~\ref{lst:primExclusivePolicySetast}). 
+$PIPS$ takes a $primInclusivePolicySet$ as input while $PEPS$ takes a $\linebreak primExclusivePolicySet$. Both  $primInclusivePolicySet$ and $primExclusivePolicySet$ types are constructed by taking a $preRequisite$ and a $policy$ as parameters (see listing~\ref{lst:primInclusivePolicySetast} and ~\ref{lst:primExclusivePolicySetast}). 
 
-A $policy$ is defined as a datatype with the constructors $Policy$ which takes a $nonemptylist$ (see listing~\ref{lst:nonemptylistcoq}) of $primPolicy$s (see listing~\ref{lst:policyast}). $primPolicy$ is constructed by calling $PrimitivePolicy$ which takes a $preRequisite$, a $policyId$ and an action $act$ (see listing~\ref{lst:primPolicyast}). Ignoring the $policyId$ for a moment, a primitive policy consists of a prerequisite and an action. If the prerequisite holds the action is allowed to be performed on the asset. 
+A $policy$ is defined as a datatype with the constructors $Policy$ which takes a nonempty list of primitive policies, or $primPolicy$s. A $primPolicy$ is constructed by calling $\linebreak PrimitivePolicy$ which takes a $preRequisite$, a $policyId$ and an action $act$ (see listing~\ref{lst:primPolicyast} for the abstract syntax version). Ignoring the $policyId$ for a moment, a primitive policy consists of a prerequisite and an action. If the prerequisite holds, the action is allowed to be performed on the asset. 
 
-The data type $nonemptylist$ reflects the definition of ``policy conjunction'' in listing listing~\ref{lst:policyast} in chapter ~\ref{chap:odrl0syntax} (see definition of $nonemptylist$ in listing~\ref{lst:nonemptylistcoq}). Essentially $nonemptylist$ represents a list data structure that has at least one element and it is defined as a new \emph{polymorphic} inductive type in its own section. 
 
 \lstset{language=Coq}
 \begin{minipage}[c]{0.95\textwidth}
@@ -65,43 +64,7 @@ Inductive primPolicy : Set :=
 \end{lstlisting}
 \end{minipage}
 
-\lstset{language=Coq}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={ACPL: Coq Version of Agreement},label={lst:agreementcoqACPL}]
-Inductive agreement : Set :=
-  | Agreement : prin -> asset -> policySet -> agreement.
-
-Definition prin := nonemptylist subject.
-
-Definition asset := nat.
-
-Definition subject := nat.
-
-Definition act := nat.
-
-Definition policyId := nat.
-
-Inductive primPolicy : Set :=
-  | PrimitivePolicy : preRequisite -> policyId -> act -> primPolicy.
-
-Inductive policy : Set :=
-  | Policy : nonemptylist primPolicy -> policy.
-
-Inductive primInclusivePolicySet : Set :=
-  | PrimitiveInclusivePolicySet : preRequisite -> policy -> primInclusivePolicySet.
-
-Inductive primExclusivePolicySet : Set :=
-  | PrimitiveExclusivePolicySet : preRequisite -> policy  -> primExclusivePolicySet.
-
-Inductive primPolicySet : Set :=
-  | PIPS : primInclusivePolicySet -> primPolicySet
-  | PEPS : primExclusivePolicySet -> primPolicySet.
-
-Inductive policySet : Set :=
-  | PPS : primPolicySet -> policySet.
-
-\end{lstlisting}
-\end{minipage}
+The data type $nonemptylist$ reflects the definition of ``policy conjunction'' (see the definition of $nonemptylist$ in listing~\ref{lst:nonemptylistcoq}). Essentially $nonemptylist$ represents a list data structure that has at least one element and it is defined as a new \emph{polymorphic} inductive type in its own Coq section. See the abstract syntax version of $nonemptylist$ in listing~\ref{lst:policyast} in chapter ~\ref{chap:odrl0syntax}.  
 
 
 \lstset{language=Coq, frame=single, caption={nonemptylist},label={lst:nonemptylistcoq}}
