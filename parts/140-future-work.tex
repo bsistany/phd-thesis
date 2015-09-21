@@ -100,7 +100,7 @@ Constraints are additional conditions on permissions in the form of boolean expr
 \end{lstlisting}
 \end{minipage}
 
-\section{Agreements in \ac{selinux}}
+\section{Agreements in SELinux}
 
 As with \ac{odrl} we will start by limiting the policy language to only allow AV rules. As mentioned earlier an operation not covered by a allow rule is denied by \ac{selinux}. We will make up explicit \emph{deny} rules therefore an agreement is defined to be a combination of allow and deny rules. Allow and deny rules as mappings are defined in listing~\ref{lst:allowmappingastselinux}.
 
@@ -119,7 +119,7 @@ AV rule : $T \times (T \times C) \rightarrow 2^{P}$
 
 Environments are collections of \emph{role-type} and \emph{user-role} relations. A role-type relation $role(R, T)$ simply associates a role with a type. A user-role relation $user(U, R)$ associates a user with a role. An environment is consistent with respect to a security context $<T, R, U>$, if and only if $role(R, T)$ and $user(U, R)$ relations hold in the environment. 
 
-\section{Queries in \ac{selinux}}
+\section{Queries in SELinux}
 
 The decision problem in \ac{selinux} access control is whether an entity with security context $<T1, R1, U1>$ may perform action $P1$ to entity with object class $C1$ with security context $<T2, R2, U2>$.
 
@@ -139,7 +139,7 @@ $deny (T1, T2, C, P)$ $\lor$ $\lnot (E$ $consistent$ $wrt$ <T1, R1, U1> $\land$ 
 
 \end{lstlisting}
 
-\section{Decidability of Queries in \ac{selinux}}
+\section{Decidability of Queries in SELinux}
 
 In this thesis we will be investigating the question of decidability for answering queries in \ac{selinux} policies based on the same four outcomes we encountered earlier in~\ref{sec:answerqueriesodrl} namely error, permitted, denied and ``not applicable''. We will first state a decidability theorem similar to the theorem in listing~\ref{lst:decidabilityodrl0coq} (minor adjustments may be needed to allow for differences with \ac{selinux} policy language) and present a proof for it in Coq. The literature in the \ac{selinux} implies only two outcomes are possible: permitted or denied. We will next attempt to prove this conjecture in Coq. Finally we will add constraint relations (see listing~\ref{lst:fqplusconstsel} and listing~\ref{lst:fqminusconstsel}) to \ac{selinux} policies (which we have not included so far) and prove the same decidability results again for the augmented policy.
 
