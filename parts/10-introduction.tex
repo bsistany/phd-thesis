@@ -2,36 +2,34 @@
 \chapter{Introduction}
 %======================================================================
 
-\section{Access-Control Models}
+\section{Introduction}
 
+To put \ac{ACCPL} in context, we need to go back to the origins of access-control and review the progression of the models from the most basic and perhaps oldest to the model \ac{ACCPL} implements. We will start the review of access-control models in section~\ref{sec:models} but first the definition of ``access-control'' is in order.
 
 Authorization refers to the process of rendering a decision to allow access to a resource or asset of interest. By the same token all unauthorized access requests to resources must be controlled and ultimately denied, hence the term ``access-control''. 
 
-Various access-control models exist and below we give a short summary of some of the most important ones leading up to our own core language, \ac{ACCPL}.
 
-\subsection{Access Control Lists}
+
+\section{Access Control Models}\label{sec:models}
 
 \ac{acl} is perhaps the oldest and the most basic access-control model. A list of subjects along with their rights are kept per resource or object of interest. Every time a subject makes an access request on an object, the \ac{acl} of the object is consulted and access is either granted or denied to the requester based on whether the requester is listed in the \ac{acl} and has the correct set of rights.
 
-\subsection{Capabilities}
 Capabilities based access-control works based on a list of objects and associated rights. The list of objects and the associated rights comprise an ``unforgeable'' ticket that a reference monitor checks to allow access (or not). Capabilities based systems don't need to authenticate users as \ac{acl} based systems do.
 
-\subsection{RBAC}
+In \ac{rbac} systems a requester's role determines whether access is granted or denied. In this model, users belong to roles and rights are associated with roles so no direct association between users and rights exist. Roles are meant to group users and add flexibility when assigning rights. \ac{rbac} systems naturally solve the problem of assigning \ac{acl}s for a large group of users and manage the administration cost of changing users' rights in \ac{acl} based systems.
 
-In \ac{rbac} systems a requester`s role determines whether access is granted or denied. In this model, users belong to roles and rights are associated with roles so no direct association between users and rights exist. Roles are meant to group users and add flexibility when assigning rights. \ac{rbac} systems naturally solve the problem of assigning \ac{acl}s for a large group of users and manage the administration cost of changing users' rights in \ac{acl} based systems.
-
-\subsection{ABAC}
 
 Despite many advantages of \ac{rbac} systems, some disadvantages also exist. Often a role needs to be decomposed into sub-roles based on the type of resource to be administered, and perhaps also based on the location that the resource serves~\cite{nist}. Basically \ac{rbac} suffers from a lack of a sub-typing mechanism whereby individual members of a group/role may be differentiated and access is granted or denied based on a more granular set of attributes. \ac{abac} model was proposed to fulfill this granularity requirement. In \ac{abac} access control decisions are made based on a set of attributes, associated with the subject making the request, the environment, and/or the resource itself~\cite{nist}. 
 
-\subsection{PBAC}
 In order to harmonize access control in large environments with many subjects and objects and disparate attributes, \ac{pbac} model has been proposed~\cite{nist}. \ac{pbac} allows for a more uniform access-control model across the system. \ac{pbac} systems help create and enforce policies
 that define who should have access to what resources, and under what circumstances~\cite{nist}.
 There is also a need for large organizations to put in place mechanisms such that access-control rules can be easily audited. This calls for a data-driven approach to access-control where the data, in this case the access-control rules, are available to read and analyze. A data-driven approach like \ac{pbac} additionally helps with modularity of the system as changes in access control rules will have almost no impact to the underlying system the rules are meant to protect.
 
+Because of the cited advantages of \ac{pbac} and its generality and wide spread use, \ac{pbac} is the model \ac{ACCPL} implements.
+
 \section{A Core Policy Language for PBAC Systems} 
 
-Does there already exist a suitable policy language that can be used for expressing general access-control expressions? How about \ac{xacml}, \ac{odrl}~\cite{odrloneone} or \ac{xrml}~\cite{Wang}? 
+Does there already exist a suitable policy language that can be used for expressing general access-control expressions? How about \ac{xacml}, \ac{odrl}\newline~\cite{odrloneone} or \ac{xrml}~\cite{Wang}? 
 
 Currently the most popular \ac{rel}s are the \ac{xrml}, and the \ac{odrl}. Both of these languages are XML based and are considered declarative languages. \ac{xrml} has been selected to be the REL for \emph{MPEG-21} which is an ISO standard for multimedia applications. \ac{odrl} is also a standards based \ac{rel} which has been accepted as part of the W3C community with the mandate of standardizing how rights and policies, related to the usage of digital content on the Open Web Platform, \emph{OWP}~\cite{openwebplatform}, are expressed. \ac{odrl} 2.0 supports expression of rights and also privacy rules for social media while \ac{odrl} 1.0 was only dealing with the mobile ecosystem -- \ac{odrl} 1.0 was adopted by the Open Mobile Alliance, \emph{OMA} in 2000.
 
@@ -48,7 +46,7 @@ As popular as both \ac{xrml} and \ac{odrl} are, their adoption and usage is stil
 
 Rights expressions in \ac{drel}s and specifically \ac{odrl} are used to arbitrate access to assets under conditions. The main construct in \ac{odrl} is the \emph{agreement} which specifies users, asset(s) and policies whereby controls on users' access to the assets are described. This is very similar to how access control conditions are expressed in access control policy languages such as \ac{xacml}~\cite{xacml} and \ac{selinux}~\cite{selinux}. In fact several authors have worked on interoperability between \ac{rel}s and access control policy languages, specifically between \ac{odrl} and \ac{xacml},~\cite{prados2005interoperability, maronas2009architecture} and also on translation from high level policies of \ac{xacml} to low-level and fine grained policies of \ac{selinux}~\cite{alam2008usage}. 
 
-A policy language that was based on some sort of logic with formal semantics and also one that was minimal and extendible was clearly needed. We started by looking at Lithium~\cite{Halpern2008} and subsequently Pucella and Weissman`s subset of \ac{odrl}~\cite{pucella2006} as potential core languages. Lithium uses \ac{drm} as the main application of its access-control system whereas Pucella and Weissman`s primary goal is to define formal semantics for \ac{odrl} whose main application in turn is \ac{drm}. We will use Pucella and Weissman`s subset of \ac{odrl} as the basis for \ac{ACCPL} and in doing so treat digital rights as our main access-control application without loss of generality with respect to other applications, with the final goal of performing formal verification on policies written in \ac{ACCPL}.
+A policy language that was designed with logic and formal semantics and also one that was minimal and extendible was clearly needed. We started by looking at Lithium~\cite{Halpern2008} and subsequently Pucella and Weissman`s subset of \ac{odrl}~\cite{pucella2006} as potential core languages. Lithium uses \ac{drm} as the main application of its access-control system whereas Pucella and Weissman`s primary goal is to define formal semantics for \ac{odrl} whose main application in turn is \ac{drm}. We will use Pucella and Weissman`s subset of \ac{odrl} as the basis for \ac{ACCPL} and in doing so treat digital rights as our main access-control application without loss of generality with respect to other applications, with the final goal of performing formal verification on policies written in \ac{ACCPL}.
 
 
 
@@ -87,7 +85,7 @@ We originally started with a specific subset of~\cite{pucella2006} so that we co
     
 Our decidability results subsume an important sub-category, namely inconsistency or conflict-detection in policy expressions or rules. Authors of~\cite{st2012verified}~\cite{felty13} describe and implement in Coq a conflict detection algorithm for detecting conflicts in \ac{xacml} access control rules. \ac{xacml} is an expressive and at the same time complex policy language which makes conflict detection a difficult task. Authors of~\cite{st2012verified} then prove the conflict detection algorithm correct (or certified) by developing a formal proof in Coq. The proof is rather complex and involves a large number of cases, including many corner cases that were difficult to get right~\cite{st2012verified}. For \ac{ACCPL} we have formally proven that conflicts are not possible.
 
-\ac{ACCPL} being a core policy language with certified semantics could be used to implement various policy languages and reason about interoperability between those languages~\cite{prados2005interoperability, maronas2009architecture}. In this manner our Coq based language \ac{ACCPL} can be viewed as \emph{abstract syntax}, complete with defined semantics, that can be used for implementing various policy languages with more concrete syntax (e.g. W3C's \ac{odrl} and \ac{selinux}). 
+\ac{ACCPL} being a core policy language with certified semantics could be used to implement various policy languages and reason about interoperability between those languages~\cite{prados2005interoperability, maronas2009architecture}. In this manner our language \ac{ACCPL} can be viewed as \emph{abstract syntax}, complete with defined semantics, that can be used for implementing various policy languages with more concrete syntax (e.g. W3C's \ac{odrl} and \ac{selinux}). 
 
 For access to the Coq source code for \ac{ACCPL}, please refer to the GitHub repository at \url{https://github.com/bsistany/yacpl.git}.
 
