@@ -11,7 +11,7 @@ We also consider \ac{ACCPL} a core policy access-control language since we have 
 
 In this thesis, we describe the design of ACCPL and its implementation in Coq.  Using Coq to implement ACCPL as it was being defined was an important factor in its design, allowing us to address the trade-off between expressive power and ease of formal proof of correctness. We argue that \ac{ACCPL} is significantly more amenable to analysis and reasoning than other access-control policy languages, while still retaining sufficient expressive power, and we describe how the design choices that were made contributed to this ease of reasoning. 
 
-The semantics of policies in \ac{ACCPL} are specified by translation from policy statements to decisions. We present decidability results for the decision problem that asks whether a request can be answered with a decision given a policy and we show that the translation algorithm meets its specification. 
+The semantics of policies in \ac{ACCPL} are specified by translation from policy statements to decisions. We present decidability results for the decision problem that asks whether a request can be answered with a decision given a policy; the translation algorithm terminates on all inputs policies with a decision. Furthermore, we show that the translation algorithm meets its specification and computes the correct decision given a policy. 
 
 \cleardoublepage
 %\newpage
