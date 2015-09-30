@@ -3,14 +3,13 @@
 %======================================================================
 
 % ---------------------------------- COQ -----------------------
-
-\section{Introduction}
-\label{sec:envConsistentP}  
+We specify the semantics of \ac{ACCPL} as a translation function from an agreement to a decision (more concretely to a set of \emph{result}s -- see listing~\ref{lst:answercoq}) . Specifying the semantics as translations from policy statements (e.g. agreement) to decisions, mostly follows the style Pucella and Weissman~\cite{pucella2006} use to define the semantics for their \ac{odrl} fragment. In Pucella and Weissman's language, the translation functions are defined from agreements to formulas in many-sorted first-order logic with equality. The translation functions for \ac{ACCPL} return a specific decision based on whether there are proof terms for certain conditions and/or proof terms for the negation of those conditions. 
+ 
 
 % COQ
-The translation functions plus the auxiliary types and infrastructure which implement the semantics for \ac{ACCPL} have been encoded in Coq. Translation functions build Coq terms of type $Prop$ for the most part. Well-formed propositions (or $Prop$s) are assertions one can express about values such as mathematical objects or even programs (e.g. 3 < 8) in Coq. 
+The translation functions plus the auxiliary types and infrastructure which implement the semantics for \ac{ACCPL} have been encoded in Coq. The Coq code implementing the semantics is high-level enough to be readable as a specification of the semantics. This is one reason why we do not use abstract syntax to describe the semantics as we did for the syntax of \ac{ACCPL} (see chapter~\ref{chap:odrl0syntax}). The other reason not to use abstract syntax the way Pucella and Weissman~\cite{pucella2006} do for their semantics, is the difficulty of coming up with abstract syntax that is intuitive and equivalent to the translation functions implemented in Coq and listed in this chapter.
 
-Whether a permission is granted or denied depends on the agreements in question but also on the facts recorded in the environment. For \ac{ACCPL} those facts revolve around the number of times a policy has been used to justify an action (see section~\ref{sec:odrl0} for more details on \ac{ACCPL}). We encode this information in an \emph{environment} which is a conjunction of equalities of the form $count(s, policyId) = n$. 
+Whether an agreement is translated into a decision indicating a permission is granted or denied depends on the agreement in question but also on the facts recorded in the environment. For \ac{ACCPL} those facts revolve around the number of times a policy has been used to justify an action (see section~\ref{sec:odrl0} for more details on \ac{ACCPL}). We encode this information in an \emph{environment} which is a conjunction of equalities of the form $count(s, policyId) = n$. 
 
 % COQ
 The Coq version of the count equality is a new inductive type called \emph{count\_equality}. An environment is defined to be a non-empty list of $count\_equality$ objects (see listing~\ref{lst:environmentcoq}). Function $make\_count\_equality$ in listing~\ref{lst:environmentcoq} is simply a convenience function that builds $count\_equality$s. For an example of how environments are created see listing~\ref{lst:environmentusagecoq}.
@@ -157,7 +156,7 @@ Theorem trans_preRequisite_dec :
 
 \section{answer and result types}\label{sec:answerandresulttypes}
 
-The policy translation functions ultimately will return one of the following answers: Permitted, NotPermitted or Unregulated. Permitted answer signifies that the access request has been granted. The NotPermitted answer is for when the access request is denied. And finally the Unregulated answer is for all the times when neither Permitted or NotPermitted answers are applicable. The $answer$ type in the Coq listing~\ref{lst:answercoq} implements the answer concept. We wrap $answer$s in a $result$ type and add some context. Intuitively a result will tell us whether a subject may perform an action on an asset or not, or else that the request is unregulated.
+The policy translation functions ultimately will return one of the following answers: Permitted, NotPermitted or Unregulated. Permitted answer signifies that the access request has been granted. The NotPermitted answer is for when the access request is denied. And finally the Unregulated answer is for all the times when neither Permitted or NotPermitted answers are applicable. The $answer$ type in the Coq listing~\ref{lst:answercoq} implements the answer concept. We wrap $answer$s in a $result$ type and add some context. Intuitively a result will tell us whether a subject may perform an action on an asset or not, or else that the request is unregulated. in listing~\ref{lst:answercoq} we also show the definition of the utility function $makeResult$ that when given an $answer$, a $subject$, an $act$ and an $asset$ builds and returns a $result$.
 
 
 \lstset{language=Coq, frame=single, caption={Decision Procedures: },label={lst:answercoq}}
@@ -171,6 +170,10 @@ Inductive answer : Set :=
   
 Inductive result : Set :=
   | Result : answer -> subject -> act -> asset -> result.
+ 
+Definition makeResult (ans:answer)(s:subject)(ac:act)(ass:asset) : result := 
+ (Result ans s ac ass).
+ 
 \end{lstlisting}
 \end{minipage}
 
@@ -514,7 +517,7 @@ Inductive single_query : Set :=
 
 \subsection{Answering Queries}\label{subsec:answerqueriesodrl}
 
-Access control models typically use a two-valued decision set to indicate whether an access request is granted or denied. However many access-control models have extended this two valued set with two more values: non applicable policies to certain queries and an error case accounting to all possible error conditions when evaluating an access request~\cite{DBLP:conf/sacmat/MorissetZ14}. Answering a query could therefore lead to one of four values: error(listing~\ref{lst:errordecision}), permitted(listing~\ref{lst:permitdecision}), denied(listing~\ref{lst:denydecision}) and ``not applicable'' (listing~\ref{lst:notapplicabledecision}) as defined in~\cite{Tschantz}. Note that $e$ denotes 'an environment being consistent' (see section~\ref{sec:envConsistentP}) in the following listings. As we will see later in chapter~\ref{chap:results} (listing~\ref{lst:permandnotpermmutualexclusive}) \ac{ACCPL} ends up using a three valued decision set with only the permit, deny and non applicable cases. 
+Access control models typically use a two-valued decision set to indicate whether an access request is granted or denied. However many access-control models have extended this two valued set with two more values: non applicable policies to certain queries and an error case accounting to all possible error conditions when evaluating an access request~\cite{DBLP:conf/sacmat/MorissetZ14}. Answering a query could therefore lead to one of four values: error(listing~\ref{lst:errordecision}), permitted(listing~\ref{lst:permitdecision}), denied(listing~\ref{lst:denydecision}) and ``not applicable'' (listing~\ref{lst:notapplicabledecision}) as defined in~\cite{Tschantz}. Note that $e$ denotes 'an environment being consistent in the following listings. As we will see later in chapter~\ref{chap:results} (listing~\ref{lst:permandnotpermmutualexclusive}) \ac{ACCPL} ends up using a three valued decision set with only the permit, deny and non applicable cases. 
 
 \lstset{mathescape, language=AST} 
 \begin{lstlisting}[frame=single, caption={Answerable Queries: Error},label={lst:errordecision}]
