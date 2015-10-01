@@ -3,13 +3,13 @@
 %======================================================================
 
 % ---------------------------------- COQ -----------------------
-We specify the semantics of \ac{ACCPL} as a translation function from an agreement to a decision (more concretely to a set of \emph{result}s -- see listing~\ref{lst:answercoq}) . Specifying the semantics as translations from policy statements (e.g. agreement) to decisions, mostly follows the style Pucella and Weissman~\cite{pucella2006} use to define the semantics for their \ac{odrl} fragment. In Pucella and Weissman's language, the translation functions are defined from agreements to formulas in many-sorted first-order logic with equality. The translation functions for \ac{ACCPL} return a specific decision based on whether there are proof terms for certain conditions and/or proof terms for the negation of those conditions. 
+We specify the semantics of \ac{ACCPL} as a translation function from an agreement to a decision (more concretely to a set of \emph{result}s -- see listing~\ref{lst:answercoq}) . Specifying the semantics as translations from policy statements (e.g. agreement) to decisions, mostly follows the style Pucella and Weissman~\cite{pucella2006} use to define the semantics for their \ac{odrl} fragment. In Pucella and Weissman's language, the translation functions are defined from agreements to formulas in many-sorted first-order logic with equality. The translation functions for \ac{ACCPL} return a specific decision based on whether there are proof terms for certain conditions and/or proof terms for the negation of those conditions (see section~\ref{sec:sumboolsection} for more details).
  
 
 % COQ
 The translation functions plus the auxiliary types and infrastructure which implement the semantics for \ac{ACCPL} have been encoded in Coq. The Coq code implementing the semantics is high-level enough to be readable as a specification of the semantics. This is one reason why we do not use abstract syntax to describe the semantics as we did for the syntax of \ac{ACCPL} (see chapter~\ref{chap:odrl0syntax}). The other reason not to use abstract syntax the way Pucella and Weissman~\cite{pucella2006} do for their semantics, is the difficulty of coming up with abstract syntax that is intuitive and equivalent to the translation functions implemented in Coq and listed in this chapter.
 
-Whether an agreement is translated into a decision indicating a permission is granted or denied depends on the agreement in question but also on the facts recorded in the environment. For \ac{ACCPL} those facts revolve around the number of times a policy has been used to justify an action (see section~\ref{sec:odrl0} for more details on \ac{ACCPL}). We encode this information in an \emph{environment} which is a conjunction of equalities of the form $count(s, policyId) = n$. 
+Whether an agreement is translated into a decision indicating a permission is granted or denied depends on the agreement in question but also on the facts recorded in the environment. For \ac{ACCPL} those facts revolve around the number of times a policy has been used to justify an action (see section~\ref{sec:odrl0} for background on environments). We encode this information in an \emph{environment} which is a conjunction of equalities of the form $count(s, policyId) = n$. 
 
 % COQ
 The Coq version of the count equality is a new inductive type called \emph{count\_equality}. An environment is defined to be a non-empty list of $count\_equality$ objects (see listing~\ref{lst:environmentcoq}). Function $make\_count\_equality$ in listing~\ref{lst:environmentcoq} is simply a convenience function that builds $count\_equality$s. For an example of how environments are created see listing~\ref{lst:environmentusagecoq}.
@@ -69,7 +69,7 @@ Fixpoint getCount
 \end{lstlisting}
 \end{minipage}
 
-\section{Decision Procedures and the sumbool type}
+\section{Decision Procedures and the sumbool Type}\label{sec:sumboolsection}
 
 sumbool is a boolean type defined in the Coq standard library module $Coq.Init.Specif$. sumbool is equipped with the justification of its value, which really helps with proofs. sumbool A B, which is written \{A\}+\{B\}, is the informative disjunction ``A or B'', where A and B are logical propositions. Its extraction is isomorphic to the type of booleans. A boolean is either true or false, and this is decidable~\cite{Coq:manual}. See listing~\ref{lst:sumbooltypeCoq} for the definition of $sumbool$ and $sumbool\_of\_bool$. With sumbools similar to bool and other 2-constructor inductive types, one can use the ``if then else'' construct to select the desired case when doing proofs which makes for much more readability of the given proofs.
 
@@ -85,7 +85,9 @@ Inductive sumbool (A B:Prop) : Set :=
 \end{lstlisting}
 \end{minipage}
 
-We have used the sumbool type to declare and prove decision procedures that we have subsequently used in the semantics and also in the proofs. In the following we will list only the type declaration of each decision procedure and the accompanying functions. The individual decision procedures were used as a building block to make the final decidability proofs for \ac{ACCPL} possible. We will refer to these listings later when we discuss the translations.
+We have used the sumbool type to declare and prove decision procedures that we have subsequently used in the translation function implementing the semantics and also in the proofs. In the following we will list only the type declaration of each decision procedure and the accompanying functions. The individual decision procedures were used as a building block to make the final decidability proofs for \ac{ACCPL} possible. We will refer to these listings later when we discuss the translations and/or proofs using the decision procedures.
+
+The decision procedure $eq\_nat\_dec$ compares two natural numbers, returning a proof term if they are equal or a proof term if they are not (see listing~\ref{lst:eqnatdeccoq}).
 
 \lstset{language=Coq, frame=single, caption={Decision Procedures: eq_nat_dec~\cite{Coq:manual}},label={lst:eqnatdeccoq}}
 \begin{lstlisting}
