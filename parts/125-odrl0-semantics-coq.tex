@@ -219,158 +219,9 @@ Definition trans_agreement
 
 Translation of a $policySet$ (called $trans\_ps$ in listing~\ref{lst:transpsCoq}), takes as input $e$, the environment, the subject, action and asset coming from a query: $action\_from\_query$, $subject\_from\_query$ and $asset\_from\_query$, $ps$, the policy set, $prin\_{u}$, the agreement's user, and $a$, the asset mentioned in the agreement. 
 
-The translation starts with checking that there is a proof for the equality of asset_from_query and a (the asset from the agreement). If so, the translation function recurses on the composing $primPolicySet$. Otherwise, a result of Unregulated is immediately returned. Intuitively we are just explicitly stating that the semantics are not applicable to queries about assets that are not mentioned in the agreement. 
+The translation starts with checking that there is a proof for the equality of asset_from_query and a (the asset from the agreement). If so, the translation function recurses on the composing $primPolicySet$ and calling the local function $process\_single\_ps$. Otherwise, the Unregulated answer is wrapped along with the subject, action and asset coming from a query: $action\_from\_query$, $subject\_from\_query$ and $asset\_from\_query$ by calling the $makeResult$ helper function. Intuitively we are just explicitly stating that the semantics are not applicable to queries about assets that are not mentioned in the agreement. 
 
-A $primPolicySet$ was either constructed by a $PIPS$ or by a $PEPS$ which distinguish between $primInclusivePolicySet$ and $primExclusivePolicySet$ subtypes. The translation functions $trans\_policy\_PIPS$ and $trans\_policy\_PEPS$ are called in turn as the case may be (see listing~\ref{lst:transpipsAndpepsCoq}).
-
-$trans\_policy\_PIPS$ translation function for a $primInclusivePolicySet$ checks whether there is a proof for the subject in question, $x$, being in $prin\_u$. If so there is a check for whether the $preRequisite$ from the policySet holds or not. If so the translation function $trans\_policy\_positive$ (see listing~\ref{lst:transPositiveCoq}) is called. In all other cases $trans\_policy\_unregulated$ (see listing~\ref{lst:transUnregulatedCoq}) is called.
-
-$trans\_policy\_PEPS$ translation function for a $primExclusivePolicySet$ checks whether there is a proof for the subject in question, $x$, being in $prin\_u$. If not, the translation function $trans\_policy\_negative$ (see listing~\ref{lst:transNegativeCoq}) is called since the policySet is exclusive to agreement's users, we expect that all subjects not in the $prin\_u$ are denied access. In case the check for $x$, being in $prin\_u$ succeeds, there is a check for whether the $preRequisite$ from the policySet holds or not. If so the translation function $trans\_policy\_positive$ is called, else $trans\_policy\_unregulated$ is called.
-
-$trans\_policy\_positive$, $trans\_policy\_negative$ and $trans\_policy\_unregulated$ translation functions start by recursing on a list of $primPolicy$s where the results of processing each $primPolicy$ is appended to the rest of the set (see high level pseudocode in listing~\ref{lst:transListOfPositiveCoq}) for the common pattern). 
-
-$trans\_policy\_positive$ acting on a single $primPolicy$ (see process_single_pp_trans_policy_positive in listing~\ref{lst:transPositiveCoq}), first checks whether the $preRequisite$ from the policy holds or not. If so the translation function checks that there is a proof for the equality of action_from_query and action (the action from the agreement). If so, the translation function finally returns a result of Permitted. In all other cases, a result of Unregulated is returned. Intuitively we are just explicitly stating that the semantics won't apply to queries about actions that are not mentioned in the agreement.
-
-$trans\_policy\_negative$ acting on a single $primPolicy$ (see process_single_pp_trans_policy_negative in listing~\ref{lst:transNegativeCoq}), first checks that there is a proof for the equality of action_from_query and action (the action from the agreement). If so, the translation function returns a result of NotPermitted. Otherwise, a result of Unregulated is returned. Note that compared to $trans\_policy\_positive$ we don't check for whether $preRequisite$ from the policy holds or not, since $trans\_policy\_negative$ is only called for policy sets of type $primExclusivePolicySet$.
-
-$trans\_policy\_unregulated$ acting on a single $primPolicy$ (see process_single_pp_trans_policy_unregulated in listing~\ref{lst:transUnregulatedCoq}), returns a result of Unregulated.
-
-\lstset{language=Coq, frame=single, caption={Translation of unregulated policies},
-    label={lst:transUnregulatedCoq}}
-%\begin{minipage}{\linewidth}
-\begin{lstlisting}
-Definition process_single_pp_trans_policy_unregulated
-   (pp: primPolicy)(x:subject)
-   (a:asset)(action_from_query: act)  : nonemptylist result :=
-  match pp with
-    | PrimitivePolicy prq' policyId action =>
-        (Single (makeResult Unregulated x action_from_query a))
-  end.
-
-Fixpoint trans_policy_unregulated
-  (e:environment)(x:subject)(p:policy)(a:asset)
-  (action_from_query: act){struct p} : nonemptylist result :=
-
-  match p with
-       | Policy pp_list => trans_pp_list_trans_policy_unregulated pp_list x a action_from_query
-  end.
-
-\end{lstlisting}
-%\end{minipage}
-
-\lstset{language=Coq, frame=single, caption={Translation of negative policies},
-    label={lst:transNegativeCoq}}
-%\begin{minipage}{\linewidth}
-\begin{lstlisting}
-Definition process_single_pp_trans_policy_negative
-   (pp: primPolicy)(x:subject)
-   (a:asset)(action_from_query: act)  : nonemptylist result :=
-  match pp with
-    | PrimitivePolicy prq' policyId action =>
- 
-          if (eq_nat_dec action_from_query action)
-          then
-            (Single 
-              (makeResult NotPermitted x action_from_query a))
-          else
-            (Single 
-              (makeResult Unregulated x action_from_query a))
-
-  end.
-
-Fixpoint trans_policy_negative
-  (e:environment)(x:subject)(p:policy)(a:asset)
-  (action_from_query: act){struct p} : nonemptylist result :=
-  
-  match p with  
-       | Policy pp_list => trans_pp_list_trans_policy_negative pp_list x a action_from_query
-  end.
-\end{lstlisting}
-%\end{minipage}
-
-\lstset{language=Coq, frame=single, caption={Translation of positive policies},
-    label={lst:transPositiveCoq}}
-%\begin{minipage}{\linewidth}
-\begin{lstlisting}
-Definition process_single_pp_trans_policy_positive 
-   (pp: primPolicy)(e:environment)(x:subject)(prin_u:prin)
-   (a:asset)(action_from_query: act)  : nonemptylist result :=
-  match pp with
-    | PrimitivePolicy prq' policyId action =>
-        if (trans_preRequisite_dec e x prq' (Single policyId) prin_u)
-        then (* prin /\ prq /\ prq' *)
-          if (eq_nat_dec action_from_query action)
-          then
-            (Single 
-              (makeResult Permitted x action_from_query a))
-          else
-            (Single 
-              (makeResult Unregulated x action_from_query a))
-               else (* prin /\ prq /\ ~prq' *)
-          (Single 
-              (makeResult Unregulated x action_from_query a))
-      end.
-
-Definition trans_policy_positive
-  (e:environment)(x:subject)(p:policy)(prin_u:prin)(a:asset)
-  (action_from_query: act) : nonemptylist result :=
-  match p with
-       | Policy pp_list => trans_pp_list_trans_policy_positive pp_list e x prin_u a action_from_query
-  end.
-
-\end{lstlisting}
-%\end{minipage}
-
-\lstset{language=Coq, frame=single, caption={Translation of list of policies: positive, negative and unregulated use the same pattern},
-    label={lst:transListOfPositiveCoq}}
-\begin{lstlisting}
-Fixpoint trans_pp_list_trans_policy_<positive | negative | unregulated> 
-  (pp_list:nonemptylist primPolicy)(e:environment)(x:subject)
-  (prin_u:prin)(a:asset)(action_from_query: act){struct pp_list}:=
-   match pp_list with
-     | Single pp1 => process_single_pp_trans_policy_<positive | negative | unregulated> pp1 e x prin_u a action_from_query
-     | NewList pp pp_list' => app_nonempty
-	 (process_single_pp_trans_policy_<positive | negative | unregulated> pp e x prin_u a action_from_query) 
-	 (trans_pp_list_trans_policy_<positive | negative | unregulated> pp_list' e x prin_u a action_from_query)
-   end.
-\end{lstlisting}
-%\end{minipage}
-
-
-\lstset{language=Coq, frame=single, caption={Translation of PIPS and PEPS},
-    label={lst:transpipsAndpepsCoq}}
-\begin{minipage}{\linewidth}
-\begin{lstlisting}
-Definition trans_policy_PIPS
-  (e:environment)(prq: preRequisite)(p:policy)(x:subject)
-  (prin_u:prin)(a:asset)(action_from_query:act) : nonemptylist result :=
-  
-    if (trans_prin_dec x prin_u)
-    then (* prin *)
-      if (trans_preRequisite_dec e x prq (getId p) prin_u)
-      then (* prin /\ prq *)
-        (trans_policy_positive e x p prin_u a action_from_query)                           
-      else (* prin /\ ~prq *)
-        (trans_policy_unregulated e x p a action_from_query)
-    else (* ~prin *)
-      (trans_policy_unregulated e x p a action_from_query).
-
-Definition trans_policy_PEPS
-  (e:environment)(prq: preRequisite)(p:policy)(x:subject)
-  (prin_u:prin)(a:asset)(action_from_query:act) : nonemptylist result :=
-  
-  if (trans_prin_dec x prin_u)
-  then (* prin *)
-    if (trans_preRequisite_dec e x prq (getId p) prin_u)
-    then (* prin /\ prq *)
-      (trans_policy_positive e x p prin_u a action_from_query)
-    else (* prin /\ ~prq *)
-      (trans_policy_unregulated e x p a action_from_query)
-  else (* ~prin *)
-    (trans_policy_negative e x p a action_from_query).
-
-\end{lstlisting}
-\end{minipage}
+The $primPolicySet$ which was passed to $process\_single\_ps$ was either constructed by a $PIPS$ constructor or by a $PEPS$ constructor, which distinguish between primInclusivePolicySet and primExclusivePolicySet subtypes. The translation functions $trans\_policy\_PIPS$ and $trans\_policy\_PEPS$ are called in turn as the case may be.
 
 
 \lstset{language=Coq, frame=single, caption={Translation of Policy Set},label={lst:transpsCoq}}
@@ -411,8 +262,171 @@ else (* asset_from_query <> a *)
 
 
 
+
+$trans\_policy\_PIPS$ translation function for a $primInclusivePolicySet$ checks whether there is a proof for the subject in question, $x$, being in $prin\_u$, by calling the decision procedure $trans\_prin\_dec$. If so there is a check for whether the $preRequisite$ from the policySet holds or not (by calling the decision procedure $trans\_preRequisite\_dec$). If so the translation function $trans\_policy\_positive$ (see listing~\ref{lst:transPositiveCoq}) is called. In all other cases $trans\_policy\_unregulated$ (see listing~\ref{lst:transUnregulatedCoq}) is called (see listing~\ref{lst:transpipsAndpepsCoq}).
+
+$trans\_policy\_PEPS$ translation function for a $primExclusivePolicySet$ checks whether there is a proof for the subject in question, $x$, being in $prin\_u$, by calling the decision procedure $trans\_prin\_dec$. If not, the translation function $trans\_policy\_negative$ (see listing~\ref{lst:transNegativeCoq}) is called since the policySet is exclusive to agreement's users, we expect that all subjects not in the $prin\_u$ are denied access. In case the check for $x$, being in $prin\_u$ succeeds, there is a check for whether the $preRequisite$ from the policySet holds or not (by calling the decision procedure $trans\_preRequisite\_dec$). If so the translation function $trans\_policy\_positive$ is called, else $trans\_policy\_unregulated$ is called (see listing~\ref{lst:transpipsAndpepsCoq}).
+
+
+\lstset{language=Coq, frame=single, caption={Translation of PIPS and PEPS},
+    label={lst:transpipsAndpepsCoq}}
+\begin{minipage}{\linewidth}
+\begin{lstlisting}
+Definition trans_policy_PIPS
+  (e:environment)(prq: preRequisite)(p:policy)(x:subject)
+  (prin_u:prin)(a:asset)(action_from_query:act) : nonemptylist result :=
+  
+    if (trans_prin_dec x prin_u)
+    then (* prin *)
+      if (trans_preRequisite_dec e x prq (getId p) prin_u)
+      then (* prin /\ prq *)
+        (trans_policy_positive e x p prin_u a action_from_query)                           
+      else (* prin /\ ~prq *)
+        (trans_policy_unregulated e x p a action_from_query)
+    else (* ~prin *)
+      (trans_policy_unregulated e x p a action_from_query).
+
+Definition trans_policy_PEPS
+  (e:environment)(prq: preRequisite)(p:policy)(x:subject)
+  (prin_u:prin)(a:asset)(action_from_query:act) : nonemptylist result :=
+  
+  if (trans_prin_dec x prin_u)
+  then (* prin *)
+    if (trans_preRequisite_dec e x prq (getId p) prin_u)
+    then (* prin /\ prq *)
+      (trans_policy_positive e x p prin_u a action_from_query)
+    else (* prin /\ ~prq *)
+      (trans_policy_unregulated e x p a action_from_query)
+  else (* ~prin *)
+    (trans_policy_negative e x p a action_from_query).
+
+\end{lstlisting}
+\end{minipage}
+
+
+The $trans\_policy\_positive$translation function starts by recursing on a list of $primPolicy$s where the results of processing a single $primPolicy$ (returned by $process\_single\_pp\_trans\_policy\_positive$) is appended to the rest of the set. We only show $trans\_pp\_list\_trans\_policy\_positive$ for $trans\_policy\_positive$ case in listing~\ref{lst:transListOfPositiveCoq}). 
+
+, $trans\_policy\_negative$ and $trans\_policy\_unregulated$ 
+
+\lstset{language=Coq, frame=single, caption={Translation of List of Primitive Policies},
+    label={lst:transListOfPositiveCoq}}
+\begin{lstlisting}
+Fixpoint trans_pp_list_trans_policy_positive
+  (pp_list:nonemptylist primPolicy)(e:environment)(x:subject)
+  (prin_u:prin)(a:asset)(action_from_query: act){struct pp_list}:=
+   match pp_list with
+     | Single pp1 => process_single_pp_trans_policy_positive pp1 e x prin_u a action_from_query
+     | NewList pp pp_list' => app_nonempty
+	 (process_single_pp_trans_policy_positive pp e x prin_u a action_from_query) 
+	 (trans_pp_list_trans_policy_positive pp_list' e x prin_u a action_from_query)
+   end.
+\end{lstlisting}
+%\end{minipage}
+
+
+$trans\_policy\_positive$ acting on a single $primPolicy$ (see process_single_pp_trans_policy_positive in listing~\ref{lst:transPositiveCoq}), first checks whether the $preRequisite$ from the policy holds or not by calling the decision procedure $trans\_preRequisite\_dec$. If so the translation function checks that there is a proof for the equality of action_from_query and action (the action from the agreement) by calling the decision procedure $eq\_nat\_dec$. If so, the translation function finally returns a result of Permitted. In all other cases, a result of Unregulated is returned. Intuitively we are just explicitly stating that the semantics won't apply to queries about actions that are not mentioned in the agreement.
+
+\lstset{language=Coq, frame=single, caption={Translation of positive policies},
+    label={lst:transPositiveCoq}}
+%\begin{minipage}{\linewidth}
+\begin{lstlisting}
+Definition process_single_pp_trans_policy_positive 
+   (pp: primPolicy)(e:environment)(x:subject)(prin_u:prin)
+   (a:asset)(action_from_query: act)  : nonemptylist result :=
+  match pp with
+    | PrimitivePolicy prq' policyId action =>
+        if (trans_preRequisite_dec e x prq' (Single policyId) prin_u)
+        then (* prin /\ prq /\ prq' *)
+          if (eq_nat_dec action_from_query action)
+          then
+            (Single 
+              (makeResult Permitted x action_from_query a))
+          else
+            (Single 
+              (makeResult Unregulated x action_from_query a))
+               else (* prin /\ prq /\ ~prq' *)
+          (Single 
+              (makeResult Unregulated x action_from_query a))
+      end.
+
+Definition trans_policy_positive
+  (e:environment)(x:subject)(p:policy)(prin_u:prin)(a:asset)
+  (action_from_query: act) : nonemptylist result :=
+  match p with
+       | Policy pp_list => trans_pp_list_trans_policy_positive pp_list e x prin_u a action_from_query
+  end.
+
+\end{lstlisting}
+%\end{minipage}
+
+
+$trans\_policy\_negative$ acting on a single $primPolicy$ (see process_single_pp_trans_policy_negative in listing~\ref{lst:transNegativeCoq}), first checks that there is a proof for the equality of action_from_query and action (the action from the agreement) by calling the decision procedure $eq\_nat\_dec$. If so, the translation function returns a result of NotPermitted. Otherwise, a result of Unregulated is returned. Note that compared to $trans\_policy\_positive$ we don't check for whether $preRequisite$ from the policy holds or not, since $trans\_policy\_negative$ is only called for policy sets of type $primExclusivePolicySet$.
+
+
+\lstset{language=Coq, frame=single, caption={Translation of negative policies},
+    label={lst:transNegativeCoq}}
+%\begin{minipage}{\linewidth}
+\begin{lstlisting}
+Definition process_single_pp_trans_policy_negative
+   (pp: primPolicy)(x:subject)
+   (a:asset)(action_from_query: act)  : nonemptylist result :=
+  match pp with
+    | PrimitivePolicy prq' policyId action =>
+ 
+          if (eq_nat_dec action_from_query action)
+          then
+            (Single 
+              (makeResult NotPermitted x action_from_query a))
+          else
+            (Single 
+              (makeResult Unregulated x action_from_query a))
+
+  end.
+
+Fixpoint trans_policy_negative
+  (e:environment)(x:subject)(p:policy)(a:asset)
+  (action_from_query: act){struct p} : nonemptylist result :=
+  
+  match p with  
+       | Policy pp_list => trans_pp_list_trans_policy_negative pp_list x a action_from_query
+  end.
+\end{lstlisting}
+%\end{minipage}
+
+
+$trans\_policy\_unregulated$ acting on a single $primPolicy$ (see process_single_pp_trans_policy_unregulated in listing~\ref{lst:transUnregulatedCoq}), returns a result of Unregulated.
+
+\lstset{language=Coq, frame=single, caption={Translation of unregulated policies},
+    label={lst:transUnregulatedCoq}}
+%\begin{minipage}{\linewidth}
+\begin{lstlisting}
+Definition process_single_pp_trans_policy_unregulated
+   (pp: primPolicy)(x:subject)
+   (a:asset)(action_from_query: act)  : nonemptylist result :=
+  match pp with
+    | PrimitivePolicy prq' policyId action =>
+        (Single (makeResult Unregulated x action_from_query a))
+  end.
+
+Fixpoint trans_policy_unregulated
+  (e:environment)(x:subject)(p:policy)(a:asset)
+  (action_from_query: act){struct p} : nonemptylist result :=
+
+  match p with
+       | Policy pp_list => trans_pp_list_trans_policy_unregulated pp_list x a action_from_query
+  end.
+
+\end{lstlisting}
+%\end{minipage}
+
+
+
+
+
+
+
 % COQ
-Translation of a \emph{prin} (called $trans\_prin$ in listing~\ref{lst:transprinCoq}) takes as input $x$, the $subject$ in question, $p$, the principal or the $prin$,  and proceeds based on whether $p$ is a single subject or a list of subjects. If $p$ is a single subject, $s$, the $Prop$ $x=s$ is returned. Otherwise the disjunction of the translation of the first subject in $p$ ($s$) and the $rest$ of the subjects is returned.
+Translation of a \emph{prin} (called $trans\_prin$ in listing~\ref{lst:transprinCoq}) takes as input $x$, the $subject$ in question, $p$, the principal or the $prin$,  and proceeds based on whether $p$ is a single subject or a list of subjects. If $p$ is a single subject, $s$, the proposition $x=s$ is returned. Otherwise the disjunction of the translation of the first subject in $p$ ($s$) and the $rest$ of the subjects is returned.
 
 \lstset{language=Coq, frame=single, caption={Translation of a Prin},label={lst:transprinCoq}}
 \begin{lstlisting}
@@ -430,7 +444,7 @@ Fixpoint trans_prin
 
 The translation of a $prerequisite$ (called $trans\_preRequisite$ in listing~\ref{lst:transpreRequisiteCoq}) takes as input $e$, the $environment$, $x$, the $subject$, $prq$, the $preRequisite$ to translate, $IDs$, the set of identifiers (of policies implied by the $prq$), $prin_{u}$, the agreement's user, and proceeds by case analysis on the structure of the $prerequisite$. A $prerequisite$ is either a $TruePrq$, a $Constraint$, a $NotCons$, or a $AndPrqs$. 
 
-In listing~\ref{lst:transpreRequisiteCoq} the translation for $TruePrq$ is the Prop $True$, the translations for $Constraint$, $NotCons$ and $AndPrqs$ simply call respective translation functions for corresponding types $constraint$ (namely $trans\_constraint$ and $trans\_notCons$ and $trans\_andPrqs$). 
+In listing~\ref{lst:transpreRequisiteCoq} the translation for $TruePrq$ is the proposition $True$, the translations for $Constraint$, $NotCons$ and $AndPrqs$ simply call respective translation functions for corresponding types $constraint$ (namely $trans\_constraint$ and $trans\_notCons$ and \\$trans\_andPrqs$). 
 
 
 \lstset{language=Coq, frame=single, caption={Translation of a PreRequisite},label={lst:transpreRequisiteCoq}}
@@ -449,7 +463,7 @@ Definition trans_preRequisite
 \end{lstlisting}
 \end{minipage}
 
-The translation of a $constraint$ (called $trans\_constraint$ in listing~\ref{lst:transconstraintCoq}) takes as input $e$ the $environment$, $x$ the $subject$, $const$, the $constraint$ to translate, $IDs$, the set of identifiers (of policies implied by the parent $preRequisite$) and $prin_{u}$, the agreement's user and proceeds by case analysis on the structure of the $constraint$. A $constraint$ is either a $Principal$, a $Count$ or a $CountByPrin$. The translation for $Principal$ returns the translation function (namely $trans\_prin$) for the $prn$ (the $prin$ that accompanies the $const$ constraint). The translation for $Count$ and $CountByPrin$ return the translation function $trans\_count$. 
+The translation of a $constraint$ (called $trans\_constraint$ in listing~\ref{lst:transconstraintCoq}) takes as input $e$ the $environment$, $x$ the $subject$, $const$, the $constraint$ to translate, $IDs$, the set of identifiers (of policies implied by the parent $preRequisite$) and $prin_{u}$, the agreement's user and proceeds by case analysis on the structure of the $constraint$. A $constraint$ is either a $Principal$, a $Count$ or a $CountByPrin$. The translation for $Principal$ returns the translation function, namely $trans\_prin$, for the $prn$ (the $prin$ that accompanies the $const$ constraint). The translation for $Count$ and $CountByPrin$ return the translation function $trans\_count$. 
 
 
 \lstset{language=Coq, frame=single, caption={Translation of a Constraint},label={lst:transconstraintCoq}}
@@ -487,7 +501,7 @@ To implement the translation for a $Count$ or a $CountByPrin$ we start by callin
 
 $trans\_count\_aux$ returns the current count for a single pair of $policyId$ and $subject$ (the call to $getCount$ which looks up the environment $e$ and returns the current count per each $subject$ and $policyId$) and for a list of pairs of $policyId$ and $subject$s, the addition of $get\_count$ (for the first pair) and $trans\_count\_aux$s (for the rest of the pairs) is returned. 
 
-A local variable $running_total$ has the value returned by $trans\_count\_aux$. Finally the proposition $running_total < n$ is returned as the translation for a $Count$ or a $CountByPrin$.
+A local variable $running\_total$ has the value returned by $trans\_count\_aux$. Finally the proposition $running\_total < n$ is returned as the translation for a $Count$ or a $CountByPrin$.
 
 Note that the only difference between translations for a $Count$ and a $CountByPrin$ is the additional $prn$ parameter for $CountByPrin$ which allows for getting counts for subjects not necessarily the same as $prin_{u}$, the agreement's user(s).
 
@@ -534,33 +548,33 @@ Inductive single_query : Set :=
 
 \subsection{Answering Queries}\label{subsec:answerqueriesodrl}
 
-Access control models typically use a two-valued decision set to indicate whether an access request is granted or denied. However many access-control models have extended this two valued set with two more values: non applicable policies to certain queries and an error case accounting to all possible error conditions when evaluating an access request~\cite{DBLP:conf/sacmat/MorissetZ14}. Answering a query could therefore lead to one of four values: error(listing~\ref{lst:errordecision}), permitted(listing~\ref{lst:permitdecision}), denied(listing~\ref{lst:denydecision}) and ``not applicable'' (listing~\ref{lst:notapplicabledecision}) as defined in~\cite{Tschantz}. Note that $e$ denotes 'an environment being consistent in the following listings. As we will see later in chapter~\ref{chap:results} (listing~\ref{lst:permandnotpermmutualexclusive}) \ac{ACCPL} ends up using a three valued decision set with only the permit, deny and non applicable cases. 
+Access control models typically use a two-valued decision set to indicate whether an access request is granted or denied. However many access-control models have extended this two valued set with two more values: non applicable policies to certain queries and an error case accounting for all possible error conditions when evaluating an access request~\cite{DBLP:conf/sacmat/MorissetZ14}. Answering a query could therefore lead to one of four values: error(listing~\ref{lst:errordecision}), permitted(listing~\ref{lst:permitdecision}), denied(listing~\ref{lst:denydecision}) and ``not applicable'' (listing~\ref{lst:notapplicabledecision}) as defined in~\cite{Tschantz}. Note that $e$ denotes 'an environment being consistent in the following listings. As we will see later in chapter~\ref{chap:results} (listing~\ref{lst:permandnotpermmutualexclusive}) \ac{ACCPL} ends up using a three valued decision set with only the permit, deny and non applicable cases. 
 
 \lstset{mathescape, language=AST} 
 \begin{lstlisting}[frame=single, caption={Answerable Queries: Error},label={lst:errordecision}]
 
-$(\bigwedge [\![ agreement]\!]) \land e \implies Permitted(s, act, a)$ and $(\bigwedge [\![ agreement]\!]) \land e \implies \lnot Permitted(s, act, a)$
+$([\![ agreement]\!] \land e) \implies Permitted(s, act, a)$ and $([\![ agreement]\!] \land e) \implies \lnot Permitted(s, act, a)$
 
 \end{lstlisting}
 
 \lstset{mathescape, language=AST} 
 \begin{lstlisting}[frame=single, caption={Answerable Queries: Permit},label={lst:permitdecision}]
 
-$(\bigwedge [\![ agreement]\!]) \land e \implies Permitted(s, act, a)$ and $(\bigwedge [\![ agreement]\!]) \land e \notimplies \lnot Permitted(s, act, a)$
+$([\![ agreement]\!]) \land e) \implies Permitted(s, act, a)$ and $([\![ agreement]\!] \land e) \notimplies \lnot Permitted(s, act, a)$
 
 \end{lstlisting}
 
 \lstset{mathescape, language=AST} 
 \begin{lstlisting}[frame=single, caption={Answerable Queries: Deny},label={lst:denydecision}]
 
-$(\bigwedge [\![ agreement]\!]) \land e \notimplies Permitted(s, act, a)$ and $(\bigwedge [\![ agreement]\!]) \land e \implies \lnot Permitted(s, act, a)$
+$([\![ agreement]\!] \land e) \notimplies Permitted(s, act, a)$ and $([\![ agreement]\!] \land e) \implies \lnot Permitted(s, act, a)$
 
 \end{lstlisting}
 
 \lstset{mathescape, language=AST} 
 \begin{lstlisting}[frame=single, caption={Answerable Queries: Not Applicable},label={lst:notapplicabledecision}]
 
-$(\bigwedge [\![ agreement]\!]) \land e \notimplies Permitted(s, act, a)$ and $(\bigwedge [\![ agreement]\!]) \land e \notimplies \lnot Permitted(s, act, a)$
+$([\![ agreement]\!] \land e) \notimplies Permitted(s, act, a)$ and $([\![ agreement]\!] \land e) \notimplies \lnot Permitted(s, act, a)$
 
 \end{lstlisting}
 
