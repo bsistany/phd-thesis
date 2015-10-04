@@ -4,7 +4,7 @@
 
                   
 %----------------------------------------------------------------------
-
+The tension in designing a policy language is usually between how to make the language expressive enough, such that the design goals for the policy language may be expressed, and how to make the policies verifiable with respect to the stated goals. A central question or goal in policy language design is whether a permission is implied by a set of policy statements. This is referred to as the decidability problem in this thesis. For example, Halpern and Weissman show that in general determining whether a permission is implied by a set of policy statements in \ac{xrml} is undecidable~\cite{HalpernW08} whereas Pucella and Weissman show that answering such questions is decidable but NP-hard for \ac{odrl}~\cite{pucella2006}. 
 
 We had set out to prove formally that the \ac{ACCPL} language was decidable. Recall that we specified the semantics of \ac{ACCPL} using a translation from policy statements to decisions. The goal was to use the translation algorithm to determine when a request for accessing a resource is implied by a given policy, when the request is not implied by the policy and finally when the request is not regulated by the given policy. More importantly we wanted to show that answering access requests always produced a decision and that the translation algorithm terminated on all input policies with a decision of granted, denied or unregulated. In this chapter we discuss the decidability proofs and other main results we had set out to accomplish. We will also show that the translation algorithm meets its specification and computes the correct decision, with respect to its specification, given a policy. 
 
@@ -15,14 +15,41 @@ In the following section we will list the main theorems that we have proved and 
 
 \section{Decidability of ACCPL}\label{sec:maintheorems}
 
-The theorem $trans\_agreement\_dec$ is the declaration of the main decidability result for \ac{ACCPL} (see listing~\ref{lst:agreementdecidablecoq}). Together with other theorems we will describe below, we have ``certified'' the decidability of \ac{ACCPL}. In words, the nonempty list that the agreement translation function $trans\_agreement$ returns will return a set of results one per each $primPolicy$. Most if not all of the results will be of type Unregulated. In the case where all the results are Unregulated we answer the access query with a result of Unregulated. We show this case indirectly by showing that the set does not contain a Permitted result nor a NotPermitted result which implies in turn the existence of at least one Unregulated result (see~\ref{lst:impliesunregulatedcoq}).
+The theorem $trans\_agreement\_dec2$ is the declaration of the main decidability result for \ac{ACCPL} (see listing~\ref{lst:agreementdecidablecoq}). Together with other theorems we will describe below, we have ``certified'' \ac{ACCPL} decidable by proving this theorem. The nonempty list that the agreement translation function $trans\_agreement$ returns will contain results one per each primitive policy ($primPolicy$). Specifically the predicate $isResultInQueryResult$ takes a result and a nonempty list of results which $trans\_agreement$ produces, and calls the $In$ predicate. The $In$ predicate is adapted from the $Coq.Lists.List$ standard library and checks for the existence of the input $result$ in the nonempty list of results. Definitions for predicates $isResultInQueryResult$ and $In$ are listed in listing~\ref{lst:agreementdecidablecoq}. The definitions for $answer$ and $result$ are repeated in the same listing. 
 
-In the case where the whole set is not comprised of Unregulated results, we have two mutually exclusive cases. The first case is when the set has a at least one Permitted result; we answer the access query in this case with a result of Permitted. The second case is when the set has at least one NotPermitted; we answer the access query in this case with a result of NotPermitted (see answer and result types in~\ref{sec:answerandresulttypes}).
+As an example and also a visual aid to understanding how queries are answered, see listing~\ref{lst:permittedcoq}. The $isResultInQueryResult$ predicate looks for a result with an answer of Permitted in the list that $trans\_agreement$ has produced, for an agreement for three primitive policies (since the set contains three results). Intuitively, we are asking whether Alice is Permitted to Print the ebook given a policy.  
+
+\lstset{language=Coq, frame=single, caption={Access Request Is Permitted},label={lst:permittedcoq}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+isResultInQueryResult
+(Result Permitted Alice Print ebook) 
+[ (Result Unregulated Alice Print ebook) ; (Result Unregulated Alice Print ebook) ; (Result Permitted Alice Print ebook) ]
+\end{lstlisting}
+%\end{minipage}
+    
+In the case where the whole set is not comprised of Unregulated results, we have two mutually exclusive cases. The first case is when the set has a at least one Permitted result; we answer the access query in this case with a result of Permitted (this would be the case in the listing~\ref{lst:permittedcoq}). The second case is when the set has at least one NotPermitted; we answer the access query in this case with a result of NotPermitted (see answer and result types in~\ref{sec:answerandresulttypes}).
 
 
 \lstset{language=Coq, frame=single, caption={Agreement Translation is Decidable},label={lst:agreementdecidablecoq}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
+Definition isResultInQueryResult (res:result)(results: nonemptylist result) : Prop :=
+  In res results.
+
+Fixpoint In (a:X) (l:nonemptylist) : Prop :=
+    match l with
+      | Single s => s=a
+      | NewList s rest => s = a \/ In a rest
+    end.
+
+Inductive answer : Set :=
+  | Permitted : answer
+  | Unregulated : answer
+  | NotPermitted : answer.
+
+Inductive result : Set :=
+  | Result : answer -> subject -> act -> asset -> result.
 
 Theorem trans_agreement_dec2:
   forall
@@ -50,30 +77,11 @@ Theorem trans_agreement_dec2:
 \end{lstlisting}
 %\end{minipage}
 
-\lstset{language=Coq, frame=single, caption={No Permitted and No NotPermitted Implies Unregulated},label={lst:impliesunregulatedcoq}}
-%\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
+Typically most, if not all of the results will be of type Unregulated. In the case where all the results are Unregulated we answer the access query with a result of Unregulated. We show this case indirectly in the theorem in listing~\ref{lst:agreementdecidablecoq} by stating the set does not contain a Permitted result nor a NotPermitted result. 
 
-Theorem trans_agreement_not_NotPerm_and_not_Perm_implies_Unregulated_dec:
-  forall
-    (e:environment)(ag:agreement)(action_from_query:act)
-    (subject_from_query:subject)(asset_from_query:asset),
+\section{Mutual Exclusivity of Permitted and NotPermitted}
 
-    (~(isResultInQueryResult
-      (Result Permitted subject_from_query action_from_query asset_from_query)
-        (trans_agreement e ag action_from_query subject_from_query asset_from_query)) /\
-
-    ~(isResultInQueryResult
-      (Result NotPermitted subject_from_query action_from_query asset_from_query)
-        (trans_agreement e ag action_from_query subject_from_query asset_from_query))) ->
-
-   (isResultInQueryResult
-      (Result Unregulated subject_from_query action_from_query asset_from_query)
-       (trans_agreement e ag action_from_query subject_from_query asset_from_query)).
-\end{lstlisting}
-%\end{minipage}
-
-The next three theorems establish the mutual exclusivity of Permitted and NotPermitted results. The $trans\_agreement\_perm\_implies\_not\_notPerm\_dec$ (see listing~\ref{lst:permimpliesnotnotperm}) says that the existence of a Permitted result in the set of results returned by $trans\_agreement$, excludes a NotPermitted result while  $trans\_agreement\_NotPerm\_implies\_not\_Perm\_dec$ (see listing~\ref{lst:notpermimpliesnotperm}) shows the inverse. Finally the proof for $trans\_agreement\_not\_Perm\_and\_ \newline NotPerm\_at\_once$ establishes that both Permitted and NotPermitted results cannot exist in the same set returned by $trans\_agreement$ (see listing~\ref{lst:permandnotpermmutualexclusive}). This result also establishes the fact that in \ac{ACCPL} conflicts are not possible.
+The $trans\_agreement\_perm\_implies\_not\_notPerm\_dec$ (see listing~\ref{lst:permimpliesnotnotperm}) says that the existence of a Permitted result in the set of results returned by $trans\_agreement$, excludes a NotPermitted result.
 
 
 \lstset{language=Coq, frame=single, caption={Permitted result Implies no NotPermitted result},label={lst:permimpliesnotnotperm}}
@@ -95,6 +103,8 @@ Theorem trans_agreement_perm_implies_not_notPerm_dec:
 %\end{minipage}
 
 
+The  $trans\_agreement\_NotPerm\_implies\_not\_Perm\_dec$ (see listing~\ref{lst:notpermimpliesnotperm}) shows that the existence of a NotPermitted result in the set of results returned by $trans\_agreement$, excludes a Permitted result.
+
 \lstset{language=Coq, frame=single, caption={NotPermitted result Implies no Permitted result},label={lst:notpermimpliesnotperm}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
@@ -113,8 +123,9 @@ Theorem trans_agreement_NotPerm_implies_not_Perm_dec:
 \end{lstlisting}
 %\end{minipage}
 
+Finally the proof for $trans\_agreement\_not\_Perm\_and\_ \newline NotPerm\_at\_once$ establishes that both Permitted and NotPermitted results cannot exist in the same set returned by $trans\_agreement$ (see listing~\ref{lst:permandnotpermmutualexclusive}). This result also establishes the fact that in \ac{ACCPL} rendering conflicting decisions is not possible. 
 
-\lstset{language=Coq, frame=single, caption={Permitted and NotPermitted results mutually exclusive},label={lst:permandnotpermmutualexclusive}}
+\lstset{language=Coq, frame=single, caption={Permitted and NotPermitted: Mutually Exclusive},label={lst:permandnotpermmutualexclusive}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem trans_agreement_not_Perm_and_NotPerm_at_once:
