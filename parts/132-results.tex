@@ -172,61 +172,7 @@ Theorem trans_agreement_not_NotPerm_and_not_Perm_implies_Unregulated_dec:
 %\end{minipage}
 
 
-\section{Proofs Hierarchy}
-
-All the theorems shown in the listings of section~\ref{sec:maintheorems}, specify $trans\_agreement$ as the top translation function that returns a set of results one per the $primPolicy$ in the agreement. We have developed the proofs in a modular fashion such that the hierarchy of the proofs follow the structure of \ac{ACCPL} language constructs very closely. For example, we have a version of the main theorem~\ref{lst:agreementdecidablecoq} for the translation functions for a $policySet$, a $primInclusivePolicySet$, a $primExclusivePolicySet$, etc. See listings~\ref{lst:policysetdecidablecoq} for the version for the translation function for a $policySet$.
-
-\lstset{language=Coq, frame=single, caption={PolicySet Translation is Decidable},label={lst:policysetdecidablecoq}}
-%\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
-
-Theorem trans_ps_dec:
-  forall
-  (e:environment)(action_from_query:act)(subject_from_query:subject)(asset_from_query:asset)
-  (ps:policySet)
-  (prin_u:prin)(a:asset),
-
- (isResultInQueryResult 
-    (Result Permitted subject_from_query action_from_query asset_from_query)
-    (trans_ps e action_from_query subject_from_query asset_from_query ps prin_u a)) 
-\/
-
- (isResultInQueryResult 
-    (Result NotPermitted subject_from_query action_from_query asset_from_query)
-    (trans_ps e action_from_query subject_from_query asset_from_query ps prin_u a)) 
-\/
-
- (isResultInQueryResult 
-    (Result Unregulated subject_from_query action_from_query asset_from_query)
-    (trans_ps e action_from_query subject_from_query asset_from_query ps prin_u a)).
-
-\end{lstlisting}
-%\end{minipage}
-
-
-While each proof builds on top of a previously proven decidability theorem based on the structure of the language construct, the pattern of the propositions to prove doesn`t always stay the same. For example, the proof for $trans\_ps\_dec$ uses the proofs for the following two theorems: $trans\_policy\_PIPS\_dec$ and $trans\_policy\_PEPS\_dec$. However the statement of decidability is different for $trans\_policy\_PIPS\_dec$ as the set returned by this translation function will not contain a NotPermitted result; either a Permitted or an Unregulated result will be returned in this case (see listing~\ref{lst:policysetPIPSdecidablecoq}).
-
-\lstset{language=Coq, frame=single, caption={Primitive Inclusive PolicySet Translation is Decidable},label={lst:policysetPIPSdecidablecoq}}
-%\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
-Theorem trans_policy_PIPS_dec:
-  forall
-  (e:environment)(prq: preRequisite)(p:policy)(subject_from_query:subject)
-  (prin_u:prin)(a:asset)(action_from_query:act),
-
- (isResultInQueryResult
-    (Result Permitted subject_from_query action_from_query a)
-    (trans_policy_PIPS e prq p subject_from_query prin_u a action_from_query))
-\/
-
-  (isResultInQueryResult
-    (Result Unregulated subject_from_query action_from_query a)
-    (trans_policy_PIPS e prq p subject_from_query prin_u a action_from_query)).
-Proof.
-
-\end{lstlisting}
-%\end{minipage}
-\subsection{Decidable As An Inductive Predicate}
+\section{Decidable As An Inductive Predicate}
 
 We encode the cases discussed in section~\ref{sec:maintheorems} in an inductively defined predicate called \emph{decidable} in listing~\ref{lst:inductivepredicatedecidablecoq}. Recall that the nonempty list that the agreement translation function $trans\_agreement$ returns will return a set of results one per each $primPolicy$.There are three cases. First when there is a NotPermitted result in the set, second when there is a Permitted result in the set, and third when there are no Permitted and no NotPermitted results in the set. We encode these three cases in three constructors for the type decidable. The constructors are: \emph{Denied}, \emph{Granted} and \emph{NotApplicable}.
 
@@ -269,18 +215,17 @@ Inductive decidable : environment -> agreement -> act -> subject -> asset -> Pro
 %\end{minipage}
 
 
-We have declared (and proven) the decidability of \ac{ACCPL} using the ``decidable'' type as seen in listing~\ref{lst:decidabletypecoq}.
+We declare and prove the decidability of \ac{ACCPL} in terms of the ``decidable'' predicate as seen in listing~\ref{lst:decidabletypecoq}. The proof is made simple since we use the previously proven theorem $trans\_agreement\_dec2$. We will list the intermediate theorems that we have declared and proved which are used in the proof of theorem $trans\_agreement\_dec2$ and subsequent proofs in section~\ref{sec:intermediatetheorems}.
 
 \lstset{language=Coq, frame=single, caption={Decidability Of Agreement Translation},label={lst:decidabletypecoq}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Theorem decidable_trans_agreement:
-  forall
-  (e:environment)(ag:agreement)(action_from_query:act)
-   (subject_from_query:subject)(asset_from_query:asset),
-     decidable e ag action_from_query subject_from_query asset_from_query.
+Theorem trans_agreement_decidable:  forall  (e:environment)(ag:agreement)(action_from_query:act)   (subject_from_query:subject)(asset_from_query:asset),     decidable e ag action_from_query subject_from_query asset_from_query.Proof.
 
-
+intros e ag action_from_query subject_from_query asset_from_query.
+specialize trans_agreement_dec2 with    e ag action_from_query subject_from_query asset_from_query.intros H. destruct H as [H1 | H2].
+apply Granted. assumption.
+destruct H2 as [H21 | H22].apply Denied. assumption.apply NonApplicable. destruct H22 as [H221 H222].exact H221.destruct H22 as [H221 H222].exact H222.Defined.
 \end{lstlisting}
 %\end{minipage}
 
@@ -433,6 +378,60 @@ Tschantz and Krishnamurthi~\cite{Tschantz} discuss the notion of monotonicity of
 
 
 
+\section{Proofs Hierarchy}\label{sec:intermediatetheorems}
+
+All the theorems shown in the listings of section~\ref{sec:maintheorems}, specify $trans\_agreement$ as the top translation function that returns a set of results one per the $primPolicy$ in the agreement. We have developed the proofs in a modular fashion such that the hierarchy of the proofs follow the structure of \ac{ACCPL} language constructs very closely. For example, we have a version of the main theorem~\ref{lst:agreementdecidablecoq} for the translation functions for a $policySet$, a $primInclusivePolicySet$, a $primExclusivePolicySet$, etc. See listings~\ref{lst:policysetdecidablecoq} for the version for the translation function for a $policySet$.
+
+\lstset{language=Coq, frame=single, caption={PolicySet Translation is Decidable},label={lst:policysetdecidablecoq}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+
+Theorem trans_ps_dec:
+  forall
+  (e:environment)(action_from_query:act)(subject_from_query:subject)(asset_from_query:asset)
+  (ps:policySet)
+  (prin_u:prin)(a:asset),
+
+ (isResultInQueryResult 
+    (Result Permitted subject_from_query action_from_query asset_from_query)
+    (trans_ps e action_from_query subject_from_query asset_from_query ps prin_u a)) 
+\/
+
+ (isResultInQueryResult 
+    (Result NotPermitted subject_from_query action_from_query asset_from_query)
+    (trans_ps e action_from_query subject_from_query asset_from_query ps prin_u a)) 
+\/
+
+ (isResultInQueryResult 
+    (Result Unregulated subject_from_query action_from_query asset_from_query)
+    (trans_ps e action_from_query subject_from_query asset_from_query ps prin_u a)).
+
+\end{lstlisting}
+%\end{minipage}
+
+
+While each proof builds on top of a previously proven decidability theorem based on the structure of the language construct, the pattern of the propositions to prove doesn`t always stay the same. For example, the proof for $trans\_ps\_dec$ uses the proofs for the following two theorems: $trans\_policy\_PIPS\_dec$ and $trans\_policy\_PEPS\_dec$. However the statement of decidability is different for $trans\_policy\_PIPS\_dec$ as the set returned by this translation function will not contain a NotPermitted result; either a Permitted or an Unregulated result will be returned in this case (see listing~\ref{lst:policysetPIPSdecidablecoq}).
+
+\lstset{language=Coq, frame=single, caption={Primitive Inclusive PolicySet Translation is Decidable},label={lst:policysetPIPSdecidablecoq}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Theorem trans_policy_PIPS_dec:
+  forall
+  (e:environment)(prq: preRequisite)(p:policy)(subject_from_query:subject)
+  (prin_u:prin)(a:asset)(action_from_query:act),
+
+ (isResultInQueryResult
+    (Result Permitted subject_from_query action_from_query a)
+    (trans_policy_PIPS e prq p subject_from_query prin_u a action_from_query))
+\/
+
+  (isResultInQueryResult
+    (Result Unregulated subject_from_query action_from_query a)
+    (trans_policy_PIPS e prq p subject_from_query prin_u a action_from_query)).
+Proof.
+
+\end{lstlisting}
+%\end{minipage}
 
 
 
