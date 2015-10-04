@@ -380,64 +380,89 @@ Tschantz and Krishnamurthi~\cite{Tschantz} discuss the notion of monotonicity of
 
 \section{Proofs Hierarchy}\label{sec:intermediatetheorems}
 
-All the theorems shown in the listings of section~\ref{sec:maintheorems}, specify $trans\_agreement$ as the top translation function that returns a set of results one per the $primPolicy$ in the agreement. We have developed the proofs in a modular fashion such that the hierarchy of the proofs follow the structure of \ac{ACCPL} language constructs very closely. For example, we have a version of the main theorem~\ref{lst:agreementdecidablecoq} for the translation functions for a $policySet$, a $primInclusivePolicySet$, a $primExclusivePolicySet$, etc. See listings~\ref{lst:policysetdecidablecoq} for the version for the translation function for a $policySet$.
 
-\lstset{language=Coq, frame=single, caption={PolicySet Translation is Decidable},label={lst:policysetdecidablecoq}}
+\lstset{language=Coq, frame=single, caption={},label={}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
+Theorem trans_agreement_dec_sb_Permitted:  forall  (e:environment)(ag:agreement)(action_from_query:act)   (subject_from_query:subject)(asset_from_query:asset), {(isResultInQueryResult     (Result Permitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))} + {~(isResultInQueryResult     (Result Permitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))}.
 
-Theorem trans_ps_dec:
-  forall
-  (e:environment)(action_from_query:act)(subject_from_query:subject)(asset_from_query:asset)
-  (ps:policySet)
-  (prin_u:prin)(a:asset),
+\end{lstlisting}
+%\end{minipage}
 
- (isResultInQueryResult 
-    (Result Permitted subject_from_query action_from_query asset_from_query)
-    (trans_ps e action_from_query subject_from_query asset_from_query ps prin_u a)) 
-\/
-
- (isResultInQueryResult 
-    (Result NotPermitted subject_from_query action_from_query asset_from_query)
-    (trans_ps e action_from_query subject_from_query asset_from_query ps prin_u a)) 
-\/
-
- (isResultInQueryResult 
-    (Result Unregulated subject_from_query action_from_query asset_from_query)
-    (trans_ps e action_from_query subject_from_query asset_from_query ps prin_u a)).
+\lstset{language=Coq, frame=single, caption={},label={}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Theorem trans_agreement_dec_sb_NotPermitted:  forall  (e:environment)(ag:agreement)(action_from_query:act)   (subject_from_query:subject)(asset_from_query:asset), {(isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))} + {~(isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))}.
 
 \end{lstlisting}
 %\end{minipage}
 
 
-While each proof builds on top of a previously proven decidability theorem based on the structure of the language construct, the pattern of the propositions to prove doesn`t always stay the same. For example, the proof for $trans\_ps\_dec$ uses the proofs for the following two theorems: $trans\_policy\_PIPS\_dec$ and $trans\_policy\_PEPS\_dec$. However the statement of decidability is different for $trans\_policy\_PIPS\_dec$ as the set returned by this translation function will not contain a NotPermitted result; either a Permitted or an Unregulated result will be returned in this case (see listing~\ref{lst:policysetPIPSdecidablecoq}).
-
-\lstset{language=Coq, frame=single, caption={Primitive Inclusive PolicySet Translation is Decidable},label={lst:policysetPIPSdecidablecoq}}
+\lstset{language=Coq, frame=single, caption={},label={}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Theorem trans_policy_PIPS_dec:
-  forall
-  (e:environment)(prq: preRequisite)(p:policy)(subject_from_query:subject)
-  (prin_u:prin)(a:asset)(action_from_query:act),
+Theorem resultInQueryResult_dec :    forall (res:result)(results: nonemptylist result),  {isResultInQueryResult res results} + {~isResultInQueryResult res results}.
+\end{lstlisting}
+%\end{minipage}
 
- (isResultInQueryResult
-    (Result Permitted subject_from_query action_from_query a)
-    (trans_policy_PIPS e prq p subject_from_query prin_u a action_from_query))
-\/
 
-  (isResultInQueryResult
-    (Result Unregulated subject_from_query action_from_query a)
-    (trans_policy_PIPS e prq p subject_from_query prin_u a action_from_query)).
-Proof.
+\lstset{language=Coq, frame=single, caption={},label={}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Theorem trans_agreement_not_Perm_and_NotPerm_at_once:  forall  (e:environment)(ag:agreement)(action_from_query:act)   (subject_from_query:subject)(asset_from_query:asset), ~((isResultInQueryResult     (Result Permitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query)) /\ (isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))).
 
 \end{lstlisting}
 %\end{minipage}
 
 
+\lstset{language=Coq, frame=single, caption={},label={}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Theorem trans_policy_PIPS_dec_not:  forall  (e:environment)(prq: preRequisite)(p:policy)(subject_from_query:subject)  (prin_u:prin)(a:asset)(action_from_query:act), ~(isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query a)    (trans_policy_PIPS e prq p subject_from_query prin_u a action_from_query)).
+
+\end{lstlisting}
+%\end{minipage}
 
 
+\lstset{language=Coq, frame=single, caption={},label={}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Theorem trans_policy_PEPS_perm_implies_not_notPerm_dec:  forall  (e:environment)(prq: preRequisite)(p:policy)(subject_from_query:subject)  (prin_u:prin)(a:asset)(action_from_query:act),    (isResultInQueryResult       (Result Permitted subject_from_query action_from_query a)        (trans_policy_PEPS e prq p subject_from_query prin_u a action_from_query)) ->   ~(isResultInQueryResult       (Result NotPermitted subject_from_query action_from_query a)       (trans_policy_PEPS e prq p subject_from_query prin_u a action_from_query)).
+
+\end{lstlisting}
+%\end{minipage}
 
 
+\lstset{language=Coq, frame=single, caption={},label={}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Theorem AnswersNotEqual: forall (ans1:answer)(ans2:answer)(s:subject)(ac:act)(ass:asset),  (ans1<>ans2) -> ((Result ans1 s ac ass) <> (Result ans2 s ac ass)).
+
+\end{lstlisting}
+%\end{minipage}
+
+\lstset{language=Coq, frame=single, caption={},label={}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+
+Theorem trans_policy_positive_dec_not:  forall (e:environment)(s:subject)(p:policy)(prin_u:prin)(a:asset)  (action_from_query: act),   ~(isResultInQueryResult     (Result NotPermitted s action_from_query a)    (trans_policy_positive e s p prin_u a action_from_query)).
+\end{lstlisting}
+%\end{minipage}
+
+\lstset{language=Coq, frame=single, caption={},label={}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Theorem trans_policy_negative_dec_not:  forall (e:environment)(s:subject)(p:policy)(a:asset)  (action_from_query: act),   ~(isResultInQueryResult     (Result Permitted s action_from_query a)    (trans_policy_negative e s p a action_from_query)).
+\end{lstlisting}
+%\end{minipage}
+
+
+\lstset{language=Coq, frame=single, caption={},label={}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Theorem trans_policy_unregulated_dec_not:  forall (e:environment)(s:subject)(p:policy)(a:asset)  (action_from_query: act),   ~(isResultInQueryResult     (Result Permitted s action_from_query a)    (trans_policy_unregulated e s p a action_from_query)) /\    ~(isResultInQueryResult     (Result NotPermitted s action_from_query a)    (trans_policy_unregulated e s p a action_from_query)).
+\end{lstlisting}
+%\end{minipage}
 
 
 
