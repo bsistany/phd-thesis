@@ -378,10 +378,11 @@ Tschantz and Krishnamurthi~\cite{Tschantz} discuss the notion of monotonicity of
 
 
 
-\section{Proofs Hierarchy}\label{sec:intermediatetheorems}
+\section{Intermediate Theorems}\label{sec:intermediatetheorems}
+The theorem $trans\_agreement\_dec\_sb\_Permitted$ states as a sumbool that the nonempty list that $trans\_agreement$ produces, contains a Permitted result or not and this is decidable (see listing~\ref{lst:decsbpermitted}).
 
 
-\lstset{language=Coq, frame=single, caption={},label={}}
+\lstset{language=Coq, frame=single, caption={Translation Function for Agreement Returns a Permitted result or Not},label={lst:decsbpermitted}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem trans_agreement_dec_sb_Permitted:  forall  (e:environment)(ag:agreement)(action_from_query:act)   (subject_from_query:subject)(asset_from_query:asset), {(isResultInQueryResult     (Result Permitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))} + {~(isResultInQueryResult     (Result Permitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))}.
@@ -389,24 +390,28 @@ Theorem trans_agreement_dec_sb_Permitted:  forall  (e:environment)(ag:agreemen
 \end{lstlisting}
 %\end{minipage}
 
-\lstset{language=Coq, frame=single, caption={},label={}}
+The theorem $trans\_agreement\_dec\_sb\_NotPermitted$ states as a sumbool that the nonempty list that $trans\_agreement$ produces, contains a NotPermitted result or not and this is decidable (see listing~\ref{lst:decsbnotpermitted}).
+
+\lstset{language=Coq, frame=single, caption={Translation Function for Agreement Returns a NotPermitted result or Not},label={lst:decsbnotpermitted}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Theorem trans_agreement_dec_sb_NotPermitted:  forall  (e:environment)(ag:agreement)(action_from_query:act)   (subject_from_query:subject)(asset_from_query:asset), {(isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))} + {~(isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))}.
+Theorem trans_agreement_dec_sb_NotPermitted:  forall  (e:environment)(ag:agreement)(action_from_query:act)   (subject_from_query:subject)(asset_from_query:asset), {(isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))} + {~(isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))}.
 
 \end{lstlisting}
 %\end{minipage}
 
+The theorem $resultInQueryResult\_dec$ states as a sumbool that a given result is either in the nonempty list of $results$ or not and this is decidable (see listing~\ref{lst:decresultInResults}).
 
-\lstset{language=Coq, frame=single, caption={},label={}}
+\lstset{language=Coq, frame=single, caption={Result is in Results or Not},label={lst:decresultInResults}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem resultInQueryResult_dec :    forall (res:result)(results: nonemptylist result),  {isResultInQueryResult res results} + {~isResultInQueryResult res results}.
 \end{lstlisting}
 %\end{minipage}
 
+The theorem $trans\_agreement\_not\_Perm\_and\_NotPerm\_at\_once$ states that you may not have both a Permitted and NotPermitted result in the nonempty list that $trans\_agreement$ produces (see listing~\ref{lst:permandnotpermatonce}).
 
-\lstset{language=Coq, frame=single, caption={},label={}}
+\lstset{language=Coq, frame=single, caption={Translation Function for Agreement will not have both Permitted and NotPermitted},label={lst:permandnotpermatonce}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem trans_agreement_not_Perm_and_NotPerm_at_once:  forall  (e:environment)(ag:agreement)(action_from_query:act)   (subject_from_query:subject)(asset_from_query:asset), ~((isResultInQueryResult     (Result Permitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query)) /\ (isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))).
@@ -414,8 +419,8 @@ Theorem trans_agreement_not_Perm_and_NotPerm_at_once:  forall  (e:environment)
 \end{lstlisting}
 %\end{minipage}
 
-
-\lstset{language=Coq, frame=single, caption={},label={}}
+The theorem $trans\_policy\_PIPS\_dec\_not$ states that the translation function trans_policy_PIPS produces a nonempty list of results that will not have a NotPermitted result. This makes intuitive sense as $trans\_policy\_PIPS$ is called for inclusive policy sets only (see listing~\ref{lst:pipsdecnot}).
+\lstset{language=Coq, frame=single, caption={Translation Function for PIPS will not return a NotPermitted result},label={lst:pipsdecnot}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem trans_policy_PIPS_dec_not:  forall  (e:environment)(prq: preRequisite)(p:policy)(subject_from_query:subject)  (prin_u:prin)(a:asset)(action_from_query:act), ~(isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query a)    (trans_policy_PIPS e prq p subject_from_query prin_u a action_from_query)).
@@ -423,17 +428,18 @@ Theorem trans_policy_PIPS_dec_not:  forall  (e:environment)(prq: preRequisite)
 \end{lstlisting}
 %\end{minipage}
 
+The theorem $trans\_policy\_PEPS\_perm\_implies\_not\_notPerm\_dec$ states that having a Permitted result in the nonempty list of results that the translation function trans_policy_PEPS produces implies there exists no NotPermitted result in the nonempty list (see listing~\ref{lst:pepspermimpliesnotperm}).
 
-\lstset{language=Coq, frame=single, caption={},label={}}
+\lstset{language=Coq, frame=single, caption={Permitted in results by Translation Function for PEPS implies no NotPermitted},label={lst:pepspermimpliesnotperm}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem trans_policy_PEPS_perm_implies_not_notPerm_dec:  forall  (e:environment)(prq: preRequisite)(p:policy)(subject_from_query:subject)  (prin_u:prin)(a:asset)(action_from_query:act),    (isResultInQueryResult       (Result Permitted subject_from_query action_from_query a)        (trans_policy_PEPS e prq p subject_from_query prin_u a action_from_query)) ->   ~(isResultInQueryResult       (Result NotPermitted subject_from_query action_from_query a)       (trans_policy_PEPS e prq p subject_from_query prin_u a action_from_query)).
 
 \end{lstlisting}
 %\end{minipage}
+The theorem AnswersNotEqual states that two answers not being equal implies that results built from those answers are not equal as well (see listing~\ref{lst:answersnotequal}).
 
-
-\lstset{language=Coq, frame=single, caption={},label={}}
+\lstset{language=Coq, frame=single, caption={Non Equal Answers Give Non Equal Results},label={lst:answersnotequal}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem AnswersNotEqual: forall (ans1:answer)(ans2:answer)(s:subject)(ac:act)(ass:asset),  (ans1<>ans2) -> ((Result ans1 s ac ass) <> (Result ans2 s ac ass)).
@@ -441,7 +447,10 @@ Theorem AnswersNotEqual: forall (ans1:answer)(ans2:answer)(s:subject)(ac:act)(as
 \end{lstlisting}
 %\end{minipage}
 
-\lstset{language=Coq, frame=single, caption={},label={}}
+The theorem $trans\_policy\_positive\_dec\_not$ states that the translation function trans_policy_positive produces a nonempty list of results that will not have a NotPermitted result (see listing~\ref{lst:positivedecnot}).
+
+
+\lstset{language=Coq, frame=single, caption={Translation Function for Permitting Policies will not return a NotPermitted result},label={lst:positivedecnot}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 
@@ -449,15 +458,19 @@ Theorem trans_policy_positive_dec_not:  forall (e:environment)(s:subject)(p:po
 \end{lstlisting}
 %\end{minipage}
 
-\lstset{language=Coq, frame=single, caption={},label={}}
+The theorem $trans\_policy\_negative\_dec\_not$ states that the translation function trans_policy_negative produces a nonempty list of results that will not have a Permitted result (see listing~\ref{lst:negativedecnot}).
+
+\lstset{language=Coq, frame=single, caption={Translation Function for NotPermitting Policies will not return a Permitted result},label={lst:negativedecnot}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem trans_policy_negative_dec_not:  forall (e:environment)(s:subject)(p:policy)(a:asset)  (action_from_query: act),   ~(isResultInQueryResult     (Result Permitted s action_from_query a)    (trans_policy_negative e s p a action_from_query)).
 \end{lstlisting}
 %\end{minipage}
 
+The theorem $trans\_policy\_unregulated\_dec\_not$ states that the translation function trans_policy_unregulated produces a nonempty list of results that will not have a Permitted nor a NotPermitted result (see listing~\ref{lst:unregulateddecnot}).
 
-\lstset{language=Coq, frame=single, caption={},label={}}
+\lstset{language=Coq, frame=single, caption={Translation Function for Unregulated Requests will not return Permitted nor NotPermitted},label={lst:unregulateddecnot}}
+
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem trans_policy_unregulated_dec_not:  forall (e:environment)(s:subject)(p:policy)(a:asset)  (action_from_query: act),   ~(isResultInQueryResult     (Result Permitted s action_from_query a)    (trans_policy_unregulated e s p a action_from_query)) /\    ~(isResultInQueryResult     (Result NotPermitted s action_from_query a)    (trans_policy_unregulated e s p a action_from_query)).
