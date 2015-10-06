@@ -5,7 +5,7 @@
 
 \section{Introduction}
 
-We follow the style of~\cite{pucella2006} by using abstract syntax to express policy statements in \ac{ACCPL}. Abstract syntax is a more compact representation than XML which is what all the XML-based policy languages such \ac{odrl} use. Furthermore abstract syntax simplifies specifying the semantics as we shall see later. As an example the agreement ``the asset TheReport may be printed a total of 5 times by either Alice or Bob and twice more by Alice only'' written in \ac{odrl}'s XML encoding is illustrated in Listing~\ref{lst:agreementxml}~\cite{pucella2006}. 
+We follow the style of~\cite{pucella2006} by using abstract syntax to express policy statements in \ac{ACCPL}. Abstract syntax is a more compact representation than XML which is what all the XML-based policy languages such \ac{odrl} use. Furthermore abstract syntax simplifies specifying the semantics as we shall see later. As an example the agreement ``the asset TheReport may be printed a total of 5 times by either Alice or Bob and twice more by Alice only'' written in \ac{odrl}'s XML encoding is illustrated in listing~\ref{lst:agreementxml}~\cite{pucella2006}. 
 
 
 \lstset{language=XML}
@@ -35,24 +35,24 @@ The agreement in Listing~\ref{lst:agreementxml} is shown in~\ref{lst:agreementpu
 agreement
  for Alice and Bob 
  about The Report 
- with True -> and[count[5] => print], and[Alice, count[2] => print].
+ with and[True -> count[5] => print, True -> and[Alice, count[2]] => print].
 \end{lstlisting}
 
 
 % \emph{prin\textsubscript{u}}
-In the following we will cover the \emph{abstract syntax} of \ac{ACCPL} that we later implement in Coq using constructs such as \emph{Inductive Types} and Definitions. 
+In the following we will cover the abstract syntax of \ac{ACCPL} that we later implement in Coq using constructs such as inductive types and definitions. 
 
 \section{Environmental Facts}\label{sec:odrl0}
 In \ac{ACCPL}, agreements and facts (i.e. environments) will refer to a count of how many times each policy should be and has been used to justify an action. This is the only fact that \ac{ACCPL} will cover although we conjecture adding other facts and the machinery to support those facts should not change verification goals and results so far of \ac{ACCPL}.
 
-In \ac{ACCPL} a \emph{prerequisite} is either $true$, a $constraint$, the negative of a $constraint$ or a conjunction of $prerequisite$s. $true$ is the prerequisite that always holds. Constraints are facts that are outside of control of users. For example, there is nothing $Alice$ can do to satisfy the constraint ``user must be Bob''. 
+In \ac{ACCPL} a \texttt{<prerequisite>} is either True, a constraint, the negative of a constraint or a conjunction of prerequisites. $true$ is the prerequisite that always holds. Constraints are facts that are outside of control of users. For example, there is nothing $Alice$ can do to satisfy the constraint ``user must be Bob''. 
 
 We will describe \ac{ACCPL} in a \emph{BNF} grammar that looks more like Pucella and Weissman`s subset grammar~\cite{pucella2006}. BNF style grammars are more abstract as they only give suggestions about the surface syntax of expressions without getting into lexical analysis and parsing related aspects such as precedence order of operators~\cite{piercesf2011}. The Coq version in contrast is the encodings of the BNF definitions which is tyically used for building compilers and interpreters. We will present both the BNF definition and its Coq encoding for each construct of \ac{ACCPL}. 
 
 
 \section{Productions} \label{sec:productionast}
 
-The top level \ac{ACCPL} production is the \emph{agreement}. An agreement expresses what actions a set of subjects may perform on an object and under what conditions. Syntactically an agreement is composed of a set of subjects/users called a \emph{principal} or \emph{prin}, an \emph{asset} and a \emph{policySet}.
+The top level \ac{ACCPL} production is the \texttt{<agreement>}. An agreement expresses what actions a set of subjects may perform on an object and under what conditions. Syntactically an agreement is composed of a set of subjects/users called a principal or \texttt{<prin>}, an \texttt{<asset>} and a \texttt{<policySet>} (see listing~\ref{lst:agreementast}).
 
 % agreement
 \lstset{language=AST}
@@ -61,7 +61,7 @@ The top level \ac{ACCPL} production is the \emph{agreement}. An agreement expres
      'agreement' 'for' <prin> 'about' <asset> 'with' <policySet> 
 \end{lstlisting}
 
-Principals or prins are composed of \emph{subjects} which are specified based on the application e.g. Alice, Bob, etc.
+Principals (\texttt{<prin>}) are composed of \texttt{<subject>}s which are specified based on the application e.g. Alice, Bob, etc (see listing~\ref{lst:prinast}).
 
 % prin
 \lstset{mathescape, language=AST}  
@@ -75,7 +75,7 @@ Principals or prins are composed of \emph{subjects} which are specified based on
 <subject> ::= N
 \end{lstlisting}
 
-Assets are also application specific but similar to subjects we will continue using specific ones for the \ac{drm} application (taken from~\cite{pucella2006}). \emph{ebook}, \emph{The Report} and \emph{latestJingle} are examples of specific subjects we will be using throughout. Syntactically an asset is represented as a natural number (\emph{N}). Similarly for subjects.
+Assets are also application specific but similar to subjects we will continue using specific ones for the \ac{drm} application (taken from~\cite{pucella2006}). \texttt{The Report}, \texttt{ebook}, and \texttt{latestJingle} are examples of specific subjects we will be using throughout. Syntactically an asset is represented as a natural number (N) (see listing~\ref{lst:assetast}). Similarly for subjects (see listing~\ref{lst:subjectast}).
 
 % asset
 \lstset{mathescape, language=AST}  
@@ -83,24 +83,21 @@ Assets are also application specific but similar to subjects we will continue us
 <asset> ::= N
 \end{lstlisting}
 
-Agreements express who may perform an action on an asset. They include a set of subjects (i.e. a $prin$), an asset and a policy set. A policy set is a primitive policy set implying non-nested policy sets. Note that we could define various combining operators for policy sets such as conjunctions and disjunctions but we keep \ac{ACCPL}'s policy sets limited to the primitive kind but use a policy combining operator when it comes to dealing with policies later on. Each primitive policy set specifies a \emph{prerequisite} and a \emph{policy}. In general if the prerequisite ``holds'' the policy is taken into consideration. Otherwise the policy will not be looked at. Some primitive policy sets are specified as \emph{inclusive} as opposed to others that are explicitly specified as \emph{exclusive}. The \emph{Primitive Exclusive Policy Set}s are exclusive to agreement's users in that only those users may perform the actions specified in the policy set. The implication is that all other users who are not specified in the agreement's principal (prin) are forbidden from performing the specified actions, no matter whether the $prerequisite$ holds or not. Not surprisingly we also define \emph{Primitive Inclusive Policy Set}s that don`t enforce any exclusivity to the agreement's users.
+Agreements express who may perform an action on an asset. They include a set of subjects (i.e. a principal), an asset and a policy set. A policy set is a primitive policy set implying non-nested policy sets. Note that we could define various combining operators for policy sets such as conjunctions and disjunctions but we keep \ac{ACCPL}'s policy sets limited to the primitive kind. We do however, use a policy combining operator when it comes to dealing with policies later on. Each primitive policy set specifies a \texttt{<prerequisite>} and a \texttt{<policy>}. In general if the prerequisite ``holds'' the policy is taken into consideration. Otherwise the policy will not be looked at (see listing~\ref{lst:policySetast}).
 
 
 % policySet
 \newcommand*{\Comment}[1]{\hfill\makebox[7.0cm][l]{#1}}%
 \lstset{mathescape, language=AST, escapechar=\&}  
-\begin{lstlisting}[frame=single, caption={policySet},label={lst:policySetast}]
+\begin{lstlisting}[frame=single, caption={policySet and primPolicySet},label={lst:policySetast}]
 <policySet> ::=  
    <primPolicySet>	&\Comment{; primitive policy set }&
-\end{lstlisting}
-
-% primitive policySet
-\lstset{mathescape, language=AST, escapechar=\&}  
-\begin{lstlisting}[frame=single, caption={primPolicySet},label={lst:primPolicySetast}]
-<primPolicySet> ::=  
+   <primPolicySet> ::=  
    <primInclusivePolicySet>	&\Comment{; primitive inclusive policy set }&
    <primExclusivePolicySet>	&\Comment{; primitive exclusive policy set }&
 \end{lstlisting}
+
+Some primitive policy sets are specified as inclusive as opposed to others that are explicitly specified as exclusive. Primitive exclusive policy sets are exclusive to agreement's users in that only those users may perform the actions specified in the policy set. The implication is that all other users who are not specified in the agreement's principal are forbidden from performing the specified actions, no matter whether the prerequisite holds or not (see listing~\ref{lst:primInclusivePolicySetast}).
 
 % primInclusivePolicySet
 \lstset{mathescape, language=AST, escapechar=\&}  
@@ -109,6 +106,8 @@ Agreements express who may perform an action on an asset. They include a set of 
    <preRequisite> $\rightarrow$ <policy>	&\Comment{; primitive inclusive policy set }&
 \end{lstlisting}
 
+Not surprisingly we also define primitive inclusive policy sets that don't enforce any exclusivity to the agreement's users (see listing~\ref{lst:primExclusivePolicySetast}).
+
 % primExclusivePolicySet
 \lstset{mathescape, language=AST, escapechar=\&}  
 \begin{lstlisting}[frame=single, caption={primExclusivePolicySet},label={lst:primExclusivePolicySetast}]
@@ -116,7 +115,17 @@ Agreements express who may perform an action on an asset. They include a set of 
    <preRequisite> $\mapsto$ <policy>	&\Comment{; primitive exclusive policy set }&
 \end{lstlisting}
 
-A primitive policy specifies an action to be performed on an asset, depending of whether the policy's prerequisite holds or not. If the prerequisite holds the agreement's user is permitted to perform the action on the agreement's asset; otherwise permission is denied. Pucella and Weissman`s subset of \ac{odrl}~\cite{pucella2006} specify a unique identifier for each policy to help the translation (from agreements to formulas). \ac{ACCPL} has maintained the identifier for future work and we include it here in our definition of the policy construct however as far as the proofs are concerned the policy identifier could be removed without a loss to the obtained results. Primitive policies could also be grouped together using the conjunction combining operator.
+A primitive policy specifies an action to be performed on an asset, depending on whether the policy's prerequisite holds or not. If the prerequisite holds the agreement's user is permitted to perform the action on the agreement's asset; otherwise permission is denied. Pucella and Weissman's subset of \ac{odrl}~\cite{pucella2006} specify a unique identifier for each policy to help the translation (from agreements to formulas). \ac{ACCPL} has maintained the identifier for future work and we include it here in our definition of the policy construct however as far as the proofs are concerned the policy identifier could be removed without a loss to the obtained results (see listing~\ref{lst:primPolicyast}).
+
+% primitive policy
+
+\lstset{mathescape, language=AST, escapechar=\&}  
+\begin{lstlisting}[frame=single, caption={primPolicy},label={lst:primPolicyast}]
+<primPolicy> ::=  
+   <preRequisite> $\Rightarrow_{<policyId>}$ <act> 	&\Comment{; primitive policy}&
+\end{lstlisting}
+
+A policy is made up of primitive policies. Primitive policies are grouped together using the conjunction combining operator (see listing~\ref{lst:policyast}).
 
 % policy
 
@@ -127,15 +136,8 @@ A primitive policy specifies an action to be performed on an asset, depending of
                  <primPolicy$_{m}$> ]	&\Comment{; conjunction }&
 \end{lstlisting}
 
-% primitive policy
 
-\lstset{mathescape, language=AST, escapechar=\&}  
-\begin{lstlisting}[frame=single, caption={primPolicy},label={lst:primPolicyast}]
-<primPolicy> ::=  
-   <preRequisite> $\Rightarrow_{<policyId>}$ <act> 	&\Comment{; primitive policy}&
-\end{lstlisting}
-
-An \emph{Action} (\emph{act}) is represented as a natural number. Similar to assets and subjects, actions are application specific. Some example actions taken from \cite{pucella2006} are \emph{Display} and \emph{Print}.
+An action (\texttt{<act>}) is represented as a natural number. Similar to assets and subjects, actions are application specific. Some example actions taken from \cite{pucella2006} are \texttt{Display} and \texttt{Print} (see listing~\ref{lst:actast}).
 
 % act
 \lstset{mathescape, language=AST}  
@@ -143,7 +145,7 @@ An \emph{Action} (\emph{act}) is represented as a natural number. Similar to ass
 <act> ::= N
 \end{lstlisting}
 
-A \emph{Policy Id} (\emph{policyId}) is a unique identifier specified as (increasing) positive integers. 
+A policy id (\texttt{<policyId>}) is a unique identifier specified as (increasing) positive integers (see listing~\ref{lst:policyIdast}).
 
 % id
 \lstset{mathescape, language=AST}  
@@ -151,7 +153,7 @@ A \emph{Policy Id} (\emph{policyId}) is a unique identifier specified as (increa
 <policyId> ::= N
 \end{lstlisting}
 
-In \ac{ACCPL} a \emph{prerequisite} is either true or it is a \emph{constraint}. The \emph{true} prerequisite always holds. A constraint is an intrinsic part of a policy and cannot be influenced by agreement's user. Minimum height requirements for popular attractions and rides are examples of what we would consider a constraint. \emph{NotCons} is a negation of a constraint. Finally the set of prerequisites are closed under conjunction operator (\emph{AndPrqs}).
+In \ac{ACCPL} a \texttt{<preRequisite>} is either True or it is a \texttt{<constraint>}. The True prerequisite always holds. A constraint is an intrinsic part of a policy and cannot be influenced by agreement's user. Minimum height requirements for popular attractions and rides are examples of what we would consider a constraint. A constraint can also be negative, specified by the keyword `not' in front of \texttt{<constraint>}. Finally the set of prerequisites are closed under conjunction operator specified by the keyword `and' in front of the list of prerequisites separated by commas (see listing~\ref{lst:preRequisiteast}).
 
 % prq
 
@@ -164,7 +166,7 @@ In \ac{ACCPL} a \emph{prerequisite} is either true or it is a \emph{constraint}.
 	'and'[ <preRequisite$_{1}$>, ..., <preRequisite$_{m}$> ] &\Comment{; conjunction }&
 \end{lstlisting}
 
-Constraints are either \emph{Principal}, \emph{Count} or \emph{CountByPrin}. Principal constraints basically require matching to specified prins. For example, the user being Alice is a Principal constraint. A count constraint refers to a set of policies \emph{P} and specifies the number of times the user of an agreement has invoked the policies in P to justify her actions. If the count constraint is part of a policy then the set P is composed of the single policy. In the case that the count constraint is part of a policy set, the set P is the set of policies specified in the policy set.
+Constraints are either a principal (\texttt{<prin>}), a count, specified by the keyword `Count' and `N' the number of executions of the related action, or a `count by principal' which is specified by \texttt{<prin>}, the keyword `Count' and `N' the number of executions of the related action. Principal constraints basically require matching to users specified in the \texttt{<prin>}s. For example, the user being Alice is a principal constraint. A count constraint refers to a set of policies P and specifies the number of times the user of an agreement has invoked the policies in P to justify her actions. If the count constraint is part of a policy then the set P is composed of the single policy. In the case that the count constraint is part of a policy set, the set P is the set of policies specified in the policy set (see listing~\ref{lst:constraintast}).
 
 % constraint
 \lstset{mathescape, language=AST, escapechar=\&}  
