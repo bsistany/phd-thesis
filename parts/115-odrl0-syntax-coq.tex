@@ -9,21 +9,21 @@ Coq is known first and foremost as a proof-assistant. The underlying formal lang
 
 Specifications of programs in Coq may be expressed using the specification language \emph{Gallina}~\cite{gallinaref}. Coq is then used to develop proofs to show that a program's run-time behaviour satisfies its specification. Such programs are called \emph{certified} because they are formally verified and confirmed to conform to their specifications~\cite{BC04}.
 
-Assertions or propositions are statements about values in Coq such as $3<8$ or $8<3$ that may be true, false or even be only conjectures. To verify that a proposition is true a proof needs to constructed. While paper-proofs use a combination of mathematics and natural language to describe their proofs, Coq provides a formal (and therefore unambiguous) language that is based on proof-theory to develop proofs in. Verification of complex proofs is possible because one can verify the intermediate proofs or sub-goals in steps, each step being derived from the previous by following precise derivation rules. The Coq proof engine solves successive goals by using predefined \emph{tactics}. Coq tactics are commands to manipulate the local context and to decompose a goal into simpler goals or sub-goals~\cite{BC04}.
+Assertions or propositions are statements about values in Coq such as \syn{3<8} or \syn{8<3} that may be true, false or even be only conjectures. To verify that a proposition is true a proof needs to constructed. While paper-proofs use a combination of mathematics and natural language to describe their proofs, Coq provides a formal (and therefore unambiguous) language that is based on proof-theory to develop proofs in. Verification of complex proofs is possible because one can verify the intermediate proofs or sub-goals in steps, each step being derived from the previous by following precise derivation rules. The Coq proof engine solves successive goals by using predefined \emph{tactics}. Coq tactics are commands to manipulate the local context and to decompose a goal into simpler goals or sub-goals~\cite{BC04}.
 
 \section{ACCPL Syntax}\label{sec:agreementConstructor}
 
 \ac{ACCPL} productions were presented as high level abstract syntax in section~\ref{sec:productionast} of chapter~\ref{chap:odrl0syntax}. Below we present the corresponding encodings in Coq. 
 
-An agreement is a new inductive type in Coq by the same name. The constructor $Agreement$ takes a $prin$, an $asset$ and a $policySet$. $prin$ is defined to be a nonempty list of $subject$s (see listing~\ref{lst:agreementcoq}). 
+An \syn{agreement} is a new inductive type in Coq by the same name. The constructor \syn{Agreement} takes a \syn{prin}, an \syn{asset} and a \syn{policySet}. \syn{prin} is defined to be a nonempty list of \syn{subject}s (see listing~\ref{lst:agreementcoq}). 
 
-\ac{ACCPL} types $asset$, $subject$, $act$ and $policyId$ are base types and are simply defined as $nat$ which is the datatype of natural numbers defined in coq's library module $Coq.Init.Datatypes$ ($nat$ is itself an inductive datatype). We use Coq constants to refer to specific objects of each type. For example, the subject 'Alice' is defined as $Definition Alice:subject := 101.$ and the act 'Play' as $Definition Play : act := 301.$. For each ``nat'' type in \ac{ACCPL} we have also used constants that play the role of ``Null'' objects (see ``Null Object Pattern''~\cite{martin1998pattern}), for example $NullSubject$ is defined as $Definition NullSubject:subject := 100.$. This means a specific natural number has been selected as a ``reserved'' number for each \ac{ACCPL} base type to play the role of a ``Null'' value. ``Null'' values are needed because all the sequence types in \ac{ACCPL} are defined to be non-empty sequences (implemented using the $nonemptylist$ datatype) even though at intermediate stages during the translation the concept of an empty list is needed. In such cases, a Null object is created and added to the nonempty list.
+\ac{ACCPL} types \syn{asset}, \syn{subject}, \syn{act} and \syn{policyId} are base types and are simply defined as \syn{nat} which is the datatype of natural numbers defined in coq's library module \syn{Coq.Init.Datatypes} (\syn{nat} is itself an inductive datatype). We use Coq constants to refer to specific objects of each type. For example, the subject `Alice' is defined as \begin{verbatim}Definition Alice:subject := 101.\end{verbatim} and the act `Play' as \begin{verbatim}Definition Play : act := 301.\end{verbatim}. For each ``nat'' type in \ac{ACCPL} we have also used constants that play the role of ``Null'' objects (see ``Null Object Pattern''~\cite{martin1998pattern}), for example NullSubject is defined as \begin{verbatim}Definition NullSubject:subject := 100.\end{verbatim}. This means a specific natural number has been selected as a ``reserved'' number for each \ac{ACCPL} base type to play the role of a ``Null'' value. ``Null'' values are needed because all the sequence types in \ac{ACCPL} are defined to be non-empty sequences (implemented using the \syn{nonemptylist} datatype) even though at intermediate stages during the translation the concept of an empty list is needed. In such cases, a Null object is created and added to the nonempty list.
 
-Next we define the $policySet$ datatype which is the direct implementation of the abstract syntax presented in listing~\ref{lst:policySetast}. A $policySet$ is constructed only one way: by calling the $PPS$ constructor which takes a $primPolicySet$ as input. There are two ways a $primPolicySet$ can be constructed (see listing~\ref{lst:primPolicySetast} for the abstract syntax version) corresponding to two constructors: $PIPS$ and $PEPS$. 
+Next we define the \syn{policySet} datatype which is the direct implementation of the abstract syntax presented in listing~\ref{lst:policySetast}. A \syn{policySet} is constructed only one way: by calling the \syn{PPS} constructor which takes a \syn{primPolicySet} as input. There are two ways a \syn{primPolicySet} can be constructed (see listing~\ref{lst:primPolicySetast} for the abstract syntax version) corresponding to two constructors: \syn{PIPS} and \syn{PEPS}. 
 
-$PIPS$ takes a $primInclusivePolicySet$ as input while $PEPS$ takes a $\linebreak primExclusivePolicySet$. Both  $primInclusivePolicySet$ and $primExclusivePolicySet$ types are constructed by taking a $preRequisite$ and a $policy$ as parameters (see listing~\ref{lst:primInclusivePolicySetast} and ~\ref{lst:primExclusivePolicySetast} for the abstract syntax versions). 
+\syn{PIPS} takes a \syn{primInclusivePolicySet} as input while \syn{PEPS} takes a $\linebreak$ \syn{primExclusivePolicySet}. Both  \syn{primInclusivePolicySet} and \syn{primExclusivePolicySet} types are constructed by taking a \syn{preRequisite} and a \syn{policy} as parameters (see listing~\ref{lst:primInclusivePolicySetast} and ~\ref{lst:primExclusivePolicySetast} for the abstract syntax versions). 
 
-A $policy$ is defined as a datatype with the constructors $Policy$ which takes a nonempty list of primitive policies, or $primPolicy$s. A $primPolicy$ is constructed by calling $\linebreak PrimitivePolicy$ which takes a $preRequisite$, a $policyId$ and an action $act$ (see listing~\ref{lst:primPolicyast} for the abstract syntax version). Ignoring the $policyId$ for a moment, a primitive policy consists of a prerequisite and an action. If the prerequisite holds, the action is allowed to be performed on the asset. 
+A \syn{policy} is defined as a datatype with the constructors \syn{Policy} which takes a nonempty list of primitive policies, or \syn{primPolicy}s. A \syn{primPolicy} is constructed by calling $\linebreak$ \syn{PrimitivePolicy} which takes a \syn{preRequisite}, a \syn{policyId} and an action \syn{act} (see listing~\ref{lst:primPolicyast} for the abstract syntax version). Ignoring the \syn{policyId} for a moment, a primitive policy consists of a prerequisite and an action. If the prerequisite holds, the action is allowed to be performed on the asset. 
 
 
 \lstset{language=Coq}
@@ -64,7 +64,7 @@ Inductive primPolicy : Set :=
 \end{lstlisting}
 \end{minipage}
 
-The data type $nonemptylist$ reflects the definition of ``policy conjunction'' (see the definition of $nonemptylist$ in listing~\ref{lst:nonemptylistcoq}). Essentially $nonemptylist$ represents a list data structure that has at least one element and it is defined as a new \emph{polymorphic} inductive type in its own Coq section. See the abstract syntax version of $nonemptylist$ in listing~\ref{lst:policyast}.  
+The data type \syn{nonemptylist} reflects the definition of ``policy conjunction'' (see the definition of \syn{nonemptylist} in listing~\ref{lst:nonemptylistcoq}). Essentially \syn{nonemptylist} represents a list data structure that has at least one element and it is defined as a new \emph{polymorphic} inductive type in its own Coq section. See the abstract syntax version of \syn{nonemptylist} in listing~\ref{lst:policyast}.  
 
 
 \lstset{language=Coq, frame=single, caption={nonemptylist},label={lst:nonemptylistcoq}}
@@ -84,13 +84,24 @@ End nonemptylist.
 \end{minipage}
 
 
-In listing~\ref{lst:preRequisitecoq} $preRequisite$ is defined as a new datatype with constructors $TruePrq$, $Constraint$, $NotCons$ and $AndPrqs$ (see listing~\ref{lst:preRequisiteast} for the abstract syntax equivalent).
+In listing~\ref{lst:preRequisitecoq} \syn{preRequisite} is defined as a new datatype with constructors \syn{TruePrq}, \syn{Constraint}, \syn{NotCons} and \syn{AndPrqs} (see listing~\ref{lst:preRequisiteast} for the abstract syntax equivalent).
 
-$TruePrq$ represents the always true prerequisite. The $Constraint$ prerequisite is defined as the type $constraint$ so its description is deferred here. Intuitively a constraint is a prerequisite to be satisfied that is outside the control of the user(s). For example, the constraint of being 'Alice' if you are 'Bob' (or 'Alice' for that matter). The constructor $NotCons$ is defined the same way the $Constraint" constructor$ is. This constructor is defined as the type $constraint$ and it is meant to represent the negation of a $constraint$ as we shall see in the translation (see listing~\ref{lst:transnotConsCoq}). The remaining constructor $AndPrqs$ takes as parameters nonempty lists of prerequisites. This constructor represents the conjunction combining operator. 
+\syn{TruePrq} represents the always true prerequisite. The \syn{Constraint} prerequisite is defined as the type \syn{constraint} so its description is deferred here. Intuitively a constraint is a prerequisite to be satisfied that is outside the control of the user(s). For example, the constraint of being `Alice' if you are `Bob' (or `Alice' for that matter). The constructor \syn{NotCons} is defined the same way the \syn{Constraint} constructor is. This constructor is defined as the type \syn{constraint} and it is meant to represent the negation of a \syn{constraint} as we shall see in the translation (see listing~\ref{lst:transnotConsCoq}). The remaining constructor \syn{AndPrqs} takes as parameters nonempty lists of prerequisites. This constructor represents the conjunction combining operator. 
 
-Finally a $constraint$ (see  listing~\ref{lst:constraintast} for the abstract syntax equivalent) is defined as a new datatype with constructors $Principal$, $Count$ and $CountByPrin$. 
+Finally a \syn{constraint} (see  listing~\ref{lst:constraintast} for the abstract syntax equivalent) is defined as a new datatype with constructors \syn{Principal}, \syn{Count} and \syn{CountByPrin}. See listing~\ref{lst:exampleconst} for the three different kinds of constraints.
 
-Principal constraint takes a $prin$ to match. For example, the constraint of the user being Bob would be represented as ``Principal constraint''. The $Count$ constructor takes a $nat$ which represents the number of times the user of an agreement has invoked the corresponding policies to justify her actions. If the count constraint is part of a policy then the corresponding policies is basically the single policy, whereas in the case that the count constraint is part of a policy set, the corresponding policies would be the set of those policies specified in the policy set. The $CountByPrin$ is similar to $Count$ but it takes an additional $prin$ parameter. In this case the subjects specified in the $prin$ parameter override the agreements' user(s).   
+\lstset{language=Coq}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Three Kinds of Constraints},label={lst:exampleconst}]
+(Constraint (Principal (Single Alice))).
+
+(Constraint (Count 10)).
+
+(Constraint (CountByPrin (Single Alice) 10)).
+
+\end{lstlisting}
+%\end{minipage}
+
 
 % prq
 \lstset{language=Coq}
