@@ -3,19 +3,19 @@
 %======================================================================
 
 % ---------------------------------- COQ -----------------------
-We specify the semantics of \ac{ACCPL} as a translation function from an agreement to a decision (more concretely to a set of \emph{result}s -- see listing~\ref{lst:answercoq}) . Specifying the semantics as translations from policy statements (e.g. agreement) to decisions, mostly follows the style Pucella and Weissman~\cite{pucella2006} use to define the semantics for their \ac{odrl} fragment. In Pucella and Weissman's language, the translation functions are defined from agreements to formulas in many-sorted first-order logic with equality. The translation functions for \ac{ACCPL} return a specific decision based on whether there are proof terms for certain conditions and/or proof terms for the negation of those conditions (see section~\ref{sec:sumboolsection} for more details).
+We specify the semantics of \ac{ACCPL} as a translation function from an agreement to a decision (more concretely to a set of \syn{result}s -- see listing~\ref{lst:answercoq}) . Specifying the semantics as translations from policy statements (e.g. an agreement) to decisions, mostly follows the style Pucella and Weissman~\cite{pucella2006} use to define the semantics for their \ac{odrl} fragment. In Pucella and Weissman's language, the translation functions are defined from agreements to formulas in many-sorted first-order logic with equality. The translation functions for \ac{ACCPL} return a specific decision based on whether there are proof terms for certain conditions and/or proof terms for the negation of those conditions (see section~\ref{sec:sumboolsection} for more details).
  
 
 % COQ
 The translation functions plus the auxiliary types and infrastructure which implement the semantics for \ac{ACCPL} have been encoded in Coq. The Coq code implementing the semantics is high-level enough to be readable as a specification of the semantics. This is one reason why we do not use abstract syntax to describe the semantics as we did for the syntax of \ac{ACCPL} (see chapter~\ref{chap:odrl0syntax}). The other reason not to use abstract syntax the way Pucella and Weissman~\cite{pucella2006} do for their semantics, is the difficulty of coming up with abstract syntax that is intuitive and equivalent to the translation functions implemented in Coq and listed in this chapter.
 
-Whether an agreement is translated into a decision indicating a permission is granted or denied depends on the agreement in question but also on the facts recorded in the environment. For \ac{ACCPL} those facts revolve around the number of times a policy has been used to justify an action (see section~\ref{sec:odrl0} for background on environments). We encode this information in an \emph{environment} which is a conjunction of equalities of the form $count(s, policyId) = n$. 
+Whether an agreement is translated into a decision indicating a permission is granted or denied depends on the agreement in question but also on the facts recorded in the environment (e.g. time of day). For \ac{ACCPL} those facts revolve around the number of times a policy has been used to justify an action (see section~\ref{sec:odrl0} for background on environments). We encode this information in Coq in a data structure called an \syn{environment}. An \syn{environment} is a conjunction of equalities of the form \syn{count(s, policyId) = n} which are called ``count equalities''.
 
 % COQ
-The Coq version of the count equality is a new inductive type called \emph{count\_equality}. An environment is defined to be a non-empty list of $count\_equality$ objects (see listing~\ref{lst:environmentcoq}). Function $make\_count\_equality$ in listing~\ref{lst:environmentcoq} is simply a convenience function that builds $count\_equality$s. For an example of how environments are created see listing~\ref{lst:environmentusagecoq}.
+The Coq version of a count equality is a new inductive type called \syn{count_equality}. An environment is defined to be a non-empty list of \syn{count_equality} objects (see listing~\ref{lst:environmentcoq}). Function \syn{make_count_equality} in listing~\ref{lst:environmentcoq} is simply a convenience function that builds \syn{count_equality}s. 
 
 \lstset{language=Coq, frame=single, caption={Environments and Counts},label={lst:environmentcoq}}
-%\begin{minipage}[c]{0.95\textwidth}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Inductive count_equality : Set := 
    | CountEquality : subject -> policyId -> nat -> count_equality.
@@ -29,23 +29,25 @@ Inductive environment : Set :=
   | ConsEnv :  count_equality ->  environment -> environment.
 
 \end{lstlisting}
-%\end{minipage}
+\end{minipage}
+
+For an example of how environments are created see listing~\ref{lst:environmentusagecoq}.
 
 \lstset{language=Coq, frame=single, caption={Defining Environments},label={lst:environmentusagecoq}}
-\begin{minipage}[c]{0.95\textwidth}
+%\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 
 Definition e1 : environment := 
   (SingleEnv (make_count_equality Alice id1 8)).
 
 \end{lstlisting}
-\end{minipage}
+%\end{minipage}
   
 
-We also define a \emph{getCount} function (see listing~\ref{lst:getCountcoq}) that given a pair consisting of a subject and policy id, looks for a corresponding count in the environment. $getCount$ assumes the given environment is consistent (meaning it won`t return two different counts for the same pair of subject and policy id), so it returns the first matched $count$ it sees for a $(subject, id)$ pair. If a $count$ for a $(subject, id)$ pair is not found it returns 0. 
+We also define a \syn{getCount} function (see listing~\ref{lst:getCountcoq}) that given a pair consisting of a subject and policy id, looks for a corresponding count in the environment. \syn{getCount} assumes the given environment is consistent (meaning it won't return two different counts for the same pair of subject and policy id), so it returns the first matched \syn{count} it sees for a \syn{(subject, id)} pair. If a \syn{count} for a \syn{(subject, id)} pair is not found it returns 0. The use of keyword \syn{Fixpoint} is shown the listing; \syn{Fixpoint} is used for recursive functions written in Coq's functional programming language. Note the use of the \syn{match} construct and pattern matching, one of the features of this language. 
 
 
-\lstset{language=Coq, frame=single, caption={getCount Function},label={lst:getCountcoq}}
+\lstset{language=Coq, frame=single, caption={\syn{getCount} Function},label={lst:getCountcoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Fixpoint getCount 
@@ -69,11 +71,11 @@ Fixpoint getCount
 \end{lstlisting}
 \end{minipage}
 
-\section{Decision Procedures and the sumbool Type}\label{sec:sumboolsection}
+\section{Decision Procedures and the \syn{sumbool} Type}\label{sec:sumboolsection}
 
-sumbool is a boolean type defined in the Coq standard library module $Coq.Init.Specif$. sumbool captures the idea of program values that indicate which of two propositions is true~\cite{chlipalacpdt2011}. sumbool is equipped with the justification of its value, which really helps with proofs. sumbool A B, which is written \{A\}+\{B\}, is the informative disjunction ``A or B'', where A and B are logical propositions. Its extraction is isomorphic to the type of booleans. A boolean is either true or false, and this is decidable~\cite{Coq:manual}. See listing~\ref{lst:sumbooltypeCoq} for the definition of $sumbool$ and $sumbool\_of\_bool$. With sumbools similar to bool and other 2-constructor inductive types, one can use the ``if then else'' construct to select the desired case when doing proofs which makes for much more readability of the given proofs.
+\syn{sumbool} is a boolean type defined in the Coq standard library module \syn{Coq.Init.Specif}. \syn{sumbool} captures the idea of program values that indicate which of two propositions is true~\cite{chlipalacpdt2011}. \syn{sumbool} is equipped with the justification of its value, which really helps with proofs. \syn{sumbool A B}, which is written \syn{A+B}, is the informative disjunction ``A or B'', where A and B are logical propositions. Its extraction is isomorphic to the type of booleans. A boolean is either true or false, and this is decidable~\cite{Coq:manual}. See listing~\ref{lst:sumbooltypeCoq} for the definition of \syn{sumbool} and \syn{sumbool_of_bool}. With \syn{sumbool}s similar to \syn{bool} and other 2-constructor inductive types, one can use the ``if then else'' construct to select the desired case when doing proofs which makes for much more readability of the given proofs.
 
-\lstset{language=Coq, frame=single, caption={sumbool type},label={lst:sumbooltypeCoq}}
+\lstset{language=Coq, frame=single, caption={\syn{sumbool} type},label={lst:sumbooltypeCoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Inductive sumbool (A B:Prop) : Set :=
@@ -85,33 +87,32 @@ Inductive sumbool (A B:Prop) : Set :=
 \end{lstlisting}
 \end{minipage}
 
-We have used the sumbool type to declare and prove decision procedures that we have subsequently used in the translation function implementing the semantics and also in the proofs. In the following we will list only the type declaration of each decision procedure and the accompanying functions. The individual decision procedures were used as a building block to make the final decidability proofs for \ac{ACCPL} possible. We will refer to these listings later when we discuss the translations and/or proofs using the decision procedures.
+We have used the \syn{sumbool} type to declare and prove decision procedures that we have subsequently used in the translation functions implementing the semantics and also in the proofs. In the following we will list only the type declaration of each decision procedure and the accompanying functions. The individual decision procedures were used as a building block to make the final decidability proofs for \ac{ACCPL} possible. We will refer to these listings later when we discuss the translations and/or proofs using the decision procedures.
 
-The decision procedure $eq\_nat\_dec$ takes two natural numbers, and declares that either there is a proof for their equality or there exists a proof for their inequality (see listing~\ref{lst:eqnatdeccoq}).
+The decision procedure \syn{eq_nat_dec} takes two natural numbers, and declares that either there is a proof for their equality or there exists a proof for their inequality (see listing~\ref{lst:eqnatdeccoq}).
 
-\lstset{language=Coq, frame=single, caption={Decision Procedures: eq_nat_dec~\cite{Coq:manual}},label={lst:eqnatdeccoq}}
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{eq_nat_dec}~\cite{Coq:manual}},label={lst:eqnatdeccoq}}
 \begin{lstlisting}
 Theorem eq_nat_dec : forall n m, {n = m} + {n <> m}.
 \end{lstlisting}
 
-The decision procedure $subject\_in\_prin\_dec$ declares that either there is a proof for the proposition $is\_subject\_in\_prin$ or there exists a proof for its negation (see listing~\ref{lst:issubjectinprincoq}). 
+The decision procedure \syn{subject_in_prin_dec} declares that either there is a proof for the proposition \syn{is_subject_in_prin} (see listing~\ref{lst:issubjectinprincoq}) or there exists a proof for its negation (see listing~\ref{lst:issubjectinprincoq}). 
 
-\lstset{language=Coq, frame=single, caption={Decision Procedures: is_subject_in_prin},label={lst:issubjectinprincoq}}
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{is_subject_in_prin}},label={lst:issubjectinprincoq}}
 \begin{lstlisting}
+Theorem subject_in_prin_dec :
+    forall (a:subject) (l:prin), {is_subject_in_prin a l} + {~ is_subject_in_prin a l}.
+
 Fixpoint is_subject_in_prin (s:subject)(p:prin): Prop :=
   match p with
   | Single s'  => s=s'
   | NewList s' rest => s=s' \/ (is_subject_in_prin s rest)
   end.
-
-Theorem subject_in_prin_dec :
-    forall (a:subject) (l:prin), {is_subject_in_prin a l} + {~ is_subject_in_prin a l}.
-
 \end{lstlisting}
 
-The decision procedure $trans\_prin\_dec$ declares that either there is a proof for the proposition $trans\_prin$ or there exists a proof for its negation (see listing~\ref{lst:transprindeccoq}). The translation function $trans\_prin$ is the proposition ``subject x is in prin'' (see listing~\ref{lst:transprinCoq}).
+The decision procedure \syn{trans_prin_dec} declares that either there is a proof for the proposition \syn{trans_prin} or there exists a proof for its negation (see listing~\ref{lst:transprindeccoq}). The translation function \syn{trans_prin} is the proposition ``subject x is in prin'' (see listing~\ref{lst:transprinCoq}).
 
-\lstset{language=Coq, frame=single, caption={Decision Procedures: trans_prin_dec},label={lst:transprindeccoq}}
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_prin_dec}},label={lst:transprindeccoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem trans_prin_dec :
@@ -119,18 +120,18 @@ Theorem trans_prin_dec :
 \end{lstlisting}
 \end{minipage}
 
-The decision procedure $trans\_count\_dec$ declares that either there is a proof for the proposition $trans\_count$ or there exists a proof for its negation (see listing~\ref{lst:transcountdeccoq}). The translation function $trans\_count n$ is the proposition ``running\_total < n'' (see listing~\ref{lst:transcountCoq}).
+The decision procedure \syn{trans_count_dec} declares that either there is a proof for the proposition \syn{trans_count} or there exists a proof for its negation (see listing~\ref{lst:transcountdeccoq}). The translation function \syn{trans_count} is the proposition ``running_total < n'' (see listing~\ref{lst:transcountCoq}).
 
-\lstset{language=Coq, frame=single, caption={Decision Procedures: trans_count_dec},label={lst:transcountdeccoq}}
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_count_dec}},label={lst:transcountdeccoq}}
 \begin{lstlisting}
 Theorem trans_count_dec :
     forall (n:nat), {trans_count n} + {~trans_count n}.
 \end{lstlisting}
 
-The decision procedure $trans\_constraint\_dec$ declares that either there is a proof for the proposition $trans\_constraint$ or there exists a proof for its negation (see listing~\ref{lst:transconstraintdeccoq}). The translation function $trans\_constraint$ is listed in listing~\ref{lst:transconstraintCoq}. 
+The decision procedure \syn{trans_constraint_dec} declares that either there is a proof for the proposition \syn{trans_constraint} or there exists a proof for its negation (see listing~\ref{lst:transconstraintdeccoq}). The translation function \syn{trans_constraint} is listed in listing~\ref{lst:transconstraintCoq}. 
 
 
-\lstset{language=Coq, frame=single, caption={Decision Procedures: trans_constraint_dec},label={lst:transconstraintdeccoq}}
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_constraint_dec}},label={lst:transconstraintdeccoq}}
 \begin{lstlisting}
 Theorem trans_constraint_dec :
     forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
@@ -138,9 +139,9 @@ Theorem trans_constraint_dec :
 \end{lstlisting}
 
 
-The decision procedure $trans\_notCons\_dec$ declares that either there is a proof for the proposition $trans\_notCons$ or there exists a proof for its negation (see listing~\ref{lst:transnotConsdeccoq}). The translation function $trans\_notCons$ is listed in listing~\ref{lst:transnotConsCoq}). The proof for $trans\_notCons\_dec$ not shown here uses two helper theorems. One is another decision procedure, \\ $trans\_negation\_constraint\_dec$ which declares that either there exists a proof for the negation of $trans\_constraint$ or there is a proof for the negation of the negation of $trans\_constraint$. The other helper theorem is $double\_neg\_constraint$ which basically declares that $trans\_constraint$ implies its own double negation. The helpers are listed in~\ref{lst:transnegationconstraintdeccoq}.
+The decision procedure \syn{trans_notCons_dec} declares that either there is a proof for the proposition \syn{trans_notCons} or there exists a proof for its negation (see listing~\ref{lst:transnotConsdeccoq}). The translation function \syn{trans_notCons} is listed in listing~\ref{lst:transnotConsCoq}). The proof for \syn{trans_notCons_dec} not shown here uses two helper theorems. One is another decision procedure, \\ \syn{trans_negation_constraint_dec} which declares that either there exists a proof for the negation of \syn{trans_constraint} or there is a proof for the negation of the negation of \syn{trans_constraint}. The other helper theorem is \syn{double_neg_constraint} which basically declares that \syn{trans_constraint} implies its own double negation. The helpers are listed in~\ref{lst:transnegationconstraintdeccoq}.
 
-\lstset{language=Coq, frame=single, caption={Decision Procedures: trans_negation_constraint_dec},label={lst:transnegationconstraintdeccoq}}
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_negation_constraint_dec}},label={lst:transnegationconstraintdeccoq}}
 \begin{lstlisting}
 Theorem double_neg_constraint:
     forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
@@ -152,7 +153,7 @@ Theorem trans_negation_constraint_dec :
        
 \end{lstlisting}
 
-\lstset{language=Coq, frame=single, caption={Decision Procedures: trans_notCons_dec},label={lst:transnotConsdeccoq}}
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_notCons_dec}},label={lst:transnotConsdeccoq}}
 \begin{lstlisting}
 Theorem trans_notCons_dec :
     forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
@@ -160,10 +161,10 @@ Theorem trans_notCons_dec :
 
 \end{lstlisting}
 
-The decision procedure $trans\_preRequisite\_dec$ declares that either there is a proof for the proposition $trans\_preRequisite$ or there exists a proof for its negation (see listing~\ref{lst:transpreRequisitedeccoq}). The translation function $trans\_preRequisite$ is listed in listing~\ref{lst:transpreRequisiteCoq}). 
+The decision procedure \syn{trans_preRequisite_dec} declares that either there is a proof for the proposition \syn{trans_preRequisite} or there exists a proof for its negation (see listing~\ref{lst:transpreRequisitedeccoq}). The translation function \syn{trans_preRequisite} is listed in listing~\ref{lst:transpreRequisiteCoq}). 
 
 
-\lstset{language=Coq, frame=single, caption={Decision Procedures: trans_preRequisite_dec},label={lst:transpreRequisitedeccoq}}
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_preRequisite_dec}},label={lst:transpreRequisitedeccoq}}
 \begin{lstlisting}
 Theorem trans_preRequisite_dec :
     forall (e:environment)(x:subject)(prq:preRequisite)(IDs:nonemptylist policyId)(prin_u:prin),
@@ -173,10 +174,10 @@ Theorem trans_preRequisite_dec :
 
 \section{answer and result types}\label{sec:answerandresulttypes}
 
-The policy translation functions ultimately will return one of the following answers: Permitted, NotPermitted or Unregulated. Permitted answer signifies that the access request has been granted. The NotPermitted answer is for when the access request is denied. And finally the Unregulated answer is for all the times when neither Permitted or NotPermitted answers are applicable. The $answer$ type in the Coq listing~\ref{lst:answercoq} implements the answer concept. We wrap $answer$s in a $result$ type and add some context. Intuitively a result will tell us whether a subject may perform an action on an asset or not, or else that the request is unregulated. in listing~\ref{lst:answercoq} we also show the definition of the utility function $makeResult$ that when given an $answer$, a $subject$, an $act$ and an $asset$ builds and returns a $result$.
+The policy translation functions ultimately will return one of the following answers: \syn{Permitted}, \syn{NotPermitted} or \syn{Unregulated}. \syn{Permitted} answer signifies that the access request has been granted. The \syn{NotPermitted} answer is for when the access request is denied. And finally the \syn{Unregulated} answer is for all the times when neither \syn{Permitted} or \syn{NotPermitted} answers are applicable. The \syn{answer} type in the Coq listing~\ref{lst:answercoq} implements the answer concept. We wrap \syn{answer}s in a \syn{result} type and add some context. Intuitively a result will tell us whether a subject may perform an action on an asset or not, or else that the request is unregulated. in listing~\ref{lst:answercoq} we also show the definition of the utility function \syn{makeResult} that when given an \syn{answer}, a \syn{subject}, an \syn{act} and an \syn{asset} builds and returns a \syn{result}.
 
 
-\lstset{language=Coq, frame=single, caption={Decision Procedures: },label={lst:answercoq}}
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{answer} and \syn{result} types},label={lst:answercoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 
@@ -197,11 +198,11 @@ Definition makeResult (ans:answer)(s:subject)(ac:act)(ass:asset) : result :=
 \section{Translations}
 
 
-Translation of the top level $agreement$ element proceeds by case analysis on the structure of the agreement. However an agreement can only be built one way; by calling the constructor $Agreement$. The translation proceeds by calling the translation function for the corresponding $policySet$ namely the parameter to $Agreement$ called $ps$. See listing~\ref{lst:transagreement}. The formal argument $e$ of type $environment$ is passed along many translation functions but will only eventually be used to get the count information from the $getCount$ function. Other formal arguments include $ag$, the agreement to be translated, plus the subject, action and asset coming from a ``query'' or request for access: $action\_from\_query$, $subject\_from\_query$ and $asset\_from\_query$. Notice that agreement translation function, $trans\_agreemen$, returns a nonempty list of \emph{result}s (see listing~\ref{lst:transagreement}).
+Translation of the top level \syn{agreement} element proceeds by case analysis on the structure of the agreement. However an agreement can only be built one way; by calling the constructor \syn{Agreement}. The translation proceeds by calling the translation function for the corresponding \syn{policySet} namely the parameter to \syn{Agreement} called \syn{ps}. See listing~\ref{lst:transagreement}. The formal argument \syn{e} of type \syn{environment} is passed along many translation functions but will only eventually be used to get the count information from the \syn{getCount} function. Other formal arguments include \syn{ag}, the agreement to be translated, plus the subject, action and asset coming from a ``query'' or request for access: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query}. Notice that agreement translation function, \syn{trans_agreemen}, returns a nonempty list of \syn{result}s (see listing~\ref{lst:transagreement}).
 
 \subsection{Policy Combinators And Interpretation Of Results}\label{subsec:policycombinators}
 
-The nonempty list of $result$s returned by the agreement translation function will have a result per primitive policy ($primPolicy$) in the agreement. As we will see later when we discuss the proofs, we have proven that results containing a Permitted answer and a NotPermitted answer are mutually exclusive. Therefore we interpret the existence of a single (or more) Permitted result in the nonempty list, as the decision being ``Permitted'' whereas the existence of a single (or more) NotPermitted type result is interpreted as ``NotPermitted". We have also proven  that when there exists no Permitted or NotPermitted results in the returned nonempty list, only Unregulated results are possible. In this case we conclude the decision is ``Unregulated''. 
+The nonempty list of \syn{result}s returned by the agreement translation function will have a result per primitive policy (\syn{primPolicy}) in the agreement. As we will see later when we discuss the proofs, we have proven that results containing a Permitted answer and a NotPermitted answer are mutually exclusive. Therefore we interpret the existence of a single (or more) Permitted result in the nonempty list, as the decision being ``Permitted'' whereas the existence of a single (or more) NotPermitted type result is interpreted as ``NotPermitted". We have also proven  that when there exists no Permitted or NotPermitted results in the returned nonempty list, only Unregulated results are possible. In this case we conclude the decision is ``Unregulated''. 
 
 \lstset{language=Coq, frame=single, caption={Translation of Agreement},label={lst:transagreement}}
 %\begin{minipage}[c]{0.95\textwidth}
@@ -217,11 +218,11 @@ Definition trans_agreement
 \end{lstlisting}
 %\end{minipage}
 
-Translation of a $policySet$ (called $trans\_ps$ in listing~\ref{lst:transpsCoq}), takes as input $e$, the environment, the subject, action and asset coming from a query: $action\_from\_query$, $subject\_from\_query$ and $asset\_from\_query$, $ps$, the policy set, $prin\_{u}$, the agreement's user, and $a$, the asset mentioned in the agreement. 
+Translation of a \syn{policySet} (called \syn{trans_ps} in listing~\ref{lst:transpsCoq}), takes as input \syn{e}, the environment, the subject, action and asset coming from a query: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query}, \syn{ps}, the policy set, \syn{prin_{u}}, the agreement's user, and \syn{a}, the asset mentioned in the agreement. 
 
-The translation starts with checking that there is a proof for the equality of asset_from_query and a (the asset from the agreement). If so, the translation function recurses on the composing $primPolicySet$ and calling the local function $process\_single\_ps$. Otherwise, the Unregulated answer is wrapped along with the subject, action and asset coming from a query: $action\_from\_query$, $subject\_from\_query$ and $asset\_from\_query$ by calling the $makeResult$ helper function. Intuitively we are just explicitly stating that the semantics are not applicable to queries about assets that are not mentioned in the agreement. 
+The translation starts with checking that there is a proof for the equality of asset_from_query and a (the asset from the agreement). If so, the translation function recurses on the composing \syn{primPolicySet} and calling the local function \syn{process_single_ps}. Otherwise, the Unregulated answer is wrapped along with the subject, action and asset coming from a query: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query} by calling the \syn{makeResult} helper function. Intuitively we are just explicitly stating that the semantics are not applicable to queries about assets that are not mentioned in the agreement. 
 
-The $primPolicySet$ which was passed to $process\_single\_ps$ was either constructed by a $PIPS$ constructor or by a $PEPS$ constructor, which distinguish between primInclusivePolicySet and primExclusivePolicySet subtypes. The translation functions $trans\_policy\_PIPS$ and $trans\_policy\_PEPS$ are called in turn as the case may be.
+The \syn{primPolicySet} which was passed to \syn{process_single_ps} was either constructed by a \syn{PIPS} constructor or by a \syn{PEPS} constructor, which distinguish between primInclusivePolicySet and primExclusivePolicySet subtypes. The translation functions \syn{trans_policy_PIPS} and \syn{trans_policy_PEPS} are called in turn as the case may be.
 
 
 \lstset{language=Coq, frame=single, caption={Translation of Policy Set},label={lst:transpsCoq}}
@@ -263,9 +264,9 @@ else (* asset_from_query <> a *)
 
 
 
-$trans\_policy\_PIPS$ translation function for a $primInclusivePolicySet$ checks whether there is a proof for the subject in question, $x$, being in $prin\_u$, by calling the decision procedure $trans\_prin\_dec$. If so there is a check for whether the $preRequisite$ from the policySet holds or not (by calling the decision procedure $trans\_preRequisite\_dec$). If so the translation function $trans\_policy\_positive$ (see listing~\ref{lst:transPositiveCoq}) is called. In all other cases $trans\_policy\_unregulated$ (see listing~\ref{lst:transUnregulatedCoq}) is called (see listing~\ref{lst:transpipsAndpepsCoq}).
+\syn{trans_policy_PIPS} translation function for a \syn{primInclusivePolicySet} checks whether there is a proof for the subject in question, \syn{x}, being in \syn{prin_u}, by calling the decision procedure \syn{trans_prin_dec}. If so there is a check for whether the \syn{preRequisite} from the policySet holds or not (by calling the decision procedure \syn{trans_preRequisite_dec}). If so the translation function \syn{trans_policy_positive} (see listing~\ref{lst:transPositiveCoq}) is called. In all other cases \syn{trans_policy_unregulated} (see listing~\ref{lst:transUnregulatedCoq}) is called (see listing~\ref{lst:transpipsAndpepsCoq}).
 
-$trans\_policy\_PEPS$ translation function for a $primExclusivePolicySet$ checks whether there is a proof for the subject in question, $x$, being in $prin\_u$, by calling the decision procedure $trans\_prin\_dec$. If not, the translation function $trans\_policy\_negative$ (see listing~\ref{lst:transNegativeCoq}) is called since the policySet is exclusive to agreement's users, we expect that all subjects not in the $prin\_u$ are denied access. In case the check for $x$, being in $prin\_u$ succeeds, there is a check for whether the $preRequisite$ from the policySet holds or not (by calling the decision procedure $trans\_preRequisite\_dec$). If so the translation function $trans\_policy\_positive$ is called, else $trans\_policy\_unregulated$ is called (see listing~\ref{lst:transpipsAndpepsCoq}).
+\syn{trans_policy_PEPS} translation function for a \syn{primExclusivePolicySet} checks whether there is a proof for the subject in question, \syn{x}, being in \syn{prin_u}, by calling the decision procedure \syn{trans_prin_dec}. If not, the translation function \syn{trans_policy_negative} (see listing~\ref{lst:transNegativeCoq}) is called since the policySet is exclusive to agreement's users, we expect that all subjects not in the \syn{prin_u} are denied access. In case the check for \syn{x}, being in \syn{prin_u} succeeds, there is a check for whether the \syn{preRequisite} from the policySet holds or not (by calling the decision procedure \syn{trans_preRequisite_dec}). If so the translation function \syn{trans_policy_positive} is called, else \syn{trans_policy_unregulated} is called (see listing~\ref{lst:transpipsAndpepsCoq}).
 
 
 \lstset{language=Coq, frame=single, caption={Translation of PIPS and PEPS},
@@ -304,9 +305,8 @@ Definition trans_policy_PEPS
 \end{minipage}
 
 
-The $trans\_policy\_positive$translation function starts by recursing on a list of $primPolicy$s where the results of processing a single $primPolicy$ (returned by $process\_single\_pp\_trans\_policy\_positive$) is appended to the rest of the set. We only show $trans\_pp\_list\_trans\_policy\_positive$ for $trans\_policy\_positive$ case in listing~\ref{lst:transListOfPositiveCoq}). 
+The \syn{trans_policy_positive}translation function starts by recursing on a list of \syn{primPolicy}s where the results of processing a single \syn{primPolicy} (returned by \syn{process_single_pp_trans_policy_positive}) is appended to the rest of the set. We only show \syn{trans_pp_list_trans_policy_positive} for \syn{trans_policy_positive} case in listing~\ref{lst:transListOfPositiveCoq}). 
 
-, $trans\_policy\_negative$ and $trans\_policy\_unregulated$ 
 
 \lstset{language=Coq, frame=single, caption={Translation of List of Primitive Policies},
     label={lst:transListOfPositiveCoq}}
@@ -324,7 +324,7 @@ Fixpoint trans_pp_list_trans_policy_positive
 %\end{minipage}
 
 
-$trans\_policy\_positive$ acting on a single $primPolicy$ (see process_single_pp_trans_policy_positive in listing~\ref{lst:transPositiveCoq}), first checks whether the $preRequisite$ from the policy holds or not by calling the decision procedure $trans\_preRequisite\_dec$. If so the translation function checks that there is a proof for the equality of action_from_query and action (the action from the agreement) by calling the decision procedure $eq\_nat\_dec$. If so, the translation function finally returns a result of Permitted. In all other cases, a result of Unregulated is returned. Intuitively we are just explicitly stating that the semantics won't apply to queries about actions that are not mentioned in the agreement.
+\syn{trans_policy_positive} acting on a single \syn{primPolicy} (see process_single_pp_trans_policy_positive in listing~\ref{lst:transPositiveCoq}), first checks whether the \syn{preRequisite} from the policy holds or not by calling the decision procedure \syn{trans_preRequisite_dec}. If so the translation function checks that there is a proof for the equality of action_from_query and action (the action from the agreement) by calling the decision procedure \syn{eq_nat_dec}. If so, the translation function finally returns a result of Permitted. In all other cases, a result of Unregulated is returned. Intuitively we are just explicitly stating that the semantics won't apply to queries about actions that are not mentioned in the agreement.
 
 \lstset{language=Coq, frame=single, caption={Translation of positive policies},
     label={lst:transPositiveCoq}}
@@ -360,7 +360,7 @@ Definition trans_policy_positive
 %\end{minipage}
 
 
-$trans\_policy\_negative$ acting on a single $primPolicy$ (see process_single_pp_trans_policy_negative in listing~\ref{lst:transNegativeCoq}), first checks that there is a proof for the equality of action_from_query and action (the action from the agreement) by calling the decision procedure $eq\_nat\_dec$. If so, the translation function returns a result of NotPermitted. Otherwise, a result of Unregulated is returned. Note that compared to $trans\_policy\_positive$ we don't check for whether $preRequisite$ from the policy holds or not, since $trans\_policy\_negative$ is only called for policy sets of type $primExclusivePolicySet$.
+\syn{trans_policy_negative} acting on a single \syn{primPolicy} (see process_single_pp_trans_policy_negative in listing~\ref{lst:transNegativeCoq}), first checks that there is a proof for the equality of action_from_query and action (the action from the agreement) by calling the decision procedure \syn{eq_nat_dec}. If so, the translation function returns a result of NotPermitted. Otherwise, a result of Unregulated is returned. Note that compared to \syn{trans_policy_positive} we don't check for whether \syn{preRequisite} from the policy holds or not, since \syn{trans_policy_negative} is only called for policy sets of type \syn{primExclusivePolicySet}.
 
 
 \lstset{language=Coq, frame=single, caption={Translation of negative policies},
@@ -394,7 +394,7 @@ Fixpoint trans_policy_negative
 %\end{minipage}
 
 
-$trans\_policy\_unregulated$ acting on a single $primPolicy$ (see process_single_pp_trans_policy_unregulated in listing~\ref{lst:transUnregulatedCoq}), returns a result of Unregulated.
+\syn{trans_policy_unregulated} acting on a single \syn{primPolicy} (see process_single_pp_trans_policy_unregulated in listing~\ref{lst:transUnregulatedCoq}), returns a result of Unregulated.
 
 \lstset{language=Coq, frame=single, caption={Translation of unregulated policies},
     label={lst:transUnregulatedCoq}}
@@ -421,12 +421,8 @@ Fixpoint trans_policy_unregulated
 
 
 
-
-
-
-
 % COQ
-Translation of a \emph{prin} (called $trans\_prin$ in listing~\ref{lst:transprinCoq}) takes as input $x$, the $subject$ in question, $p$, the principal or the $prin$,  and proceeds based on whether $p$ is a single subject or a list of subjects. If $p$ is a single subject, $s$, the proposition $x=s$ is returned. Otherwise the disjunction of the translation of the first subject in $p$ ($s$) and the $rest$ of the subjects is returned.
+Translation of a \syn{prin} (called \syn{trans_prin} in listing~\ref{lst:transprinCoq}) takes as input \syn{x}, the subject in question, \syn{p}, the principal or the \syn{prin},  and proceeds based on whether \syn{p} is a single subject or a list of subjects. If \syn{p} is a single subject, \syn{s}, the proposition \syn{x=s} is returned. Otherwise the disjunction of the translation of the first subject in \syn{prin} (\syn{s}) and the \syn{rest} of the subjects is returned.
 
 \lstset{language=Coq, frame=single, caption={Translation of a Prin},label={lst:transprinCoq}}
 \begin{lstlisting}
@@ -442,9 +438,9 @@ Fixpoint trans_prin
 
 
 
-The translation of a $prerequisite$ (called $trans\_preRequisite$ in listing~\ref{lst:transpreRequisiteCoq}) takes as input $e$, the $environment$, $x$, the $subject$, $prq$, the $preRequisite$ to translate, $IDs$, the set of identifiers (of policies implied by the $prq$), $prin_{u}$, the agreement's user, and proceeds by case analysis on the structure of the $prerequisite$. A $prerequisite$ is either a $TruePrq$, a $Constraint$, a $NotCons$, or a $AndPrqs$. 
+The translation of a \syn{prerequisite} (called \syn{trans_preRequisite} in listing~\ref{lst:transpreRequisiteCoq}) takes as input \syn{e}, the \syn{environment}, \syn{x}, the \syn{subject}, \syn{prq}, the \syn{preRequisite} to translate, \syn{IDs}, the set of identifiers (of policies implied by the \syn{prq}), \syn{prin_{u}}, the agreement's user, and proceeds by case analysis on the structure of the \syn{prerequisite}. A \syn{prerequisite} is either a \syn{TruePrq}, a \syn{Constraint}, a \syn{NotCons}, or a \syn{AndPrqs}. 
 
-In listing~\ref{lst:transpreRequisiteCoq} the translation for $TruePrq$ is the proposition $True$, the translations for $Constraint$, $NotCons$ and $AndPrqs$ simply call respective translation functions for corresponding types $constraint$ (namely $trans\_constraint$ and $trans\_notCons$ and \\$trans\_andPrqs$). 
+In listing~\ref{lst:transpreRequisiteCoq} the translation for \syn{TruePrq} is the proposition \syn{True}, the translations for \syn{Constraint}, \syn{NotCons} and \syn{AndPrqs} simply call respective translation functions for corresponding types \syn{constraint} (namely \syn{trans_constraint} and \syn{trans_notCons} and \\ \syn{trans_andPrqs}). 
 
 
 \lstset{language=Coq, frame=single, caption={Translation of a PreRequisite},label={lst:transpreRequisiteCoq}}
@@ -463,10 +459,11 @@ Definition trans_preRequisite
 \end{lstlisting}
 \end{minipage}
 
-The translation of a $constraint$ (called $trans\_constraint$ in listing~\ref{lst:transconstraintCoq}) takes as input $e$ the $environment$, $x$ the $subject$, $const$, the $constraint$ to translate, $IDs$, the set of identifiers (of policies implied by the parent $preRequisite$) and $prin_{u}$, the agreement's user and proceeds by case analysis on the structure of the $constraint$. A $constraint$ is either a $Principal$, a $Count$ or a $CountByPrin$. The translation for $Principal$ returns the translation function, namely $trans\_prin$, for the $prn$ (the $prin$ that accompanies the $const$ constraint). The translation for $Count$ and $CountByPrin$ return the translation function $trans\_count$. 
+The translation of a \syn{constraint} (called \syn{trans_constraint} in listing~\ref{lst:transconstraintCoq}) takes as input \syn{e} the \syn{environment}, \syn{x} the \syn{subject}, \syn{const}, the \syn{constraint} to translate, \syn{IDs}, the set of identifiers (of policies implied by the parent \syn{preRequisite}) and \syn{prin_{u}}, the agreement's user and proceeds by case analysis on the structure of the \syn{constraint}. A \syn{constraint} is either a \syn{Principal}, a \syn{Count} or a \syn{CountByPrin}. The translation for \syn{Principal} returns the translation function, namely \syn{trans_prin}, for the \syn{prn} (the \syn{prin} that accompanies the \syn{const} constraint). The translation for \syn{Count} and \syn{CountByPrin} return the translation function \syn{trans_count}. 
 
 
 \lstset{language=Coq, frame=single, caption={Translation of a Constraint},label={lst:transconstraintCoq}}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 
 Fixpoint trans_constraint 
@@ -482,9 +479,9 @@ Fixpoint trans_constraint
   end.
   
 \end{lstlisting}
+\end{minipage}
 
-
-The translation of a $NotCons$ (called $trans\_notCons$ in listing~\ref{lst:transnotConsCoq}) takes as input $e$ the $environment$, $x$ the $subject$, $const$, the $constraint$ to translate, $IDs$, the set of identifiers (of policies implied by the parent $preRequisite$) and $prin_{u}$, the agreement's user and proceeds to return the negation of $trans\_constraint$ (see listing~\ref{lst:transconstraintCoq}).
+The translation of a \syn{NotCons} (called \syn{trans_notCons} in listing~\ref{lst:transnotConsCoq}) takes as input \syn{e} the \syn{environment}, \syn{x} the \syn{subject}, \syn{const}, the \syn{constraint} to translate, \syn{IDs}, the set of identifiers (of policies implied by the parent \syn{preRequisite}) and \syn{prin_{u}}, the agreement's user and proceeds to return the negation of \syn{trans_constraint} (see listing~\ref{lst:transconstraintCoq}).
 
 \lstset{language=Coq, frame=single, caption={Translation of NotCons},label={lst:transnotConsCoq}}
 \begin{lstlisting}
@@ -495,15 +492,15 @@ Definition trans_notCons
 \end{lstlisting}
 
 
-The translation of a $Count$ or a $CountByPrin$ (called $trans\_count$ in listing~\ref{lst:transcountCoq}) takes as input $e$ the $environment$, $n$ the total number of times the subjects mentioned in $prin_{u}$ (last parameter) may invoke the policies identified by $IDs$ (third parameter).
+The translation of a \syn{Count} or a \syn{CountByPrin} (called \syn{trans_count} in listing~\ref{lst:transcountCoq}) takes as input \syn{e} the \syn{environment}, \syn{n} the total number of times the subjects mentioned in \syn{prin_{u}} (last parameter) may invoke the policies identified by \syn{IDs} (third parameter).
 
-To implement the translation for a $Count$ or a $CountByPrin$ we start by calling an auxiliary function $process\_two\_lists$ that effectively returns a new list composed of pairs of members of the first list and the second list (the cross-product of the two input lists). In the case of $trans\_count$, the call is ``$process\_two\_lists$ $IDs$ $prin_u$'' which returns a list of pairs of $policyId$ and $subject$ namely $ids\_and\_subjects$. $ids\_and\_subjects$ is then passed to a locally defined function \emph{trans_count_aux}.
+To implement the translation for a \syn{Count} or a \syn{CountByPrin} we start by calling an auxiliary function \syn{process_two_lists} that effectively returns a new list composed of pairs of members of the first list and the second list (the cross-product of the two input lists). In the case of \syn{trans_count}, the call is ``\syn{process_two_lists} \syn{IDs} \syn{prin_u}'' which returns a list of pairs of \syn{policyId} and \syn{subject} namely \syn{ids_and_subjects}. \syn{ids_and_subjects} is then passed to a locally defined function \syn{trans_count_aux}.
 
-$trans\_count\_aux$ returns the current count for a single pair of $policyId$ and $subject$ (the call to $getCount$ which looks up the environment $e$ and returns the current count per each $subject$ and $policyId$) and for a list of pairs of $policyId$ and $subject$s, the addition of $get\_count$ (for the first pair) and $trans\_count\_aux$s (for the rest of the pairs) is returned. 
+\syn{trans_count_aux} returns the current count for a single pair of \syn{policyId} and \syn{subject} (the call to \syn{getCount} which looks up the environment \syn{e} and returns the current count per each \syn{subject} and \syn{policyId}) and for a list of pairs of \syn{policyId} and \syn{subject}s, the addition of \syn{get_count} (for the first pair) and \syn{trans_count_aux}s (for the rest of the pairs) is returned. 
 
-A local variable $running\_total$ has the value returned by $trans\_count\_aux$. Finally the proposition $running\_total < n$ is returned as the translation for a $Count$ or a $CountByPrin$.
+A local variable \syn{running_total} has the value returned by \syn{trans_count_aux}. Finally the proposition \syn{running_total < n} is returned as the translation for a \syn{Count} or a \syn{CountByPrin}.
 
-Note that the only difference between translations for a $Count$ and a $CountByPrin$ is the additional $prn$ parameter for $CountByPrin$ which allows for getting counts for subjects not necessarily the same as $prin_{u}$, the agreement's user(s).
+Note that the only difference between translations for a \syn{Count} and a \syn{CountByPrin} is the additional \syn{prn} parameter for \syn{CountByPrin} which allows for getting counts for subjects not necessarily the same as \syn{prin_{u}}, the agreement's user(s).
 
 
 \lstset{language=Coq, frame=single, caption={Translation of count},label={lst:transcountCoq}}
@@ -534,7 +531,7 @@ Ultimately policy statements describing an agreement will be used to enforce tho
 
 In this chapter we will review our encoding of queries in Coq and Coq representations of other definitions used to prove our decidability results.
 
-Queries are tuples of the form $(agreement, s, action, a, e)$. The tuple corresponds to the question of determining whether an agreement implies that a subject $s$ may perform action $action$ on an asset $a$ given the environment $e$. The Coq representation is listed in listing~\ref{lst:querycoq}. 
+Queries are tuples of the form \syn{(agreement, s, action, a, e)}. The tuple corresponds to the question of determining whether an agreement implies that a subject \syn{s} may perform action \syn{action} on an asset \syn{a} given the environment \syn{e}. The Coq representation is listed in listing~\ref{lst:querycoq}. 
 
 \lstset{language=Coq, frame=single, caption={Queries},label={lst:querycoq}}
 \begin{minipage}[c]{0.95\textwidth}
@@ -548,7 +545,7 @@ Inductive single_query : Set :=
 
 \subsection{Answering Queries}\label{subsec:answerqueriesodrl}
 
-Access control models typically use a two-valued decision set to indicate whether an access request is granted or denied. However many access-control models have extended this two valued set with two more values: non applicable policies to certain queries and an error case accounting for all possible error conditions when evaluating an access request~\cite{DBLP:conf/sacmat/MorissetZ14}. Answering a query could therefore lead to one of four values: error(listing~\ref{lst:errordecision}), permitted(listing~\ref{lst:permitdecision}), denied(listing~\ref{lst:denydecision}) and ``not applicable'' (listing~\ref{lst:notapplicabledecision}) as defined in~\cite{Tschantz}. Note that $e$ denotes 'an environment being consistent in the following listings. As we will see later in chapter~\ref{chap:results} (listing~\ref{lst:permandnotpermmutualexclusive}) \ac{ACCPL} ends up using a three valued decision set with only the permit, deny and non applicable cases. 
+Access control models typically use a two-valued decision set to indicate whether an access request is granted or denied. However many access-control models have extended this two valued set with two more values: non applicable policies to certain queries and an error case accounting for all possible error conditions when evaluating an access request~\cite{DBLP:conf/sacmat/MorissetZ14}. Answering a query could therefore lead to one of four values: error(listing~\ref{lst:errordecision}), permitted(listing~\ref{lst:permitdecision}), denied(listing~\ref{lst:denydecision}) and ``not applicable'' (listing~\ref{lst:notapplicabledecision}) as defined in~\cite{Tschantz}. Note that \syn{e} denotes 'an environment being consistent in the following listings. As we will see later in chapter~\ref{chap:results} (listing~\ref{lst:permandnotpermmutualexclusive}) \ac{ACCPL} ends up using a three valued decision set with only the permit, deny and non applicable cases. 
 
 \lstset{mathescape, language=AST} 
 \begin{lstlisting}[frame=single, caption={Answerable Queries: Error},label={lst:errordecision}]

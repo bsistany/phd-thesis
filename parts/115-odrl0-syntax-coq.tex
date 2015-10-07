@@ -86,13 +86,34 @@ End nonemptylist.
 
 In listing~\ref{lst:preRequisitecoq} \syn{preRequisite} is defined as a new datatype with constructors \syn{TruePrq}, \syn{Constraint}, \syn{NotCons} and \syn{AndPrqs} (see listing~\ref{lst:preRequisiteast} for the abstract syntax equivalent).
 
-\syn{TruePrq} represents the always true prerequisite. The \syn{Constraint} prerequisite is defined as the type \syn{constraint} so its description is deferred here. Intuitively a constraint is a prerequisite to be satisfied that is outside the control of the user(s). For example, the constraint of being `Alice' if you are `Bob' (or `Alice' for that matter). The constructor \syn{NotCons} is defined the same way the \syn{Constraint} constructor is. This constructor is defined as the type \syn{constraint} and it is meant to represent the negation of a \syn{constraint} as we shall see in the translation (see listing~\ref{lst:transnotConsCoq}). The remaining constructor \syn{AndPrqs} takes as parameters nonempty lists of prerequisites. This constructor represents the conjunction combining operator. 
+\syn{TruePrq} represents the always true prerequisite. The \syn{Constraint} constructor takes a value of type \syn{constraint} which we will describe below. Intuitively a constraint is a prerequisite to be satisfied that is outside the control of the user(s). For example, the constraint of being `Alice'. The constructor \syn{NotCons} is defined the same way the \syn{Constraint} constructor is. This constructor is defined as the type \syn{constraint} and it is meant to represent the negation of a \syn{constraint} as we shall see in the translation (see listing~\ref{lst:transnotConsCoq}). The remaining constructor \syn{AndPrqs} takes as parameters nonempty lists of prerequisites. This constructor represents the conjunction combining operator. 
 
-Finally a \syn{constraint} (see  listing~\ref{lst:constraintast} for the abstract syntax equivalent) is defined as a new datatype with constructors \syn{Principal}, \syn{Count} and \syn{CountByPrin}. See listing~\ref{lst:exampleconst} for the three different kinds of constraints.
+
+% prq
+\lstset{language=Coq}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={preRequisite},label={lst:preRequisitecoq}]
+Inductive preRequisite : Set :=
+  | TruePrq : preRequisite
+  | Constraint : constraint -> preRequisite 
+  | NotCons : constraint -> preRequisite 
+  | AndPrqs : nonemptylist preRequisite -> preRequisite.
+  
+\end{lstlisting}
+%\end{minipage}
+
+Finally a \syn{constraint} (see  listing~\ref{lst:constraintast} for the abstract syntax equivalent) is defined as a new datatype with constructors \syn{Principal}, \syn{Count} and \syn{CountByPrin}. See listing~\ref{lst:exampleconst} for the definition of \syn{constraint} and examples of how the three different kinds of constraints are used.
 
 \lstset{language=Coq}
 %\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Three Kinds of Constraints},label={lst:exampleconst}]
+\begin{lstlisting}[frame=single, caption={Constraint Definition and the Three Kinds of Constraints},label={lst:exampleconst}]
+
+Inductive constraint : Set :=
+  | Principal : prin  -> constraint 
+  | Count : nat -> constraint 
+  | CountByPrin : prin -> nat -> constraint.
+
+
 (Constraint (Principal (Single Alice))).
 
 (Constraint (Count 10)).
@@ -103,34 +124,8 @@ Finally a \syn{constraint} (see  listing~\ref{lst:constraintast} for the abstrac
 %\end{minipage}
 
 
-% prq
-\lstset{language=Coq}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={preRequisite},label={lst:preRequisitecoq}]
-Inductive preRequisite : Set :=
-  | TruePrq : preRequisite
-  | Constraint : constraint -> preRequisite 
-  | NotCons : constraint -> preRequisite 
-  | AndPrqs : nonemptylist preRequisite -> preRequisite.
-  
-  
-Inductive constraint : Set :=
-  | Principal : prin  -> constraint 
-  | Count : nat -> constraint 
-  | CountByPrin : prin -> nat -> constraint.
+We started with the encoding of the agreement for Alice and Bob in chapter~\ref{chap:odrl0syntax} but we deferred the definition of the Coq constructs used to encode that agreement. All the definitions needed to encode the agreement for Alice and Bob have now been defined so we now show how that agreement looks like as encodings of \ac{ACCPL} constructs in Coq in the listing~\ref{lst:agreementAliceAndBob}. Recall the listing~\ref{lst:agreementpucella2006} for \syn{<agreement>} which used the syntax taken from~\cite{pucella2006}.
 
-\end{lstlisting}
-\end{minipage}
-
-We started with the encoding of the agreement for Alice and Bob in chapter~\ref{chap:odrl0syntax} but we deferred the definition of the Coq constructs used to define that agreement. All the definitions needed to encode the agreement for Alice and Bob have now been defined so we show how that agreement looks like in \ac{ACCPL} in the listing~\ref{lst:agreementAliceAndBob}. We also repeat the listing of the agreement using the syntax from~\cite{pucella2006} from chapter~\ref{chap:odrl0syntax} in the listing~\ref{lst:agreementpucella2006two}.
-
-\lstset{language=Pucella2006}
-\begin{lstlisting}[frame=single, caption={Agreement for Alice and Bob as BNF},label={lst:agreementpucella2006two}]
-agreement
- for Alice and Bob 
- about The Report 
- with True -> and[count[5] => print], and[Alice, count[2] => print].
-\end{lstlisting}
 
 
 \lstset{language=Coq}
