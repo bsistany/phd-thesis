@@ -198,18 +198,18 @@ Definition makeResult (ans:answer)(s:subject)(ac:act)(ass:asset) : result :=
 
 \section{Translations}
 
+Translation of an agreement is a function that takes an agreement, namely the parameter called \syn{ag}, performs partial evaluation and returns a new function that when given an \syn{environment} and a \syn{query} will return a nonempty list of \syn{result}s. See listing~\ref{lst:transagreement}.
+Pattern matching on the agreement in question, the \syn{ag}, extracts the components of the agreement. These are \syn{ps}, the policy set, \syn{prin_u}, the agreement's user(s), and \syn{a}, the asset mentioned in the agreement. Notice that formal argument \syn{e} of type \syn{environment} is passed along many translation functions but will only eventually be used to get the count information from the \syn{getCount} function. The components of the query or request for access meaning the subject, action and asset: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query} make up other parameters that are passed into the next level translation function, namely the translation for a policy set called \syn{trans_ps}.
 
-Translation of the top level \syn{agreement} element proceeds by case analysis on the structure of the given agreement. However an agreement can only be built one way; by calling the constructor \syn{Agreement}. The translation proceeds by calling the translation function for the corresponding \syn{policySet} namely the parameter to \syn{Agreement} called \syn{ps}. See listing~\ref{lst:transagreement}. The formal argument \syn{e} of type \syn{environment} is passed along many translation functions but will only eventually be used to get the count information from the \syn{getCount} function. Other formal arguments include \syn{ag}, the agreement to be translated, plus the subject, action and asset coming from a ``query'' or request for access: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query}. Notice that agreement translation function, \syn{trans_agreement}, returns a nonempty list of \syn{result}s (see listing~\ref{lst:transagreement}).
+\section{Policy Combinators And Interpretation Of Results}\label{sec:policycombinators}
 
-\subsection{Policy Combinators And Interpretation Of Results}\label{subsec:policycombinators}
-
-The nonempty list of \syn{result}s returned by the agreement translation function will have a result per primitive policy (\syn{primPolicy}) in the agreement. As we will see later when we discuss the proofs, we have proven that results containing a \syn{Permitted} answer and a \syn{NotPermitted} answer are mutually exclusive. Therefore we interpret the existence of a single (or more) \syn{Permitted} result in the nonempty list, as the decision being ``Permitted'' whereas the existence of a single (or more) \syn{NotPermitted} type result is interpreted as ``NotPermitted". We have also proven  that when there exists no \syn{Permitted} or \syn{NotPermitted} results in the returned nonempty list, only \syn{Unregulated} results are possible. In this case we conclude the decision is ``Unregulated''. 
+The nonempty list of \syn{result}s returned by the agreement translation function will have a result per primitive policy (\syn{primPolicy}) in the agreement. As we will see later when we discuss the proofs, we have proven that results containing a \syn{Permitted} answer and a \syn{NotPermitted} answer are mutually exclusive. Therefore we interpret the existence of a single (or more) \syn{Permitted} result in the nonempty list, as the decision being ``Permitted'' whereas the existence of a single (or more) \syn{NotPermitted} type result is interpreted as ``NotPermitted". We also have a proof that shows that when there exists no \syn{Permitted} or \syn{NotPermitted} results in the returned nonempty list, only \syn{Unregulated} results are possible. In this case we conclude the decision is ``Unregulated''. 
 
 \lstset{language=Coq, frame=single, caption={Translation of Agreement},label={lst:transagreement}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Definition trans_agreement
-   (e:environment)(ag:agreement)(action_from_query:act)
+   (ag:agreement)(e:environment)(action_from_query:act)
    (subject_from_query:subject)(asset_from_query:asset) : nonemptylist result :=
 
    match ag with
