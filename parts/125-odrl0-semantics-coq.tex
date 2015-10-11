@@ -9,7 +9,7 @@ We specify the semantics of \ac{ACCPL} as a translation function from an agreeme
 % COQ
 The translation functions plus the auxiliary types and infrastructure which implement the semantics for \ac{ACCPL} have been encoded in Coq. The Coq code implementing the semantics is high-level enough to be readable as a specification of the semantics. This is one reason why we do not use abstract syntax to describe the semantics as we did for the syntax of \ac{ACCPL} (see chapter~\ref{chap:odrl0syntax}). The other reason not to use abstract syntax the way Pucella and Weissman~\cite{pucella2006} do for their semantics, is the difficulty of coming up with abstract syntax that is intuitive and equivalent to the translation functions implemented in Coq and listed in this chapter.
 
-Whether an agreement is translated into a decision indicating a permission is granted or denied depends on the agreement in question but also on the facts recorded in the environment (e.g. time of day). For \ac{ACCPL} those facts revolve around the number of times a policy has been used to justify an action (see section~\ref{sec:odrl0} for background on environments). We encode this information in Coq in a data structure called an \syn{environment}. An \syn{environment} is a conjunction of equalities of the form \syn{count(s, policyId) = n} which are called ``count equalities''.
+Whether an agreement is translated into a decision indicating a permission is granted or denied depends on the agreement in question but also on the facts recorded in the environment (e.g. time of day). For \ac{ACCPL} those facts revolve around the number of times a policy has been used to justify an action (see section~\ref{sec:odrl0} for background on environments). We encode this information in Coq as a new inductive type called an \syn{environment}. An \syn{environment} is a conjunction of equalities of the form \syn{count(s, policyId) = n} which are called ``count equalities''.
 
 % COQ
 The Coq version of a count equality is a new inductive type called \syn{count_equality}. An environment is defined to be a non-empty list of \syn{count_equality} objects (see listing~\ref{lst:environmentcoq}). Function \syn{make_count_equality} in listing~\ref{lst:environmentcoq} is simply a convenience function that builds \syn{count_equality}s. 
@@ -44,7 +44,7 @@ Definition e1 : environment :=
 %\end{minipage}
   
 
-We also define a \syn{getCount} function (see listing~\ref{lst:getCountcoq}) that given a pair consisting of a subject and policy id, looks for a corresponding count in the environment. \syn{getCount} assumes the given environment is consistent (meaning it won't return two different counts for the same pair of subject and policy id), so it returns the first matched \syn{count} it sees for a \syn{(subject, id)} pair. If a \syn{count} for a \syn{(subject, id)} pair is not found it returns 0. The use of keyword \syn{Fixpoint} is shown the listing; \syn{Fixpoint} is used for recursive functions written in Coq's functional programming language. Note the use of the \syn{match} construct and pattern matching, one of the features of this language. 
+We also define a \syn{getCount} function (see listing~\ref{lst:getCountcoq}) that given a pair consisting of a subject and policy id, looks for a corresponding count in the environment. \syn{getCount} assumes the given environment is consistent (meaning it won't return two different counts for the same pair of subject and policy id), so it returns the first matched \syn{count} it sees for a \syn{(subject, id)} pair. If a \syn{count} for a \syn{(subject, id)} pair is not found it returns 0. The use of keyword \syn{Fixpoint} is shown in the listing; \syn{Fixpoint} is used for recursive functions written in Coq's functional programming language. Note the use of the \syn{match} construct and pattern matching, one of the features of this language. 
 
 
 \lstset{language=Coq, frame=single, caption={\syn{getCount} Function},label={lst:getCountcoq}}
@@ -120,7 +120,7 @@ Theorem trans_prin_dec :
 \end{lstlisting}
 \end{minipage}
 
-The decision procedure \syn{trans_count_dec} declares that either there is a proof for the proposition \syn{trans_count} or there exists a proof for its negation (see listing~\ref{lst:transcountdeccoq}). The translation function \syn{trans_count} is the proposition ``running_total < n'' (see listing~\ref{lst:transcountCoq}).
+The decision procedure \syn{trans_count_dec} declares that either there is a proof for the proposition \syn{trans_count} or there exists a proof for its negation (see listing~\ref{lst:transcountdeccoq}). The translation function \syn{trans_count} is the proposition \syn{running_total < n} (see listing~\ref{lst:transcountCoq}).
 
 \lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_count_dec}},label={lst:transcountdeccoq}}
 \begin{lstlisting}
@@ -132,12 +132,13 @@ The decision procedure \syn{trans_constraint_dec} declares that either there is 
 
 
 \lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_constraint_dec}},label={lst:transconstraintdeccoq}}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem trans_constraint_dec :
     forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
        {trans_constraint e x const IDs prin_u} + {~trans_constraint e x const IDs prin_u}.
 \end{lstlisting}
-
+\end{minipage}
 
 The decision procedure \syn{trans_notCons_dec} declares that either there is a proof for the proposition \syn{trans_notCons} or there exists a proof for its negation (see listing~\ref{lst:transnotConsdeccoq}). The translation function \syn{trans_notCons} is listed in listing~\ref{lst:transnotConsCoq}). The proof for \syn{trans_notCons_dec} not shown here uses two helper theorems. One is another decision procedure, \\ \syn{trans_negation_constraint_dec} which declares that either there exists a proof for the negation of \syn{trans_constraint} or there is a proof for the negation of the negation of \syn{trans_constraint}. The other helper theorem is \syn{double_neg_constraint} which basically declares that \syn{trans_constraint} implies its own double negation. The helpers are listed in~\ref{lst:transnegationconstraintdeccoq}.
 
@@ -172,9 +173,9 @@ Theorem trans_preRequisite_dec :
 \end{lstlisting}
 
 
-\section{answer and result types}\label{sec:answerandresulttypes}
+\section{\syn{answer} and \syn{result} types}\label{sec:answerandresulttypes}
 
-The policy translation functions ultimately will return one of the following answers: \syn{Permitted}, \syn{NotPermitted} or \syn{Unregulated}. \syn{Permitted} answer signifies that the access request has been granted. The \syn{NotPermitted} answer is for when the access request is denied. And finally the \syn{Unregulated} answer is for all the times when neither \syn{Permitted} or \syn{NotPermitted} answers are applicable. The \syn{answer} type in the Coq listing~\ref{lst:answercoq} implements the answer concept. We wrap \syn{answer}s in a \syn{result} type and add some context. Intuitively a result will tell us whether a subject may perform an action on an asset or not, or else that the request is unregulated. in listing~\ref{lst:answercoq} we also show the definition of the utility function \syn{makeResult} that when given an \syn{answer}, a \syn{subject}, an \syn{act} and an \syn{asset} builds and returns a \syn{result}.
+The policy translation functions ultimately will return one of the following answers: \syn{Permitted}, \syn{NotPermitted} or \syn{Unregulated}. \syn{Permitted} answer signifies that the access request has been granted. The \syn{NotPermitted} answer is for when the access request is denied. And finally the \syn{Unregulated} answer is for all the times when neither \syn{Permitted} or \syn{NotPermitted} answers are applicable. The \syn{answer} type in the Coq listing~\ref{lst:answercoq} implements the answer concept. We wrap \syn{answer}s in a \syn{result} type and add some context. Intuitively a \syn{result} will tell us whether a subject may perform an action on an asset or not, or else that the request is unregulated. in listing~\ref{lst:answercoq} we also show the definition of the helper function \syn{makeResult} that when given an \syn{answer}, a \syn{subject}, an \syn{act} and an \syn{asset} builds and returns a \syn{result}.
 
 
 \lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{answer} and \syn{result} types},label={lst:answercoq}}
@@ -198,11 +199,11 @@ Definition makeResult (ans:answer)(s:subject)(ac:act)(ass:asset) : result :=
 \section{Translations}
 
 
-Translation of the top level \syn{agreement} element proceeds by case analysis on the structure of the agreement. However an agreement can only be built one way; by calling the constructor \syn{Agreement}. The translation proceeds by calling the translation function for the corresponding \syn{policySet} namely the parameter to \syn{Agreement} called \syn{ps}. See listing~\ref{lst:transagreement}. The formal argument \syn{e} of type \syn{environment} is passed along many translation functions but will only eventually be used to get the count information from the \syn{getCount} function. Other formal arguments include \syn{ag}, the agreement to be translated, plus the subject, action and asset coming from a ``query'' or request for access: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query}. Notice that agreement translation function, \syn{trans_agreemen}, returns a nonempty list of \syn{result}s (see listing~\ref{lst:transagreement}).
+Translation of the top level \syn{agreement} element proceeds by case analysis on the structure of the given agreement. However an agreement can only be built one way; by calling the constructor \syn{Agreement}. The translation proceeds by calling the translation function for the corresponding \syn{policySet} namely the parameter to \syn{Agreement} called \syn{ps}. See listing~\ref{lst:transagreement}. The formal argument \syn{e} of type \syn{environment} is passed along many translation functions but will only eventually be used to get the count information from the \syn{getCount} function. Other formal arguments include \syn{ag}, the agreement to be translated, plus the subject, action and asset coming from a ``query'' or request for access: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query}. Notice that agreement translation function, \syn{trans_agreement}, returns a nonempty list of \syn{result}s (see listing~\ref{lst:transagreement}).
 
 \subsection{Policy Combinators And Interpretation Of Results}\label{subsec:policycombinators}
 
-The nonempty list of \syn{result}s returned by the agreement translation function will have a result per primitive policy (\syn{primPolicy}) in the agreement. As we will see later when we discuss the proofs, we have proven that results containing a Permitted answer and a NotPermitted answer are mutually exclusive. Therefore we interpret the existence of a single (or more) Permitted result in the nonempty list, as the decision being ``Permitted'' whereas the existence of a single (or more) NotPermitted type result is interpreted as ``NotPermitted". We have also proven  that when there exists no Permitted or NotPermitted results in the returned nonempty list, only Unregulated results are possible. In this case we conclude the decision is ``Unregulated''. 
+The nonempty list of \syn{result}s returned by the agreement translation function will have a result per primitive policy (\syn{primPolicy}) in the agreement. As we will see later when we discuss the proofs, we have proven that results containing a \syn{Permitted} answer and a \syn{NotPermitted} answer are mutually exclusive. Therefore we interpret the existence of a single (or more) \syn{Permitted} result in the nonempty list, as the decision being ``Permitted'' whereas the existence of a single (or more) \syn{NotPermitted} type result is interpreted as ``NotPermitted". We have also proven  that when there exists no \syn{Permitted} or \syn{NotPermitted} results in the returned nonempty list, only \syn{Unregulated} results are possible. In this case we conclude the decision is ``Unregulated''. 
 
 \lstset{language=Coq, frame=single, caption={Translation of Agreement},label={lst:transagreement}}
 %\begin{minipage}[c]{0.95\textwidth}
