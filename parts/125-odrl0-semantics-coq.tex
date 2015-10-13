@@ -71,7 +71,7 @@ Fixpoint getCount
 \end{lstlisting}
 \end{minipage}
 
-\section{Decision Procedures and the \syn{sumbool} Type}\label{sec:sumboolsection}
+\section{The \syn{sumbool} Type}\label{sec:sumboolsection}
 
 \syn{sumbool} is a boolean type defined in the Coq standard library module \syn{Coq.Init.Specif}. \syn{sumbool} captures the idea of program values that indicate which of two propositions is true~\cite{chlipalacpdt2011}. \syn{sumbool} is equipped with the justification of its value, which really helps with proofs. \syn{sumbool A B}, which is written \syn{A+B}, is the informative disjunction ``A or B'', where A and B are logical propositions. Its extraction is isomorphic to the type of booleans. A boolean is either true or false, and this is decidable~\cite{Coq:manual}. See listing~\ref{lst:sumbooltypeCoq} for the definition of \syn{sumbool} and \syn{sumbool_of_bool}. With \syn{sumbool}s similar to \syn{bool} and other 2-constructor inductive types, one can use the ``if then else'' construct to select the desired case when doing proofs which makes for much more readability of the given proofs.
 
@@ -87,90 +87,8 @@ Inductive sumbool (A B:Prop) : Set :=
 \end{lstlisting}
 \end{minipage}
 
-We have used the \syn{sumbool} type to declare and prove decision procedures that we have subsequently used in the translation functions implementing the semantics and also in the proofs. In the following we will list only the type declaration of each decision procedure and the accompanying functions. The individual decision procedures were used as a building block to make the final decidability proofs for \ac{ACCPL} possible. We will refer to these listings later when we discuss the translations and/or proofs using the decision procedures.
+We have used the \syn{sumbool} type to declare and prove decision procedures that we have subsequently used in the translation functions implementing the semantics and also in the proofs. 
 
-The decision procedure \syn{eq_nat_dec} takes two natural numbers, and declares that either there is a proof for their equality or there exists a proof for their inequality (see listing~\ref{lst:eqnatdeccoq}).
-
-\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{eq_nat_dec}~\cite{Coq:manual}},label={lst:eqnatdeccoq}}
-\begin{lstlisting}
-Theorem eq_nat_dec : forall n m, {n = m} + {n <> m}.
-\end{lstlisting}
-
-The decision procedure \syn{subject_in_prin_dec} declares that either there is a proof for the proposition \syn{is_subject_in_prin} (see listing~\ref{lst:issubjectinprincoq}) or there exists a proof for its negation (see listing~\ref{lst:issubjectinprincoq}). 
-
-\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{is_subject_in_prin}},label={lst:issubjectinprincoq}}
-\begin{lstlisting}
-Theorem subject_in_prin_dec :
-    forall (a:subject) (l:prin), {is_subject_in_prin a l} + {~ is_subject_in_prin a l}.
-
-Fixpoint is_subject_in_prin (s:subject)(p:prin): Prop :=
-  match p with
-  | Single s'  => s=s'
-  | NewList s' rest => s=s' \/ (is_subject_in_prin s rest)
-  end.
-\end{lstlisting}
-
-The decision procedure \syn{trans_prin_dec} declares that either there is a proof for the proposition \syn{trans_prin} or there exists a proof for its negation (see listing~\ref{lst:transprindeccoq}). The translation function \syn{trans_prin} is the proposition ``subject x is in prin'' (see listing~\ref{lst:transprinCoq}).
-
-\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_prin_dec}},label={lst:transprindeccoq}}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
-Theorem trans_prin_dec :
-   forall (x:subject)(p: prin), {trans_prin x p} + {~trans_prin x p}.
-\end{lstlisting}
-\end{minipage}
-
-The decision procedure \syn{trans_count_dec} declares that either there is a proof for the proposition \syn{trans_count} or there exists a proof for its negation (see listing~\ref{lst:transcountdeccoq}). The translation function \syn{trans_count} is the proposition \syn{running_total < n} (see listing~\ref{lst:transcountCoq}).
-
-\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_count_dec}},label={lst:transcountdeccoq}}
-\begin{lstlisting}
-Theorem trans_count_dec :
-    forall (n:nat), {trans_count n} + {~trans_count n}.
-\end{lstlisting}
-
-The decision procedure \syn{trans_constraint_dec} declares that either there is a proof for the proposition \syn{trans_constraint} or there exists a proof for its negation (see listing~\ref{lst:transconstraintdeccoq}). The translation function \syn{trans_constraint} is listed in listing~\ref{lst:transconstraintCoq}. 
-
-
-\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_constraint_dec}},label={lst:transconstraintdeccoq}}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
-Theorem trans_constraint_dec :
-    forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
-       {trans_constraint e x const IDs prin_u} + {~trans_constraint e x const IDs prin_u}.
-\end{lstlisting}
-\end{minipage}
-
-The decision procedure \syn{trans_notCons_dec} declares that either there is a proof for the proposition \syn{trans_notCons} or there exists a proof for its negation (see listing~\ref{lst:transnotConsdeccoq}). The translation function \syn{trans_notCons} is listed in listing~\ref{lst:transnotConsCoq}). The proof for \syn{trans_notCons_dec} not shown here uses two helper theorems. One is another decision procedure, \\ \syn{trans_negation_constraint_dec} which declares that either there exists a proof for the negation of \syn{trans_constraint} or there is a proof for the negation of the negation of \syn{trans_constraint}. The other helper theorem is \syn{double_neg_constraint} which basically declares that \syn{trans_constraint} implies its own double negation. The helpers are listed in~\ref{lst:transnegationconstraintdeccoq}.
-
-\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_negation_constraint_dec}},label={lst:transnegationconstraintdeccoq}}
-\begin{lstlisting}
-Theorem double_neg_constraint:
-    forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
-       (trans_constraint e x const IDs prin_u) -> ~~(trans_constraint e x const IDs prin_u).
-  
-Theorem trans_negation_constraint_dec :
-    forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
-       {~trans_constraint e x const IDs prin_u} + {~~trans_constraint e x const IDs prin_u}.
-       
-\end{lstlisting}
-
-\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_notCons_dec}},label={lst:transnotConsdeccoq}}
-\begin{lstlisting}
-Theorem trans_notCons_dec :
-    forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
-       {trans_notCons e x const IDs prin_u} + {~ trans_notCons e x const IDs prin_u}.
-
-\end{lstlisting}
-
-The decision procedure \syn{trans_preRequisite_dec} declares that either there is a proof for the proposition \syn{trans_preRequisite} or there exists a proof for its negation (see listing~\ref{lst:transpreRequisitedeccoq}). The translation function \syn{trans_preRequisite} is listed in listing~\ref{lst:transpreRequisiteCoq}). 
-
-
-\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_preRequisite_dec}},label={lst:transpreRequisitedeccoq}}
-\begin{lstlisting}
-Theorem trans_preRequisite_dec :
-    forall (e:environment)(x:subject)(prq:preRequisite)(IDs:nonemptylist policyId)(prin_u:prin),
-       {trans_preRequisite e x prq IDs prin_u} + {~ trans_preRequisite e x prq IDs prin_u}.
-\end{lstlisting}
 
 
 \section{\syn{answer} and \syn{result} types}\label{sec:answerandresulttypes}
@@ -532,6 +450,94 @@ Fixpoint trans_count
   running_total < n.
 \end{lstlisting}
 \end{minipage}
+
+\section{Decision Procedures}
+
+In the following we will list only the type declaration of each decision procedure and the accompanying functions. The individual decision procedures were used as a building block to make the final decidability proofs for \ac{ACCPL} possible. We will refer to these listings later when we discuss the translations and/or proofs using the decision procedures.
+
+The decision procedure \syn{eq_nat_dec} takes two natural numbers, and declares that either there is a proof for their equality or there exists a proof for their inequality (see listing~\ref{lst:eqnatdeccoq}).
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{eq_nat_dec}~\cite{Coq:manual}},label={lst:eqnatdeccoq}}
+\begin{lstlisting}
+Theorem eq_nat_dec : forall n m, {n = m} + {n <> m}.
+\end{lstlisting}
+
+The decision procedure \syn{subject_in_prin_dec} declares that either there is a proof for the proposition \syn{is_subject_in_prin} (see listing~\ref{lst:issubjectinprincoq}) or there exists a proof for its negation (see listing~\ref{lst:issubjectinprincoq}). 
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{is_subject_in_prin}},label={lst:issubjectinprincoq}}
+\begin{lstlisting}
+Theorem subject_in_prin_dec :
+    forall (a:subject) (l:prin), {is_subject_in_prin a l} + {~ is_subject_in_prin a l}.
+
+Fixpoint is_subject_in_prin (s:subject)(p:prin): Prop :=
+  match p with
+  | Single s'  => s=s'
+  | NewList s' rest => s=s' \/ (is_subject_in_prin s rest)
+  end.
+\end{lstlisting}
+
+The decision procedure \syn{trans_prin_dec} declares that either there is a proof for the proposition \syn{trans_prin} or there exists a proof for its negation (see listing~\ref{lst:transprindeccoq}). The translation function \syn{trans_prin} is the proposition ``subject x is in prin'' (see listing~\ref{lst:transprinCoq}).
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_prin_dec}},label={lst:transprindeccoq}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Theorem trans_prin_dec :
+   forall (x:subject)(p: prin), {trans_prin x p} + {~trans_prin x p}.
+\end{lstlisting}
+\end{minipage}
+
+The decision procedure \syn{trans_count_dec} declares that either there is a proof for the proposition \syn{trans_count} or there exists a proof for its negation (see listing~\ref{lst:transcountdeccoq}). The translation function \syn{trans_count} is the proposition \syn{running_total < n} (see listing~\ref{lst:transcountCoq}).
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_count_dec}},label={lst:transcountdeccoq}}
+\begin{lstlisting}
+Theorem trans_count_dec :
+    forall (n:nat), {trans_count n} + {~trans_count n}.
+\end{lstlisting}
+
+The decision procedure \syn{trans_constraint_dec} declares that either there is a proof for the proposition \syn{trans_constraint} or there exists a proof for its negation (see listing~\ref{lst:transconstraintdeccoq}). The translation function \syn{trans_constraint} is listed in listing~\ref{lst:transconstraintCoq}. 
+
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_constraint_dec}},label={lst:transconstraintdeccoq}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Theorem trans_constraint_dec :
+    forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
+       {trans_constraint e x const IDs prin_u} + {~trans_constraint e x const IDs prin_u}.
+\end{lstlisting}
+\end{minipage}
+
+The decision procedure \syn{trans_notCons_dec} declares that either there is a proof for the proposition \syn{trans_notCons} or there exists a proof for its negation (see listing~\ref{lst:transnotConsdeccoq}). The translation function \syn{trans_notCons} is listed in listing~\ref{lst:transnotConsCoq}). The proof for \syn{trans_notCons_dec} not shown here uses two helper theorems. One is another decision procedure, \\ \syn{trans_negation_constraint_dec} which declares that either there exists a proof for the negation of \syn{trans_constraint} or there is a proof for the negation of the negation of \syn{trans_constraint}. The other helper theorem is \syn{double_neg_constraint} which basically declares that \syn{trans_constraint} implies its own double negation. The helpers are listed in~\ref{lst:transnegationconstraintdeccoq}.
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_negation_constraint_dec}},label={lst:transnegationconstraintdeccoq}}
+\begin{lstlisting}
+Theorem double_neg_constraint:
+    forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
+       (trans_constraint e x const IDs prin_u) -> ~~(trans_constraint e x const IDs prin_u).
+  
+Theorem trans_negation_constraint_dec :
+    forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
+       {~trans_constraint e x const IDs prin_u} + {~~trans_constraint e x const IDs prin_u}.
+       
+\end{lstlisting}
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_notCons_dec}},label={lst:transnotConsdeccoq}}
+\begin{lstlisting}
+Theorem trans_notCons_dec :
+    forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
+       {trans_notCons e x const IDs prin_u} + {~ trans_notCons e x const IDs prin_u}.
+
+\end{lstlisting}
+
+The decision procedure \syn{trans_preRequisite_dec} declares that either there is a proof for the proposition \syn{trans_preRequisite} or there exists a proof for its negation (see listing~\ref{lst:transpreRequisitedeccoq}). The translation function \syn{trans_preRequisite} is listed in listing~\ref{lst:transpreRequisiteCoq}). 
+
+
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_preRequisite_dec}},label={lst:transpreRequisitedeccoq}}
+\begin{lstlisting}
+Theorem trans_preRequisite_dec :
+    forall (e:environment)(x:subject)(prq:preRequisite)(IDs:nonemptylist policyId)(prin_u:prin),
+       {trans_preRequisite e x prq IDs prin_u} + {~ trans_preRequisite e x prq IDs prin_u}.
+\end{lstlisting}
+
 
 \section{Queries}
 
