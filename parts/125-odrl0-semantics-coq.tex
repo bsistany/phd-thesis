@@ -87,7 +87,7 @@ Inductive sumbool (A B:Prop) : Set :=
 \end{lstlisting}
 \end{minipage}
 
-We have used the \syn{sumbool} type to declare and prove decision procedures that we have subsequently used in the translation functions implementing the semantics and also in the proofs. 
+We have used the \syn{sumbool} type to declare and prove decision procedures that we have subsequently used in the translation functions implementing the semantics and also in the proofs. We will list the decision procedures in section~\ref{sec:decprocs} after reviewing the translation functions in section~\ref{sec:translationfuncs}.
 
 
 
@@ -114,7 +114,7 @@ Definition makeResult (ans:answer)(s:subject)(ac:act)(ass:asset) : result :=
 \end{lstlisting}
 \end{minipage}
 
-\section{Translations}
+\section{Translations}\label{sec:translationfuncs}
 
 Translation of an agreement is a function that takes an agreement, namely the parameter called \syn{ag}, performs partial evaluation and returns a new function that when given an \syn{environment} and a \syn{query} will return a nonempty list of \syn{result}s (see listing~\ref{lst:transagreement}).
 Pattern matching on the agreement in question, the \syn{ag}, extracts the components of the agreement. These are \syn{ps}, the policy set, \syn{prin_u}, the agreement's user(s), and \syn{a}, the asset mentioned in the agreement. Notice that formal argument \syn{e} of type \syn{environment} is passed along many translation functions but will only eventually be used to get the count information from the \syn{getCount} function. The components of the query or request for access meaning the subject, action and asset: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query} make up other parameters that are passed into the next level translation function, namely the translation for a policy set called \syn{trans_ps}.
@@ -451,7 +451,7 @@ Fixpoint trans_count
 \end{lstlisting}
 \end{minipage}
 
-\section{Decision Procedures}
+\section{Decision Procedures}\label{sec:decprocs}
 
 In the following we will list only the type declaration of each decision procedure and the accompanying functions. The individual decision procedures were used as a building block to make the final decidability proofs for \ac{ACCPL} possible. We will refer to these listings later when we discuss the translations and/or proofs using the decision procedures.
 
