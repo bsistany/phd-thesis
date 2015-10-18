@@ -250,7 +250,7 @@ Defined.
 
 Tschantz and Krishnamurthi~\cite{Tschantz} argue for the need for formal means to compare and contrast policy-based access-control languages and they present a set of properties to analyze the behaviour of policies in light of additional and/or explicit environmental facts, policy growth and policy decomposition. Tschantz and Krishnamurthi apply their properties to two core policy languages and compare the results. One of the core policy languages they present is a simplified \ac{xacml} and the other is Lithium~\cite{Halpern2008}. In the following sections we will describe Tschantz and Krishnamurthi's properties and evaluate \ac{ACCPL} with respect to these properties.
 
-\section{Reasonability Properties}
+\section{Reasonability Properties}\label{sec:threeinterpretations}
 
 The properties Tschantz and Krishnamurthi~\cite{Tschantz} present revolve around three questions:
 
@@ -262,7 +262,7 @@ The properties Tschantz and Krishnamurthi~\cite{Tschantz} present revolve around
 
 Tschantz and Krishnamurthi~\cite{Tschantz} use a simple policy as a motivating example (which they attribute to~\cite{Halpern2008}) that we will adapt and reuse here. The example will help to review the range of interpretations possible and ultimately the range of policy language design choices and where \ac{ACCPL} is on that range.
 The policy in English is as follows:
-\subsection{Basic Policy and Query}\label{sec:basicpolicyenglish}
+
 \begin{itemize}
 \item If the subject has a subscription to the Gold bundle, then permit that subject to print TheReport.
 
@@ -286,7 +286,6 @@ e1 = BasicBundle(s)
 
 According to Tschantz and Krishnamurthi~\cite{Tschantz} at least three different interpretations are possible. We will list the possibilities and then evaluate how \ac{ACCPL} would answer the query.
 
-\subsection{Possible Interpretations}\label{sec:threeinterpretations}
 \begin{itemize}
 \item Implicit: Grant access because of \syn{p3}. This interpretation assumes that if a subject has a subscription to the Basic bundle, the subject does not have a subscription to the Gold bundle so the assumption is that there is a proof for \syn{~GoldBundle(s)}. This is an example of ``implicit'' knowledge and ``closed world assumptions''.
 
@@ -302,20 +301,19 @@ A policy language based on the first and third interpretations are not certifiab
 
 Tschantz and Krishnamurthi~\cite{Tschantz} define an access-control policy language as a tuple $L = (P, Q, G, N, \left\langle\left\langle . \right\rangle\right\rangle)$ where $P$ is a set of policies, $Q$ is a set of requests or queries, $G$ is the granting decisions, $N$ is the non-granting decisions, $\left\langle\left\langle . \right\rangle\right\rangle$ is a function taking a policy $p \in P$ to a relation between $Q$ and $G \cup N$ where $G \cap N = \emptyset$. Let $D$ represent $G \cup N$. Policy $p$ assigns a decision of $d \in D$ to the query $q \in Q$. $L$ also defines a partial order on decisions such that $d \leq d'$ if either $d, d' \in N$ or $d, d' \in G$ or $d \in N$ and $d' \in G$. Note that for \ac{ACCPL}, $D = \left\{ {Unregulated, NotPermitted, Permitted}\right\}$, $G = \left\{ {Permitted}\right\}$ and $N = \left\{ {Unregulated, NotPermitted}\right\}$.
 
-\section{Types of Decisions}
 
-Policy based access-control languages typically support at least the Permit and Deny decisions. When a decision for a query is not granted, one design choice for a language is to return a Deny. However in this case Deny stands for ``not Permit''. It is possible to have cases when the policy truly doesn't specify either Permit or Deny. In such cases arbitrarily returning the decision of Deny makes it difficult to compose policies and in fact, an explicit decision of NonApplicable is warranted. Some languages may decide to only have Permit decisions. In such languages lack of a Permit decision for a query signifies a Deny so Deny decisions are not explicit. Although the policies of these languages may be more readable than those with more explicit decisions but they result in ambiguity on whether a Deny decision was really intended or not. Finally some languages define an explicit decision of ``Error'' for cases such as when both Permit and Deny decisions are reached for the same query. An explicit Error decision is preferable to undefined behaviour because it can lead to improvements to policies and/or how the queries are built. 
+\section{Policy Combinators}\label{sec:policycombinators}
 
-\section{Policy Combinators}
-
-Primitive policies are often developed by independent entities within an organization therefore it is natural to want a way of combining them into a policy for the whole organization using policy combinators. Some languages such as \ac{odrl} have nested sub-policies inside other policies. In such cases one design decision could be to allow for different combinators for different layers to make the language more expressive. Some examples of policy combinators are: conjunction, disjunction, exclusive disjunction, Permit override (if any of the primitive policies returns a Permit, return only Permit), Deny override (if any of the primitive policies returns a Deny, return only Deny).
+Primitive policies are often developed by independent entities within an organization therefore it is natural to want a way of combining them into a policy for the whole organization using policy combinators. Some languages such as \ac{odrl} have nested sub-policies inside other policies. In such cases one design decision could be to allow for different combinators for different layers to make the language more expressive. Some examples of policy combinators are: conjunction, disjunction, exclusive disjunction, \syn{Permitted} override (if any of the primitive policies returns a \syn{Permitted}, return only \syn{Permitted}), \syn{NotPermitted} override (if any of the primitive policies returns a \syn{NotPermitted}, return only \syn{NotPermitted})~\cite{Tschantz}.
 
 \section{ACCPL}
 
-When designing \ac{ACCPL} and to make the decidability proofs possible, we sought out all the different combinations and cases possible (through interaction with the proof process) and explicitly enumerated them in the translation functions. Once we made explicit all the different cases where a decision was possible, we assigned \syn{Permitted} and \syn{NotPermitted} decisions (equivalent to Permit and Deny decisions in this chapter) to two specific cases while every other enumerated case was rendered with an \syn{Unregulated} (not applicable) decision. Explicit enumeration of all the different cases has been certified to be complete by the fact that we have the decidability results. For future work, one can modify the decision assignments to different cases, deciding for the semantics to give more Permit decisions for example or more Deny decisions or other changes in the same vein. One can also remove the \syn{Unregulated} decisions from the translation functions and assign instead Permit or Deny depending on whether we want to make the language more permissive or more prohibitive. In this case however the current decidability theorem will no longer hold and the \syn{Unregulated} case would have to be removed from the statement of the theorem and the proof to be modified to look like~\ref{lst:agreementdecidablecoqSecond}.
+When designing \ac{ACCPL} and to make the decidability proofs possible, we sought out all the different combinations and cases possible (through interaction with the proof process) and explicitly enumerated them in the translation functions. Once we made explicit all the different cases where a decision was possible, we assigned \syn{Permitted} and \syn{NotPermitted} decisions to two specific cases while every other enumerated case was rendered with an \syn{Unregulated} (not applicable) decision. Explicit enumeration of all the different cases has been certified to be complete by the fact that we have the decidability results. Note that we could have made different design choices in assigning the decisions. 
+
+For example, we could have replaced all or some of the current \syn{Unregulated} decision assignments to either \syn{Permitted} or \syn{NotPermitted} depending on whether we want to make the language more permissive or more prohibitive. Note if we were to implement the changes proposed here, the current decidability results would no longer hold and the \syn{Unregulated} case would have to be removed from the statement of the theorem and the theorem statement to be modified to look like the theorem listed in listing~\ref{lst:agreementdecidablecoqSecond}.
 
 \lstset{language=Coq, frame=single, caption={Agreement Translation is Decidable (for \syn{Permitted} or \syn{NotPermitted} only)},label={lst:agreementdecidablecoqSecond}}
-%\begin{minipage}[c]{0.95\textwidth}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem trans_agreement_dec:
   forall
@@ -331,38 +329,19 @@ Theorem trans_agreement_dec:
     (trans_agreement e ag action_from_query subject_from_query asset_from_query)).
 
 \end{lstlisting}
-%\end{minipage}
+\end{minipage}
 
 
-\section{Reasonability Properties for ACCPL}
 
-\subsection{Deterministic and Total}
+\section{Deterministic and Total}
 
-According to Tschantz and Krishnamurthi~\cite{Tschantz} a language $L$ is defined to be deterministic if $forall$ $p \in P$, $forall$ $q \in Q$, $forall$ $d, d' \in D$, $q \left\langle\left\langle p  \right\rangle\right\rangle d$ $\land$ $q \left\langle\left\langle p  \right\rangle\right\rangle d'$ $\implies$ $d = d'$. A language $L$ is total if $forall$ $p \in P$, $forall$ $q \in Q$, $exists$ $d \in D$, s.t. $q \left\langle\left\langle p  \right\rangle\right\rangle d$. 
+According to Tschantz and Krishnamurthi~\cite{Tschantz} a language $L$ is defined to be deterministic if $forall$ $p \in P$, $forall$ $q \in Q$, $forall$ $d, d' \in D$, $q \left\langle\left\langle p  \right\rangle\right\rangle d$ $\land$ $q \left\langle\left\langle p  \right\rangle\right\rangle d'$ $\implies$ $d = d'$. In words, the definition states that for a deterministic language, given a query and a policy, if the policy translation renders a decision of $d$ and a decision of $d'$, then the two decisions must be the same.
 
-We declare (and prove) the determinism of \ac{ACCPL} in the theorem listed in~\ref{lst:agreementisdeterministic}. \ac{ACCPL} is proved total by the fact that it is decidable (see~\ref{lst:decidabletypecoq}). 
+A language $L$ is total if $forall$ $p \in P$, $forall$ $q \in Q$, $exists$ $d \in D$, s.t. $q \left\langle\left\langle p  \right\rangle\right\rangle d$. In words, for a total language, the policy translation always renders a decision.
 
-\lstset{language=Coq, frame=single, caption={Agreement Translation is Deterministic},label={lst:agreementisdeterministic}}
-%\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
+We conjecture that \ac{ACCPL} is both deterministic and total. We defer the proof of determinism of \ac{ACCPL} to future work. As for \ac{ACCPL} being a total language we believe the fact that \ac{ACCPL} is decidable (see listing~\ref{lst:decidabletypecoq}) implies \ac{ACCPL} is a total language. We defer the detailed declaration and proof of totality of \ac{ACCPL} to future work.
 
-Theorem trans_agreement_deterministic:
-  forall
-  (e:environment)(ag:agreement)(action_from_query:act)
-   (subject_from_query:subject)(asset_from_query:asset)(d: answer),
-
-   (isResultInQueryResult 
-    (Result d subject_from_query action_from_query asset_from_query)
-    (trans_agreement e ag action_from_query subject_from_query asset_from_query)) ->
-
-   (isResultInQueryResult 
-    (Result d subject_from_query action_from_query asset_from_query)
-    (trans_agreement e ag action_from_query subject_from_query asset_from_query)).
-\end{lstlisting}
-%\end{minipage}
-
-
-\subsection{Safety}
+\section{Safety}
 
 As discussed in section~\ref{sec:threeinterpretations} policy interpretations could be implicit or explicit. Explicit interpretations distinguish between unknown information and information known to be absent. The explicit approach promotes verbose policies and requests and usually leads to too many \syn{Unregulated} or NotApplicable decisions (in the absence of the right environmental facts). However the verbosity could be used to direct what additional facts are needed to make a granting and denying decision. Under the second interpretation in~\ref{sec:threeinterpretations} while the decision is NotApplicable, the system can direct the entity making the request provide a proof of \syn{~GoldBundle(s)} in order for a granting decision to be rendered. 
 
@@ -373,13 +352,13 @@ Tschantz and Krishnamurthi~\cite{Tschantz} define safety as $forall$ $p \in P$, 
 Could we conclude that an access-control policy language with the explicit approach such as \ac{ACCPL} is also safe? in the design of \ac{ACCPL} and the translation functions in particular we only grant or deny access in specific cases. We grant access if the asset and the action in query are found in the agreement and \syn{trans_prin} has a proof and \syn{trans_preRequisite} for both policy set and policy have proofs. We deny an access request if the policy set is an exclusive policy set (\syn{primExclusivePolicySet}) and \syn{trans_prin} does not hold. In all other cases we render the decision of \syn{Unregulated}. In other words, in the absence of necessary facts (proofs), we give the least decision (e.g. \syn{Unregulated}), when there are more facts available in the environment (such as \syn{trans_preRequisite} holding), we grant either deny or permit decisions. However when all the facts hold, corresponding to the greatest query in the definition of safety, we render a granting decision which is also the greatest decision in the lattice of decisions: \syn{Unregulated} $\leq$ \syn{NotPermitted} $\leq$ \syn{Permitted}.
 
 
-\subsection{Independent Composition}
+\section{Independent Composition}
 
 As discussed in section~\ref{sec:threeinterpretations}, the third interpretation works by taking into account not only the third policy, $p3$, but also $p1$ and $p2$ to render a decision of granted. However each of the policies in isolation would result in the NotApplicable decision. 
 
 Taking into account all policies and rendering a decision that is not different from combining the decisions reached by each primitive policy in isolation, is a property called ``Independent Composition'' by Tschantz and Krishnamurthi~\cite{Tschantz}. The third interpretation in section~\ref{sec:threeinterpretations} is clearly not have this property. Formally, a language $L$ has the independent composition property, if $forall$ $p \in P$, $forall$ $q \in Q$, $forall$ $d, d^\ast \in D$, \\$\boxplus$ ($q \left\langle\left\langle p_{1}  \right\rangle\right\rangle d_{1}$, $q \left\langle\left\langle p_{2}  \right\rangle\right\rangle d_{2}$, ..., $q \left\langle\left\langle p_{n}  \right\rangle\right\rangle d_{n}$) $=$ $q \left\langle\left\langle (\oplus p_{1}, p_{2}, ..., p_{n}) \right\rangle\right\rangle d^\ast$, where $\oplus$ is a composition operator defined in the language and $\boxplus$ is the decision composition operator. For this definition to be well-defined, there is a requirement that complete environmental facts be available for each individual policy so that a decision can be rendered for each primitive policy with respect to the request, in isolation.
 
-Does \ac{ACCPL} have the independent composition property? As covered in chapter~\ref{chap:accplsemanticscoq} and subsection~\ref{subsec:policycombinators} the translation functions for \ac{ACCPL}, starting with \syn{trans_agreement} all return sets of \syn{result}s.  The set of \syn{result}s returned by the agreement translation function will have a result per \syn{primPolicy} (type of primitive policies) in the agreement. Recall that results containing a \syn{Permitted} answer and a \syn{NotPermitted} answer are mutually exclusive and the existence of a single (or more) \syn{Permitted} result in the set makes the whole set ``Permitted'' whereas the existence of a single (or more) \syn{NotPermitted} result makes the whole set ``NotPermitted''. When no \syn{Permitted} or \syn{NotPermitted} is seen in the set, we only have \syn{Unregulated} results which would make the whole set ``Unregulated". This is the decision combination strategy we have designed for \ac{ACCPL}; the policy combination strategy \ac{ACCPL} simply preserves all individual decisions and returns the whole set for rendering a global decision. Below we consider the three different possible decisions that the decision combination strategy may reach and review whether the result of any individual policy may change as a result.
+Does \ac{ACCPL} have the independent composition property? As covered in chapter~\ref{chap:accplsemanticscoq} and section~\ref{sec:policycombinators} the translation functions for \ac{ACCPL}, starting with \syn{trans_agreement} all return sets of \syn{result}s.  The set of \syn{result}s returned by the agreement translation function will have a result per \syn{primPolicy} (type of primitive policies) in the agreement. Recall that results containing a \syn{Permitted} answer and a \syn{NotPermitted} answer are mutually exclusive and the existence of a single (or more) \syn{Permitted} result in the set makes the whole set ``Permitted'' whereas the existence of a single (or more) \syn{NotPermitted} result makes the whole set ``NotPermitted''. When no \syn{Permitted} or \syn{NotPermitted} is seen in the set, we only have \syn{Unregulated} results which would make the whole set ``Unregulated". This is the decision combination strategy we have designed for \ac{ACCPL}; the policy combination strategy \ac{ACCPL} simply preserves all individual decisions and returns the whole set for rendering a global decision. Below we consider the three different possible decisions that the decision combination strategy may reach and review whether the result of any individual policy may change as a result.
 
 \begin{enumerate}
   \item Global decision is \syn{Permitted}. Only possible results are \syn{Permitted} or \syn{Unregulated}. In this case, only the \syn{Unregulated} results have been modified by the decision combination strategy. \syn{Permitted} results coming from any individual primitive policy will have been preserved.
@@ -389,7 +368,7 @@ Does \ac{ACCPL} have the independent composition property? As covered in chapter
 
 We argue that \ac{ACCPL} has the independent composition property with respect to granting and denying policies only as detailed in the previous paragraphs. 
 
-\subsection{Monotonicity of Policy Combinators}
+\section{Monotonicity of Policy Combinators}
 
 Tschantz and Krishnamurthi~\cite{Tschantz} discuss the notion of monotonicity of policy combinators. Intuitively, in a language with a policy combinator that is monotonic, adding another primitive policy, cannot change the combined decision to go from grating to non-granting. In \ac{ACCPL}, NotApplicable results are only possible if \syn{trans_prin} does not hold. Assume the combined (global) decision is already \syn{Permitted} for a certain agreement. In the case when \syn{trans_prin} does not hold, adding a primitive policy to the agreement will not change the \syn{Permitted} result to a \syn{NotPermitted} result, since a primitive policy is composed of a \syn{preRequisite} and an \syn{act} only. In the case where \syn{trans_prin} does hold, there are two cases. Either the \syn{preRequisite} of the added policy holds and the decision is another \syn{Permitted} result, or the \syn{preRequisite} of the added policy does not hold, and the decision is an \syn{Unregulated} which won't affect the combined decision.
 

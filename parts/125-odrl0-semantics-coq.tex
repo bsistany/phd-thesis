@@ -90,6 +90,12 @@ Inductive sumbool (A B:Prop) : Set :=
 We have used the \syn{sumbool} type to declare and prove decision procedures that we have subsequently used in the translation functions implementing the semantics and also in the proofs. We will list the decision procedures in section~\ref{sec:decprocs} after reviewing the translation functions in section~\ref{sec:translationfuncs}.
 
 
+\section{Types of Decisions}
+
+Policy based access-control languages typically use a two-valued decision set to indicate whether an access request is granted or denied. When a decision for a query is not granted, one design choice for a language is to return an explicit Deny decision. However in this case Deny stands for ``not permitted''. It is possible to have cases when the policy truly doesn't specify either Permit or Deny. In such cases arbitrarily returning the decision of Deny makes it difficult to compose policies and in fact, an explicit decision of ``non applicable'' is warranted in such cases. Some languages may decide to only support Permit decisions. In such languages lack of a Permit decision for a query signifies a Deny so Deny decisions are not explicit. Although the policies of these languages may be more readable than those with more explicit decisions but they result in ambiguity on whether a Deny decision was really intended or not. Finally some languages define an explicit decision of ``error'' for cases such as when both Permit and Deny decisions are reached for the same query. An explicit Error decision is preferable to undefined behaviour because it can lead to improvements to policies and/or how the queries are built~\cite{Tschantz}. 
+
+Pucella and Weissman~\cite{pucella2006} employ a two-valued decision set where the granting decision is called \syn{Permitted} and the non-granting or denying decision is called \syn{NotPermitted}. In \ac{ACCPL} we have extended the decision set to be three-valued. We have added the \syn{Unregulated} decision to \syn{Permitted} and \syn{NotPermitted} decisions. The decision \syn{Unregulated} is the same as ``not applicable'' defined above.
+
 
 \section{\syn{answer} and \syn{result} types}\label{sec:answerandresulttypes}
 
