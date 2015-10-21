@@ -2,8 +2,6 @@
 \chapter{Introduction}
 %======================================================================
 
-\section{Introduction}
-
 To put \ac{ACCPL} in context, we need to go back to the origins of access-control and review the progression of the models from the most basic and perhaps oldest to the model \ac{ACCPL} implements. We will start the review of access-control models in section~\ref{sec:models} but first the definition of ``access-control'' is in order.
 
 Authorization refers to the process of rendering a decision to allow access to a resource or asset of interest. By the same token all unauthorized access requests to resources must be controlled and ultimately denied, hence the term ``access-control''. 
@@ -29,13 +27,13 @@ Because of the cited advantages of \ac{pbac} and its generality and wide spread 
 
 \section{A Core Policy Language for PBAC Systems} 
 
-Does there already exist a suitable policy language that can be used for expressing general access-control expressions? How about \ac{xacml}, \ac{odrl}\newline~\cite{odrloneone} or \ac{xrml}~\cite{Wang}? 
+Does there already exist a suitable policy language that can be used for expressing general access-control expressions? How about \ac{xacml}, \ac{odrl}~\cite{odrloneone} or \ac{xrml}~\cite{Wang}? 
 
-Currently the most popular \ac{rel}s are the \ac{xrml}, and the \ac{odrl}. Both of these languages are XML based and are considered declarative languages. \ac{xrml} has been selected to be the REL for \emph{MPEG-21} which is an ISO standard for multimedia applications. \ac{odrl} is also a standards based \ac{rel} which has been accepted as part of the W3C community with the mandate of standardizing how rights and policies, related to the usage of digital content on the Open Web Platform, \emph{OWP}~\cite{openwebplatform}, are expressed. \ac{odrl} 2.0 supports expression of rights and also privacy rules for social media while \ac{odrl} 1.0 was only dealing with the mobile ecosystem -- \ac{odrl} 1.0 was adopted by the Open Mobile Alliance, \emph{OMA} in 2000.
+Currently the most popular \ac{rel}s are the \ac{xrml}, and the \ac{odrl}. Both of these languages are XML based and are considered declarative languages. \ac{xrml} has been selected to be the REL for \emph{MPEG-21} which is an ISO standard for multimedia applications. \ac{odrl} is also a standards-based \ac{rel} which has been accepted as part of the W3C community with the mandate of standardizing how rights and policies, related to the usage of digital content on the Open Web Platform, \emph{OWP}~\cite{openwebplatform}, are expressed. \ac{odrl} 2.0 supports expression of rights and also privacy rules for social media while \ac{odrl} 1.0 was only dealing with the mobile ecosystem -- \ac{odrl} 1.0 was adopted by the Open Mobile Alliance, \emph{OMA} in 2000.
 
 \ac{rel}s, or more precisely \ac{drel}s when dealing with digital assets deal with the ``rights definition'' aspect of the \ac{drm} ecosystem. A \ac{drel}, allows the expression and definition of digital asset usage rights such that other areas of the \ac{drm} ecosystem, namely the enforcement mechanism and the usage tracking components can function correctly.
 
-As popular as both \ac{xrml} and \ac{odrl} are, their adoption and usage is still somewhat limited in practice. Both Apple and Microsoft for example have defined their own lightweight \ac{rel}s~\cite{problemwithrels} in \emph{Fair Play}~\cite{fairplay} and in \emph{PlayReady}~\cite{playready}. The authors of~\cite{problemwithrels} argue that both these \ac{rel}s (\ac{xrml} and \ac{odrl}) and others are simply too complex to be used effectively (for expressing rights) since they also try to cover much of the the enforcement and tracking aspects of \ac{drm}s.
+As popular as both \ac{xrml} and \ac{odrl} are, their adoption and usage is still somewhat limited in practice. Both Apple and Microsoft for example have defined their own lightweight \ac{rel}s~\cite{problemwithrels} in FairPlay~\cite{fairplay} and in PlayReady~\cite{playready}. The authors of~\cite{problemwithrels} argue that both these \ac{rel}s (\ac{xrml} and \ac{odrl}) and others are simply too complex to be used effectively (for expressing rights) since they also try to cover much of the the enforcement and tracking aspects of \ac{drm}s.
 
 \ac{drm} refers to the digital management of rights associated with the access or usage of digital assets. There are various aspects of rights management however. According to the authors of the white paper ``A digital rights management ecosystem model for the education community,''(~\cite{collier})
  digital rights management systems cover the following four areas: 1) defining rights 2) distributing/acquiring rights 3) enforcing rights and 4) tracking usage.
