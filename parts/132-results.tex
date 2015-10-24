@@ -80,13 +80,13 @@ Theorem trans_agreement_dec2:
 
 Typically most, if not all of the results will be of type \syn{Unregulated}. In the case where all the results are \syn{Unregulated} we answer the access query with a result of \syn{Unregulated}. We show this case indirectly in the theorem in listing~\ref{lst:agreementdecidablecoq} by stating the set does not contain a \syn{Permitted} result nor a \syn{NotPermitted} result. 
 
-\section{Mutual Exclusivity of \syn{Permitted} and \syn{NotPermitted}}
+\section{Mutual Exclusivity of \syn{Permitted} and \syn{NotPermitted}}\label{sec:mutualexclusive}
 
 The \syn{trans_agreement_perm_implies_not_notPerm_dec} (see listing~\ref{lst:permimpliesnotnotperm}) says that the existence of a \syn{Permitted} result in the set of results returned by \syn{trans_agreement}, excludes a \syn{NotPermitted} result.
 
 
 \lstset{language=Coq, frame=single, caption={\syn{Permitted} result Implies no \syn{NotPermitted} result},label={lst:permimpliesnotnotperm}}
-%\begin{minipage}[c]{0.95\textwidth}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem trans_agreement_perm_implies_not_notPerm_dec:
   forall
@@ -101,7 +101,7 @@ Theorem trans_agreement_perm_implies_not_notPerm_dec:
       (Result NotPermitted subject_from_query action_from_query asset_from_query)
        (trans_agreement e ag action_from_query subject_from_query asset_from_query)).
 \end{lstlisting}
-%\end{minipage}
+\end{minipage}
 
 
 The  \syn{trans_agreement_NotPerm_implies_not_Perm_dec} (see listing~\ref{lst:notpermimpliesnotperm}) shows that the existence of a \syn{NotPermitted} result in the set of results returned by \syn{trans_agreement}, excludes a \syn{Permitted} result.
@@ -175,48 +175,19 @@ Theorem trans_agreement_not_NotPerm_and_not_Perm_implies_Unregulated_dec:
 
 \section{Decidable As An Inductive Predicate}
 
-We encode the cases discussed in section~\ref{sec:maintheorems} in an inductively defined predicate called \syn{decidable} in listing~\ref{lst:inductivepredicatedecidablecoq}. Recall that the nonempty list that the agreement translation function \syn{trans_agreement} returns will return a set of results one per each \syn{primPolicy}.There are three cases. First when there is at least a \syn{NotPermitted} result in the set, second when there is at least a \syn{Permitted} result in the set, and third when there are no \syn{Permitted} and no \syn{NotPermitted} results in the set. We encode these three cases in three constructors for the type \syn{decidable}. The constructors are: \syn{Denied}, \syn{Granted} and \syn{NotApplicable}. Notice that we use \syn{Denied}, \syn{Granted} and \syn{NotApplicable} synonymously with \syn{NotPermitted}, \syn{Permitted} and \syn{Unregulated}. The reason is a practical one and is due to Coq; we needed to use new names for the \syn{decidable} constructors since we already used \syn{NotPermitted}, \syn{Permitted} and \syn{Unregulated} as constructors for \syn{answer}. 
+We encode the cases discussed in section~\ref{sec:maintheorems} in an inductively defined predicate called \syn{decidable} in listing~\ref{lst:inductivepredicatedecidablecoq}. Recall that the nonempty list that the agreement translation function \syn{trans_agreement} returns will return a set of results one per each \syn{primPolicy}.There are three cases. First when there is at least a \syn{NotPermitted} result in the set and there is no \syn{Permitted} result, second when there is at least a \syn{Permitted} result in the set and no \syn{NotPermitted} result, and third when there are no \syn{Permitted} and no \syn{NotPermitted} results in the set. We encode these three cases in three constructors for the type \syn{decidable}. The constructors are: \syn{Denied}, \syn{Granted} and \syn{NotApplicable}. Notice that we use \syn{Denied}, \syn{Granted} and \syn{NotApplicable} synonymously with \syn{NotPermitted}, \syn{Permitted} and \syn{Unregulated}. The reason is a practical one and is due to Coq; we needed to use new names for the \syn{decidable} constructors since we already used \syn{NotPermitted}, \syn{Permitted} and \syn{Unregulated} as constructors for \syn{answer}. 
 
 \lstset{language=Coq, frame=single, caption={Inductive Predicate decidable},label={lst:inductivepredicatedecidablecoq}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 
-Inductive decidable : environment -> agreement -> act -> subject -> asset -> Prop :=
-
-     | Denied : forall
-  (e:environment)(ag:agreement)(action_from_query:act)
-   (subject_from_query:subject)(asset_from_query:asset), 
-
- (isResultInQueryResult 
-    (Result NotPermitted subject_from_query action_from_query asset_from_query)
-       (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
-  -> decidable e ag action_from_query subject_from_query asset_from_query
-
-     | Granted : forall
-  (e:environment)(ag:agreement)(action_from_query:act)
-   (subject_from_query:subject)(asset_from_query:asset), 
- (isResultInQueryResult 
-    (Result Permitted subject_from_query action_from_query asset_from_query)
-       (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
-  -> decidable e ag action_from_query subject_from_query asset_from_query
-
-     | NonApplicable : forall
-  (e:environment)(ag:agreement)(action_from_query:act)
-   (subject_from_query:subject)(asset_from_query:asset), 
-
-  ~(isResultInQueryResult 
-    (Result Permitted subject_from_query action_from_query asset_from_query)
-    (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
-     ->
-  ~(isResultInQueryResult 
-    (Result NotPermitted subject_from_query action_from_query asset_from_query)
-    (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
-  -> decidable e ag action_from_query subject_from_query asset_from_query.
-\end{lstlisting}
+Inductive decidable : environment -> agreement -> act -> subject -> asset -> Prop :=     | Denied : forall  (e:environment)(ag:agreement)(action_from_query:act)   (subject_from_query:subject)(asset_from_query:asset),  (isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query asset_from_query)       (trans_agreement e ag action_from_query subject_from_query asset_from_query))   -> ~(isResultInQueryResult     (Result Permitted subject_from_query action_from_query asset_from_query)       (trans_agreement e ag action_from_query subject_from_query asset_from_query))   -> decidable e ag action_from_query subject_from_query asset_from_query     | Granted : forall  (e:environment)(ag:agreement)(action_from_query:act)   (subject_from_query:subject)(asset_from_query:asset),  (isResultInQueryResult     (Result Permitted subject_from_query action_from_query asset_from_query)       (trans_agreement e ag action_from_query subject_from_query asset_from_query))  -> ~(isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query asset_from_query)       (trans_agreement e ag action_from_query subject_from_query asset_from_query))   -> decidable e ag action_from_query subject_from_query asset_from_query     | NonApplicable : forall  (e:environment)(ag:agreement)(action_from_query:act)   (subject_from_query:subject)(asset_from_query:asset),   ~(isResultInQueryResult     (Result Permitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))      ->  ~(isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))   -> decidable e ag action_from_query subject_from_query asset_from_query.\end{lstlisting}
 %\end{minipage}
 
 
-We declare and prove the decidability of \ac{ACCPL} in terms of the \syn{decidable} predicate as seen in listing~\ref{lst:decidabletypecoq}. The proof is made simple since we use the previously proven theorem \syn{trans_agreement_dec2}. We will list the intermediate theorems that we have declared and proved which are used in the proof of theorem \syn{trans_agreement_dec2} and subsequent proofs in section~\ref{sec:intermediatetheorems}.
+We declare and prove the decidability of \ac{ACCPL} in terms of the \syn{decidable} predicate as seen in listing~\ref{lst:decidabletypecoq}. The proof is made simple since we use the previously proven theorem \syn{trans_agreement_dec2}. The proof also makes use of two theorems we saw earlier in section~\ref{sec:mutualexclusive}. Recall that the first theorem, \syn{trans_agreement_perm_implies_not_notPerm_dec}, says that the existence of a \syn{Permitted} result in the set of results returned by \syn{trans_agreement}, will exclude any \syn{NotPermitted} result and that the second theorem, \syn{trans_agreement_NotPerm_implies_not_Perm_dec}, shows that the existence of a \syn{NotPermitted} result in the set of results returned by \syn{trans_agreement}, will exclude a \syn{Permitted} result.
+
+We will list the intermediate theorems that we have declared and proved which are used in the proof of theorem \syn{trans_agreement_dec2} and subsequent proofs in section~\ref{sec:intermediatetheorems}.
 
 \lstset{language=Coq, frame=single, caption={Decidability Of Agreement Translation},label={lst:decidabletypecoq}}
 %\begin{minipage}[c]{0.95\textwidth}
@@ -226,22 +197,8 @@ Theorem trans_agreement_decidable:
   (e:environment)(ag:agreement)(action_from_query:act)
    (subject_from_query:subject)(asset_from_query:asset),
      decidable e ag action_from_query subject_from_query asset_from_query.
-Proof.
 
-intros e ag action_from_query subject_from_query asset_from_query.
-specialize trans_agreement_dec2 with 
-   e ag action_from_query subject_from_query asset_from_query.
-intros H. destruct H as [H1 | H2].
-apply Granted. assumption.
-destruct H2 as [H21 | H22].
-apply Denied. assumption.
-apply NonApplicable. 
-destruct H22 as [H221 H222].
-exact H221.
-destruct H22 as [H221 H222].
-exact H222.
-Defined.
-
+Proof.intros e ag action_from_query subject_from_query asset_from_query.specialize trans_agreement_dec2 with    e ag action_from_query subject_from_query asset_from_query.intros H. destruct H as [H1 | H2].apply Granted. assumption.simpl. intuition.apply trans_agreement_perm_implies_not_notPerm_dec in H1. contradiction. destruct H2 as [H21 | H22].apply Denied. assumption.simpl. intuition.apply trans_agreement_NotPerm_implies_not_Perm_dec in H21. contradiction. apply NonApplicable. destruct H22 as [H221 H222].exact H221.destruct H22 as [H221 H222].exact H222.Defined.
 \end{lstlisting}
 %\end{minipage}
 
