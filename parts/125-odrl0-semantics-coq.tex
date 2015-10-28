@@ -432,36 +432,43 @@ Definition trans_notCons
 
 The translation of a \syn{Count} or a \syn{CountByPrin} (called \syn{trans_count} in listing~\ref{lst:transcountCoq}) takes as input an environment \syn{e}, \syn{n} the total number of times the subjects mentioned in \syn{prin_u} may invoke the 
 the policies identified by \syn{IDs}.
+A local variable \syn{running_total} has the current count of the number of times subjects in \syn{prin_u} have invoked the policies. Finally the proposition \syn{running_total < n} is returned as the translation for a \syn{Count} or a \syn{CountByPrin}.
 
-To implement the translation for a \syn{Count} or a \syn{CountByPrin} we start by calling an auxiliary function \syn{process_two_lists} that effectively returns a new list composed of pairs of members of the first list and the second list (the cross-product of the two input lists). In the case of \syn{trans_count}, the call is ``\syn{process_two_lists} \syn{IDs} \syn{prin_u}'' which returns a list of pairs of \syn{policyId} and \syn{subject} namely \syn{ids_and_subjects}. \syn{ids_and_subjects} is then passed to a locally defined function \syn{trans_count_aux}.
-
-\syn{trans_count_aux} returns the current count for a single pair of \syn{policyId} and \syn{subject} (the call to \syn{getCount} which looks up the environment \syn{e} and returns the current count per each \syn{subject} and \syn{policyId}) and for a list of pairs of \syn{policyId} and \syn{subject}s, the addition of \syn{get_count} (for the first pair) and \syn{trans_count_aux}s (for the rest of the pairs) is returned. 
-
-A local variable \syn{running_total} has the value returned by \syn{trans_count_aux}. Finally the proposition \syn{running_total < n} is returned as the translation for a \syn{Count} or a \syn{CountByPrin}.
-
-Note that the only difference between translations for a \syn{Count} and a \syn{CountByPrin} is the additional \syn{prn} parameter for \syn{CountByPrin} which allows for getting counts for subjects not necessarily the same as \syn{prin_{u}}, the agreement's user(s). We therefore omit the definition for \syn{CountByPrin}.
+Note that the only difference between translations for a \syn{Count} and a \syn{CountByPrin} is the additional \syn{prn} parameter for \syn{CountByPrin} which allows for getting counts for subjects not necessarily the same as \syn{prin_u}, the agreement's user(s). We therefore omit the definition for \syn{CountByPrin}.
 
 
 \lstset{language=Coq, frame=single, caption={Translation of Count},label={lst:transcountCoq}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Fixpoint trans_count  (e:environment)(n:nat)(IDs:nonemptylist policyId)  (prin_u:prin) : Prop :=  let ids_and_subjects := process_two_lists IDs prin_u in  let running_total := trans_count_aux e ids_and_subjects in  running_total < n.
+\end{lstlisting}
+%\end{minipage}
+
+
+To implement the translation for a \syn{Count} or a \syn{CountByPrin} we start by calling an auxiliary function \syn{process_two_lists} (see listing~\ref{lst:transcountprocesstwolistsCoq}) that effectively returns a new list composed of pairs of members of the first list and the second list (the cross-product of the two input lists). In the case of \syn{trans_count}, the call is ``\syn{process_two_lists} \syn{IDs} \syn{prin_u}'' which returns a list of pairs of \syn{policyId} and \syn{subject} namely \syn{ids_and_subjects}. \syn{ids_and_subjects} is then passed to a locally defined function called \syn{trans_count_aux}.
+
+\lstset{language=Coq, frame=single, caption={Count Helper: Cross-Product of Two Lists, \syn{process_two_lists}},label={lst:transcountprocesstwolistsCoq}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+
+Section Process_Lists.Variable X : Set.Variable Y : Set.Fixpoint process_two_lists (l1 : nonemptylist X) (l2 : nonemptylist Y) :  nonemptylist (Twos X Y) :=let process_element_list := (fix process_element_list (e1 : X) (l2 : nonemptylist Y) :	nonemptylist (Twos X Y) :=  match l2 with    | Single s => Single (mkTwos e1 s)    | NewList s rest => app_nonempty (Single (mkTwos e1 s)) (process_element_list e1 rest)  end) in  match l1 with    | Single s => process_element_list s l2    | NewList s rest => app_nonempty (process_element_list s l2) (process_two_lists rest l2)  end.End Process_Lists.
+
+\end{lstlisting}
+%\end{minipage}
+
+
+The function \syn{trans_count_aux} (see listing~\ref{lst:transcountauxCoq}) returns the current count for a single pair of \syn{policyId} and \syn{subject} (the call to \syn{getCount} which looks up the environment \syn{e} and returns the current count per each \syn{subject} and \syn{policyId}) and for a list of pairs of \syn{policyId} and \syn{subject}s, the addition of \syn{get_count} (for the first pair) and \syn{trans_count_aux}s (for the rest of the pairs) is returned. 
+
+\lstset{language=Coq, frame=single, caption={Count Helper: \syn{trans_count_aux}},label={lst:transcountauxCoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Fixpoint trans_count (e:environment)(n:nat)(IDs:nonemptylist policyId)(prin_u:prin) : Prop :=
 
-  let trans_count_aux 
-    := (fix trans_count_aux
-         (ids_and_subjects : nonemptylist (Twos policyId subject)) : nat :=
-     match ids_and_subjects with
-        | Single pair1 => getCount e (right pair1) (left pair1)
-        | NewList pair1 rest_pairs =>
-            (getCount e (right pair1)(left pair1)) +
-            (trans_count_aux rest_pairs)
-      end) in
-  
-  let ids_and_subjects := process_two_lists IDs prin_u in
-  let running_total := trans_count_aux ids_and_subjects in
-  running_total < n.
+Fixpoint trans_count_aux (e:environment)(ids_and_subjects : nonemptylist (Twos policyId subject)) : nat :=  match ids_and_subjects with	| Single pair1 => getCount e (right pair1) (left pair1)	| NewList pair1 rest_pairs =>	    (getCount e (right pair1)(left pair1)) +	    (trans_count_aux e rest_pairs)  end.
 \end{lstlisting}
 \end{minipage}
+
+
+
 
 \section{Decision Procedures}\label{sec:decprocs}
 
@@ -498,12 +505,11 @@ Theorem trans_prin_dec :
 \end{lstlisting}
 \end{minipage}
 
-The decision procedure \syn{trans_count_dec} declares that either there is a proof for the proposition \syn{trans_count} or there exists a proof for its negation (see listing~\ref{lst:transcountdeccoq}). The translation function \syn{trans_count} is the proposition \syn{running_total < n} (see listing~\ref{lst:transcountCoq}).
+The decision procedure \syn{trans_count_dec} declares that either there is a proof for the proposition \syn{trans_count} or there exists a proof for its negation (see listing~\ref{lst:transcountdeccoq}). Recall the translation function \syn{trans_count} is mostly the proposition \syn{running_total < n} with some local context (see listing~\ref{lst:transcountCoq}).
 
 \lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_count_dec}},label={lst:transcountdeccoq}}
 \begin{lstlisting}
-Theorem trans_count_dec :
-    forall (n:nat), {trans_count n} + {~trans_count n}.
+Theorem trans_count_dec:   forall (e:environment)(n:nat)(IDs:nonemptylist policyId)(prin_u:prin),     {trans_count e n IDs prin_u} + {~ trans_count e n IDs prin_u}.
 \end{lstlisting}
 
 The decision procedure \syn{trans_constraint_dec} declares that either there is a proof for the proposition \syn{trans_constraint} or there exists a proof for its negation (see listing~\ref{lst:transconstraintdeccoq}). The translation function \syn{trans_constraint} is listed in listing~\ref{lst:transconstraintCoq}. 
@@ -533,12 +539,14 @@ Theorem trans_negation_constraint_dec :
 \end{lstlisting}
 
 \lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_notCons_dec}},label={lst:transnotConsdeccoq}}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem trans_notCons_dec :
     forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
        {trans_notCons e x const IDs prin_u} + {~ trans_notCons e x const IDs prin_u}.
 
 \end{lstlisting}
+\end{minipage}
 
 The decision procedure \syn{trans_preRequisite_dec} declares that either there is a proof for the proposition \syn{trans_preRequisite} or there exists a proof for its negation (see listing~\ref{lst:transpreRequisitedeccoq}). The translation function \syn{trans_preRequisite} is listed in listing~\ref{lst:transpreRequisiteCoq}). 
 
