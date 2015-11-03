@@ -7,7 +7,7 @@
 The tension in designing a policy language is usually between how to make the language expressive enough, such that the design goals for the policy language may be expressed, and how to make the policies verifiable with respect to the stated goals. A central question or goal in policy language design is whether a permission is implied by a set of policy statements. This is referred to as the decidability problem in this thesis. For example, Halpern and Weissman~\cite{HalpernW08} show that in general determining whether a permission is implied by a set of policy statements in \ac{xrml} is undecidable whereas Pucella and Weissman show that answering such questions is decidable but NP-hard for \ac{odrl}~\cite{pucella2006}.
  
 
-We had set out to prove formally that the \ac{ACCPL} language was decidable. Recall that we specified the semantics of \ac{ACCPL} using a translation from policy statements to decisions. The goal was to use the translation algorithm to determine when a request for accessing a resource is implied by a given policy, when the request is not implied by the policy and finally when the request is not regulated by the given policy. More importantly we wanted to show that answering access requests always produced a decision and that the translation algorithm terminated on all input policies with a decision of \syn{Permitted}, \syn{NotPermitted} or \syn{Unregulated}. In this chapter we discuss the decidability proofs and other main results we had set out to accomplish. We will also show that the translation algorithm meets its specification and computes the correct decision, with respect to its specification, given a policy. 
+We had set out to prove formally that the \ac{ACCPL} language was decidable. Recall that we specified the semantics of \ac{ACCPL} using a translation from policy statements together with an access request and an environment containing all relevant facts, to decisions. The goal was to use the translation algorithm to determine when a request for accessing a resource is implied by a given policy, when the request is not implied by the policy and finally when the request is not regulated by the given policy. More importantly we wanted to show that answering access requests always produced a decision and that the translation algorithm terminated on all input policies with a decision of \syn{Permitted}, \syn{NotPermitted} or \syn{Unregulated}. In this chapter we discuss the decidability proofs and other main results we had set out to accomplish. We will also show that the translation algorithm meets its specification and computes the correct decision, with respect to its specification, given a policy. 
 
 
 \ac{ACCPL} started out as a reduced version of Pucella and Weissman's subset of \ac{odrl}\\~\cite{pucella2006} but based on the direction of the proofs we were developing significant changes had to be made to Pucella and Weissman's language to make the proofs possible. An important lesson learned was that the process of designing a certifiable policy language cannot be done in isolation since while certifiability of the language derives the design one way, expressiveness requirements of the language usually drive it in the opposite direction. Certifiability cannot be a post-design activity as the changes it will impose are often fundamental ones.
@@ -181,7 +181,48 @@ We encode the cases discussed in section~\ref{sec:maintheorems} in an inductivel
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 
-Inductive decidable : environment -> agreement -> act -> subject -> asset -> Prop :=     | Denied : forall  (e:environment)(ag:agreement)(action_from_query:act)   (subject_from_query:subject)(asset_from_query:asset),  (isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query asset_from_query)       (trans_agreement e ag action_from_query subject_from_query asset_from_query))   -> ~(isResultInQueryResult     (Result Permitted subject_from_query action_from_query asset_from_query)       (trans_agreement e ag action_from_query subject_from_query asset_from_query))   -> decidable e ag action_from_query subject_from_query asset_from_query     | Granted : forall  (e:environment)(ag:agreement)(action_from_query:act)   (subject_from_query:subject)(asset_from_query:asset),  (isResultInQueryResult     (Result Permitted subject_from_query action_from_query asset_from_query)       (trans_agreement e ag action_from_query subject_from_query asset_from_query))  -> ~(isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query asset_from_query)       (trans_agreement e ag action_from_query subject_from_query asset_from_query))   -> decidable e ag action_from_query subject_from_query asset_from_query     | NonApplicable : forall  (e:environment)(ag:agreement)(action_from_query:act)   (subject_from_query:subject)(asset_from_query:asset),   ~(isResultInQueryResult     (Result Permitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))      ->  ~(isResultInQueryResult     (Result NotPermitted subject_from_query action_from_query asset_from_query)    (trans_agreement e ag action_from_query subject_from_query asset_from_query))   -> decidable e ag action_from_query subject_from_query asset_from_query.\end{lstlisting}
+Inductive decidable : environment -> agreement -> act -> subject -> asset -> Prop :=
+
+     | Denied : forall
+  (e:environment)(ag:agreement)(action_from_query:act)
+   (subject_from_query:subject)(asset_from_query:asset), 
+
+ (isResultInQueryResult 
+    (Result NotPermitted subject_from_query action_from_query asset_from_query)
+       (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+  ->
+ ~(isResultInQueryResult 
+    (Result Permitted subject_from_query action_from_query asset_from_query)
+       (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+
+  -> decidable e ag action_from_query subject_from_query asset_from_query
+
+     | Granted : forall
+  (e:environment)(ag:agreement)(action_from_query:act)
+   (subject_from_query:subject)(asset_from_query:asset), 
+ (isResultInQueryResult 
+    (Result Permitted subject_from_query action_from_query asset_from_query)
+       (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+ ->
+ ~(isResultInQueryResult 
+    (Result NotPermitted subject_from_query action_from_query asset_from_query)
+       (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+ 
+ -> decidable e ag action_from_query subject_from_query asset_from_query
+
+     | NonApplicable : forall
+  (e:environment)(ag:agreement)(action_from_query:act)
+   (subject_from_query:subject)(asset_from_query:asset), 
+
+  ~(isResultInQueryResult 
+    (Result Permitted subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+     ->
+  ~(isResultInQueryResult 
+    (Result NotPermitted subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+  -> decidable e ag action_from_query subject_from_query asset_from_query.
+\end{lstlisting}
 %\end{minipage}
 
 
@@ -198,7 +239,27 @@ Theorem trans_agreement_decidable:
    (subject_from_query:subject)(asset_from_query:asset),
      decidable e ag action_from_query subject_from_query asset_from_query.
 
-Proof.intros e ag action_from_query subject_from_query asset_from_query.specialize trans_agreement_dec2 with    e ag action_from_query subject_from_query asset_from_query.intros H. destruct H as [H1 | H2].apply Granted. assumption.simpl. intuition.apply trans_agreement_perm_implies_not_notPerm_dec in H1. contradiction. destruct H2 as [H21 | H22].apply Denied. assumption.simpl. intuition.apply trans_agreement_NotPerm_implies_not_Perm_dec in H21. contradiction. apply NonApplicable. destruct H22 as [H221 H222].exact H221.destruct H22 as [H221 H222].exact H222.Defined.
+Proof.
+intros e ag action_from_query subject_from_query asset_from_query.
+specialize trans_agreement_dec2 with 
+   e ag action_from_query subject_from_query asset_from_query.
+intros H. destruct H as [H1 | H2].
+
+apply Granted. assumption.
+simpl. intuition.
+apply trans_agreement_perm_implies_not_notPerm_dec in H1. contradiction. 
+
+destruct H2 as [H21 | H22].
+apply Denied. assumption.
+simpl. intuition.
+apply trans_agreement_NotPerm_implies_not_Perm_dec in H21. contradiction. 
+
+apply NonApplicable. 
+destruct H22 as [H221 H222].
+exact H221.
+destruct H22 as [H221 H222].
+exact H222.
+Defined.
 \end{lstlisting}
 %\end{minipage}
 
