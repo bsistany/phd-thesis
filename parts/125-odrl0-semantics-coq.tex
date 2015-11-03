@@ -122,8 +122,6 @@ Definition makeResult (ans:answer)(s:subject)(ac:act)(ass:asset) : result :=
 
 \section{Translations}\label{sec:translationfuncs}
 
-Translation of an agreement is a function that takes an agreement, namely the parameter called \syn{ag}, performs partial evaluation and returns a new function that when given an \syn{environment} and a \syn{query} will return a nonempty list of \syn{result}s (see listing~\ref{lst:transagreement}). 
-
 Intuitively a query or request asks the following question given an agreement: ``may subject \syn{s} perform an action \syn{ac} to asset \syn{a}?''. We represent a query by its components, namely the subject, action and asset that form the query question: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query}. While developing the proofs for the decidability of \ac{ACCPL} we realized we needed this query specific information deep in the translation functions to be able to render unambiguous decisions and ultimately make the proofs work. We therefore pass the query components to all the translation functions starting with the \syn{trans_agreement} function. 
 
 Pattern matching in the body of the \syn{trans_agreement} function (in listing~\ref{lst:transagreement}), on \syn{ag}, the agreement in question, extracts the components of the agreement. These are \syn{ps}, the policy set, \syn{prin_u}, the agreement's user(s), and \syn{a}, the asset mentioned in the agreement. Notice that formal argument \syn{e} of type \syn{environment} is passed along many translation functions but will only eventually be used to get the count information from the \syn{getCount} function. As mentioned above, the components of the query or request, namely \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query} make up the other parameters that are passed into the next level translation function, which is the translation for a policy set called \syn{trans_ps}.
@@ -133,7 +131,7 @@ Pattern matching in the body of the \syn{trans_agreement} function (in listing~\
 The nonempty list of \syn{result}s returned by the agreement translation function will have a result per primitive policy (\syn{primPolicy}) in the agreement. As we will see later when we discuss the proofs, we have proven that results containing a \syn{Permitted} answer and a \syn{NotPermitted} answer are mutually exclusive. Therefore we interpret the existence of a single (or more) \syn{Permitted} result in the nonempty list, as the decision being ``Permitted'' whereas the existence of a single (or more) \syn{NotPermitted} type result is interpreted as ``NotPermitted". We also have a proof that shows that when there exists no \syn{Permitted} or \syn{NotPermitted} results in the returned nonempty list, only \syn{Unregulated} results are possible. In this case we conclude the decision is ``Unregulated''. 
 
 \lstset{language=Coq, frame=single, caption={Translation of Agreement},label={lst:transagreement}}
-%\begin{minipage}[c]{0.95\textwidth}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Definition trans_agreement
    (ag:agreement)(e:environment)(action_from_query:act)
@@ -144,7 +142,7 @@ Definition trans_agreement
        (trans_ps e action_from_query subject_from_query asset_from_query ps prin_u a)
    end.
 \end{lstlisting}
-%\end{minipage}
+\end{minipage}
 
 Translation of a policy set (called \syn{trans_ps} in listing~\ref{lst:transpsCoq}), takes as input \syn{e}, the environment, the subject, action and asset coming from a query: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query}, \syn{ps}, the policy set, \syn{prin_u}, the agreement's user, and \syn{a}, the asset mentioned in the agreement. 
 
@@ -440,7 +438,12 @@ Note that the only difference between translations for a \syn{Count} and a \syn{
 \lstset{language=Coq, frame=single, caption={Translation of Count},label={lst:transcountCoq}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Fixpoint trans_count  (e:environment)(n:nat)(IDs:nonemptylist policyId)  (prin_u:prin) : Prop :=  let ids_and_subjects := process_two_lists IDs prin_u in  let running_total := trans_count_aux e ids_and_subjects in  running_total < n.
+Fixpoint trans_count
+  (e:environment)(n:nat)(IDs:nonemptylist policyId)
+  (prin_u:prin) : Prop :=
+  let ids_and_subjects := process_two_lists IDs prin_u in
+  let running_total := trans_count_aux e ids_and_subjects in
+  running_total < n.
 \end{lstlisting}
 %\end{minipage}
 
@@ -451,7 +454,25 @@ To implement the translation for a \syn{Count} or a \syn{CountByPrin} we start b
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 
-Section Process_Lists.Variable X : Set.Variable Y : Set.Fixpoint process_two_lists (l1 : nonemptylist X) (l2 : nonemptylist Y) :  nonemptylist (Twos X Y) :=let process_element_list := (fix process_element_list (e1 : X) (l2 : nonemptylist Y) :	nonemptylist (Twos X Y) :=  match l2 with    | Single s => Single (mkTwos e1 s)    | NewList s rest => app_nonempty (Single (mkTwos e1 s)) (process_element_list e1 rest)  end) in  match l1 with    | Single s => process_element_list s l2    | NewList s rest => app_nonempty (process_element_list s l2) (process_two_lists rest l2)  end.End Process_Lists.
+Section Process_Lists.
+
+Variable X : Set.
+Variable Y : Set.
+
+Fixpoint process_two_lists (l1 : nonemptylist X) (l2 : nonemptylist Y) :  nonemptylist (Twos X Y) :=
+
+let process_element_list := (fix process_element_list (e1 : X) (l2 : nonemptylist Y) :	nonemptylist (Twos X Y) :=
+  match l2 with
+    | Single s => Single (mkTwos e1 s)
+    | NewList s rest => app_nonempty (Single (mkTwos e1 s)) (process_element_list e1 rest)
+  end) in
+
+  match l1 with
+    | Single s => process_element_list s l2
+    | NewList s rest => app_nonempty (process_element_list s l2) (process_two_lists rest l2)
+  end.
+
+End Process_Lists.
 
 \end{lstlisting}
 %\end{minipage}
@@ -463,7 +484,13 @@ The function \syn{trans_count_aux} (see listing~\ref{lst:transcountauxCoq}) retu
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 
-Fixpoint trans_count_aux (e:environment)(ids_and_subjects : nonemptylist (Twos policyId subject)) : nat :=  match ids_and_subjects with	| Single pair1 => getCount e (right pair1) (left pair1)	| NewList pair1 rest_pairs =>	    (getCount e (right pair1)(left pair1)) +	    (trans_count_aux e rest_pairs)  end.
+Fixpoint trans_count_aux (e:environment)(ids_and_subjects : nonemptylist (Twos policyId subject)) : nat :=
+  match ids_and_subjects with
+	| Single pair1 => getCount e (right pair1) (left pair1)
+	| NewList pair1 rest_pairs =>
+	    (getCount e (right pair1)(left pair1)) +
+	    (trans_count_aux e rest_pairs)
+  end.
 \end{lstlisting}
 \end{minipage}
 
@@ -509,7 +536,9 @@ The decision procedure \syn{trans_count_dec} declares that either there is a pro
 
 \lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_count_dec}},label={lst:transcountdeccoq}}
 \begin{lstlisting}
-Theorem trans_count_dec:   forall (e:environment)(n:nat)(IDs:nonemptylist policyId)(prin_u:prin),     {trans_count e n IDs prin_u} + {~ trans_count e n IDs prin_u}.
+Theorem trans_count_dec: 
+  forall (e:environment)(n:nat)(IDs:nonemptylist policyId)(prin_u:prin), 
+    {trans_count e n IDs prin_u} + {~ trans_count e n IDs prin_u}.
 \end{lstlisting}
 
 The decision procedure \syn{trans_constraint_dec} declares that either there is a proof for the proposition \syn{trans_constraint} or there exists a proof for its negation (see listing~\ref{lst:transconstraintdeccoq}). The translation function \syn{trans_constraint} is listed in listing~\ref{lst:transconstraintCoq}. 
