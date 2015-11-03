@@ -31,20 +31,21 @@ We follow the style of~\cite{pucella2006} by using abstract syntax to express po
 The agreement in Listing~\ref{lst:agreementxml} is shown in~\ref{lst:agreementpucella2006} using the syntax from~\cite{pucella2006}.
 
 \lstset{language=Pucella2006}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}[frame=single, caption={Agreement for Alice and Bob as BNF (as used in~\cite{pucella2006})},label={lst:agreementpucella2006}]
 agreement
  for Alice and Bob 
  about The Report 
  with and[True -> count[5] => print, True -> and[Alice, count[2]] => print].
 \end{lstlisting}
-
+\end{minipage} 
 
 In the following we will cover the abstract syntax of \ac{ACCPL} that we later implement in Coq using constructs such as inductive types and definitions. 
 
 \section{Environmental Facts}\label{sec:odrl0}
 In \ac{ACCPL}, agreements and facts (i.e. environments) will refer to a count of how many times each policy should be and has been used to justify an action. This is the only fact that \ac{ACCPL} will cover although we conjecture adding other facts and the machinery to support those facts should not change verification goals and results so far of \ac{ACCPL}.
 
-In \ac{ACCPL} a \syn{<prerequisite>} is either True, a \syn{<constraint>}, the negation of a \syn{<constraint>} or a conjunction of \syn{<prerequisite>}s. \syn{True} is the prerequisite that always holds. Constraints are facts that are outside of control of users. For example, there is nothing \syn{Alice} can do to satisfy the constraint ``user must be Bob''. In listing~\ref{lst:agreementpucella2006} we have a policy set (what follows the keyword `with') that is a conjunction of two base (or primitive) policy sets. Both primitive policy sets in this listing specify a \syn{<prerequisite>} of True. The first policy set contains a primitive policy which in turn is composed of a \syn{<prerequisite>} (\syn{count[5]}) and an action (first \syn{print}). The second policy set in listing~\ref{lst:agreementpucella2006} contains a primitive policy which specifies the action \syn{print} (second \syn{print} in the listing). The primitive policy belonging to the second policy set specifies a \syn{<prerequisite>} that is a conjunction of two primitive \syn{<prerequisite>}s: \syn{Alice} and \syn{count[5]}. Note that in \ac{ACCPL} we only support primitive policy sets i.e. no combining of policy sets using conjunctions or other combining operators. 
+In \ac{ACCPL} a \syn{<prerequisite>} is either True, a \syn{<constraint>}, the negation of a \syn{<constraint>} or a conjunction of \syn{<prerequisite>}s. \syn{True} is the prerequisite that always holds. Constraints are facts that are outside of control of users. For example, there is nothing \syn{Alice} can do to satisfy the constraint ``user must be Bob''. In listing~\ref{lst:agreementpucella2006} we have a policy set (what follows the keyword `with') that is a conjunction of two base (or primitive) policy sets. Both primitive policy sets in this listing specify a \syn{<prerequisite>} of True. The first policy set contains a primitive policy which in turn is composed of a \syn{<prerequisite>} (\syn{count[5]}) and an action (first \syn{print}). The second policy set in listing~\ref{lst:agreementpucella2006} contains a primitive policy which specifies the action \syn{print} (second \syn{print} in the listing). The primitive policy belonging to the second policy set specifies a \syn{<prerequisite>} that is a conjunction of two primitive \syn{<prerequisite>}s: \syn{Alice} and \syn{count[5]}. Note that although the policy set in listing~\ref{lst:agreementpucella2006} shows a conjunction of two base (or primitive) policy sets, in \ac{ACCPL} we only support base policy sets (policy sets that are not composed of other policy sets) i.e. no combining of base policy sets using conjunctions or other combining operators. 
 
 
 We will describe \ac{ACCPL} in a \emph{BNF} grammar that looks more like Pucella and Weissman's subset grammar~\cite{pucella2006}. BNF style grammars are more abstract as they only give suggestions about the surface syntax of expressions without getting into lexical analysis and parsing related aspects such as precedence order of operators~\cite{piercesf2011}. The Coq version in contrast is the encodings of the BNF definitions which is tyically used for building compilers and interpreters. We will present both the BNF definition and its Coq encoding for each construct of \ac{ACCPL}. 
@@ -78,7 +79,7 @@ Assets are also application specific and we will continue using specific ones fo
 <asset> ::= N
 \end{lstlisting}
 
-Subjects are treated similarly to assets. A \syn{<subject>} is represented as a natural number (\syn{N}). See listing~\ref{lst:subjectast}).
+Subjects are treated similarly to assets. A \syn{<subject>} is represented as a natural number (\syn{N}) (see listing~\ref{lst:subjectast}).
 
 % subject
 \lstset{mathescape, language=AST}  
@@ -92,6 +93,7 @@ Agreements express who may perform an action on an asset. They include a set of 
 % policySet
 \newcommand*{\Comment}[1]{\hfill\makebox[7.0cm][l]{#1}}%
 \lstset{mathescape, language=AST, escapechar=\&}  
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}[frame=single, caption={policySet and primPolicySet},label={lst:policySetast}]
 <policySet> ::=  
    <primPolicySet>	&\Comment{; primitive policy set }&
@@ -100,8 +102,9 @@ Agreements express who may perform an action on an asset. They include a set of 
    <primInclusivePolicySet>	&\Comment{; primitive inclusive policy set }&
    <primExclusivePolicySet>	&\Comment{; primitive exclusive policy set }&
 \end{lstlisting}
+\end{minipage}
 
-Some primitive policy sets are specified as inclusive as opposed to others that are explicitly specified as exclusive. Primitive exclusive policy sets are exclusive to agreement's users in that only those users may perform the actions specified in the policy set. The implication is that all other users who are not specified in the agreement's principal are forbidden from performing the specified actions, no matter whether the prerequisite holds or not (see listing~\ref{lst:primInclusivePolicySetast}).
+Some primitive policy sets are specified as inclusive as opposed to others that are explicitly specified as exclusive. Primitive exclusive policy sets are exclusive to an agreement's users in that only those users may perform the actions specified in the policy set. The implication is that all other users who are not specified in the agreement's principal are forbidden from performing the specified actions, no matter whether the prerequisite holds or not (see listing~\ref{lst:primInclusivePolicySetast}).
 
 % primInclusivePolicySet
 \lstset{mathescape, language=AST, escapechar=\&}  
