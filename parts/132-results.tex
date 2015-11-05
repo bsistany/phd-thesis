@@ -228,7 +228,8 @@ Inductive decidable : environment -> agreement -> act -> subject -> asset -> Pro
 %\end{minipage}
 
 
-We declare and prove the decidability of \ac{ACCPL} in terms of the \syn{decidable} predicate as seen in listing~\ref{lst:decidabletypecoq}. The proof is made simple since we use the previously proven theorem \syn{trans_agreement_dec2}. The proof also makes use of two theorems we saw earlier in section~\ref{sec:mutualexclusive}. Recall that the first theorem, \syn{trans_agreement_perm_implies_not_notPerm_dec}, says that the existence of a \syn{Permitted} result in the set of results returned by \syn{trans_agreement}, will exclude any \syn{NotPermitted} result and that the second theorem, \syn{trans_agreement_NotPerm_implies_not_Perm_dec}, shows that the existence of a \syn{NotPermitted} result in the set of results returned by \syn{trans_agreement}, will exclude a \syn{Permitted} result.
+We declare and prove the decidability of \ac{ACCPL} in terms of the \syn{decidable} predicate as seen in listing~\ref{lst:decidabletypecoq}. The proof is made simple since we use the previously proven theorem \syn{trans_agreement_dec2}. The proof also makes use of two theorems we saw earlier in section~\ref{sec:mutualexclusive}. Recall that the first theorem, \syn{trans_agreement_perm_implies_not_notPerm_dec}, says that the existence of a \syn{Permitted} result in the set of results returned by \syn{trans_agreement}, will exclude any \syn{NotPermitted} result and that the second theorem, \syn{trans_agreement_NotPerm_implies_not_Perm_dec}, shows that the existence of a \syn{NotPermitted} result in the set of results returned by \syn{trans_agreement}, will exclude a \syn{Permitted} result. The proof shows the series of tactics that were applied to 
+complete the proof interactively.  We do not explain the tactics here, but just show the proof to illustrate by example what proofs look like.
 
 We will list the intermediate theorems that we have declared and proved which are used in the proof of theorem \syn{trans_agreement_dec2} and subsequent proofs in section~\ref{sec:intermediatetheorems}.
 
@@ -268,7 +269,7 @@ Defined.
  
 
 \section{Intermediate Theorems}\label{sec:intermediatetheorems}
-The theorem \syn{trans_agreement_dec_sb_Permitted} states as a sumbool that the nonempty list that \syn{trans_agreement} produces, contains a \syn{Permitted} result or not and this is decidable (see listing~\ref{lst:decsbpermitted}).
+The theorem \syn{trans_agreement_dec_sb_Permitted} states as a \syn{sumbool} that the nonempty list that \syn{trans_agreement} produces, contains a \syn{Permitted} result or not and this is decidable (see listing~\ref{lst:decsbpermitted}).
 
 
 \lstset{language=Coq, frame=single, caption={Translation Function for Agreement Returns a \syn{Permitted} result or Not},label={lst:decsbpermitted}}
@@ -290,7 +291,7 @@ Theorem trans_agreement_dec_sb_Permitted:
 \end{lstlisting}
 %\end{minipage}
 
-The theorem \syn{trans_agreement_dec_sb_NotPermitted} states as a sumbool that the nonempty list that \syn{trans_agreement} produces, contains a \syn{NotPermitted} result or not and this is decidable (see listing~\ref{lst:decsbnotpermitted}).
+The theorem \syn{trans_agreement_dec_sb_NotPermitted} states as a \syn{sumbool} that the nonempty list that \syn{trans_agreement} produces, contains a \syn{NotPermitted} result or not and this is decidable (see listing~\ref{lst:decsbnotpermitted}).
 
 \lstset{language=Coq, frame=single, caption={Translation Function for Agreement Returns a \syn{NotPermitted} result or Not},label={lst:decsbnotpermitted}}
 %\begin{minipage}[c]{0.95\textwidth}
@@ -310,7 +311,7 @@ Theorem trans_agreement_dec_sb_NotPermitted:
 \end{lstlisting}
 %\end{minipage}
 
-The theorem \syn{resultInQueryResult_dec} states as a sumbool that a given result is either in the nonempty list of \syn{results} or not and this is decidable (see listing~\ref{lst:decresultInResults}).
+The theorem \syn{resultInQueryResult_dec} states as a \syn{sumbool} that a given result is either in the nonempty list of \syn{results} or not and this is decidable (see listing~\ref{lst:decresultInResults}).
 
 \lstset{language=Coq, frame=single, caption={Result is in Results or Not},label={lst:decresultInResults}}
 %\begin{minipage}[c]{0.95\textwidth}
@@ -344,7 +345,7 @@ Theorem trans_agreement_not_Perm_and_NotPerm_at_once:
 \end{lstlisting}
 %\end{minipage}
 
-The theorem \syn{trans_policy_PIPS_dec_not} states that the translation function trans_policy_PIPS produces a nonempty list of results that will not have a \syn{NotPermitted} result. This makes intuitive sense as \syn{trans_policy_PIPS} is called for inclusive policy sets only (see listing~\ref{lst:pipsdecnot}).
+The theorem \syn{trans_policy_PIPS_dec_not} states that the translation function \syn{trans_policy_PIPS} produces a nonempty list of results that will not have a \syn{NotPermitted} result. This makes intuitive sense as \syn{trans_policy_PIPS} is called for inclusive policy sets only (see listing~\ref{lst:pipsdecnot}).
 \lstset{language=Coq, frame=single, caption={Translation Function for PIPS will not return a \syn{NotPermitted} result},label={lst:pipsdecnot}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
@@ -360,7 +361,7 @@ Theorem trans_policy_PIPS_dec_not:
 \end{lstlisting}
 %\end{minipage}
 
-The theorem \syn{trans_policy_PEPS_perm_implies_not_notPerm_dec} states that having a \syn{Permitted} result in the nonempty list of results that the translation function trans_policy_PEPS produces implies there exists no \syn{NotPermitted} result in the nonempty list (see listing~\ref{lst:pepspermimpliesnotperm}).
+The theorem \syn{trans_policy_PEPS_perm_implies_not_notPerm_dec} states that having a \syn{Permitted} result in the nonempty list of results that the translation function \syn{trans_policy_PEPS} produces implies there exists no \syn{NotPermitted} result in the nonempty list (see listing~\ref{lst:pepspermimpliesnotperm}).
 
 \lstset{language=Coq, frame=single, caption={\syn{Permitted} in results by Translation Function for PEPS implies no \syn{NotPermitted}},label={lst:pepspermimpliesnotperm}}
 %\begin{minipage}[c]{0.95\textwidth}
@@ -380,7 +381,7 @@ Theorem trans_policy_PEPS_perm_implies_not_notPerm_dec:
 
 \end{lstlisting}
 %\end{minipage}
-The theorem AnswersNotEqual states that two answers not being equal implies that results built from those answers are not equal as well (see listing~\ref{lst:answersnotequal}).
+The theorem \syn{AnswersNotEqual} states that two answers not being equal implies that results built from those answers are not equal as well (see listing~\ref{lst:answersnotequal}).
 
 \lstset{language=Coq, frame=single, caption={Non Equal Answers Give Non Equal Results},label={lst:answersnotequal}}
 %\begin{minipage}[c]{0.95\textwidth}
@@ -391,7 +392,7 @@ Theorem AnswersNotEqual: forall (ans1:answer)(ans2:answer)(s:subject)(ac:act)(as
 \end{lstlisting}
 %\end{minipage}
 
-The theorem \syn{trans_policy_positive_dec_not} states that the translation function trans_policy_positive produces a nonempty list of results that will not have a \syn{NotPermitted} result (see listing~\ref{lst:positivedecnot}).
+The theorem \syn{trans_policy_positive_dec_not} states that the translation function \syn{trans_policy_positive} produces a nonempty list of results that will not have a \syn{NotPermitted} result (see listing~\ref{lst:positivedecnot}).
 
 
 \lstset{language=Coq, frame=single, caption={Translation Function for Permitting Policies will not return a \syn{NotPermitted} result},label={lst:positivedecnot}}
@@ -409,7 +410,7 @@ Theorem trans_policy_positive_dec_not:
 \end{lstlisting}
 %\end{minipage}
 
-The theorem \syn{trans_policy_negative_dec_not} states that the translation function trans_policy_negative produces a nonempty list of results that will not have a \syn{Permitted} result (see listing~\ref{lst:negativedecnot}).
+The theorem \syn{trans_policy_negative_dec_not} states that the translation function \syn{trans_policy_negative} produces a nonempty list of results that will not have a \syn{Permitted} result (see listing~\ref{lst:negativedecnot}).
 
 \lstset{language=Coq, frame=single, caption={Translation Function for NotPermitting Policies will not return a \syn{Permitted} result},label={lst:negativedecnot}}
 %\begin{minipage}[c]{0.95\textwidth}
@@ -426,7 +427,7 @@ Theorem trans_policy_negative_dec_not:
 \end{lstlisting}
 %\end{minipage}
 
-The theorem \syn{trans_policy_unregulated_dec_not} states that the translation function trans_policy_unregulated produces a nonempty list of results that will not have a \syn{Permitted} nor a \syn{NotPermitted} result (see listing~\ref{lst:unregulateddecnot}).
+The theorem \syn{trans_policy_unregulated_dec_not} states that the translation function \syn{trans_policy_unregulated} produces a nonempty list of results that will not have a \syn{Permitted} nor a \syn{NotPermitted} result (see listing~\ref{lst:unregulateddecnot}).
 
 \lstset{language=Coq, frame=single, caption={Translation Function for \syn{Unregulated} Requests will not return \syn{Permitted} nor \syn{NotPermitted}},label={lst:unregulateddecnot}}
 
