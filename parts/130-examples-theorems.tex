@@ -42,6 +42,7 @@ forall x : subject, x = Alice /\ True -> 2 < 5 -> Permitted x Print TheReport.
 The theorem $One$ that we are going to prove is trivial but nonetheless in English it states that Alice is Permitted to Print TheReport. The proof comes after the command 'Proof.' and ends with 'Qed'. 
 
 \lstset{language=Coq}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}[frame=single, caption={Theorem One},label={lst:theoremone}]
 
 Definition psA1:policySet :=
@@ -62,6 +63,7 @@ Proof. simpl in H. apply H. split. reflexivity. auto.  omega. Qed.
 
 
 \end{lstlisting}
+\end{minipage}
 
 \section{Theorem Two}
 
@@ -79,6 +81,7 @@ forall x : subject,
 Theorem $T1\_A5$ states the exclusivity of the policy set, namely that any subject that is not Bob is not permitted to print the asset LoveAndPeace. Theorem $T2\_A5$ uses $T1\_A5$ to prove Alice is not permitted to print the asset.
 
 \lstset{language=Coq}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}[frame=single, caption={Theorem Two},label={lst:theoremtwo}]
 
 Definition prin_bob := (Single Bob).
@@ -102,7 +105,7 @@ End A5.
 
 
 \end{lstlisting}
-
+\end{minipage}
 
 \section{Theorem Three}
 
@@ -150,6 +153,7 @@ Inductive env_consistent : environment -> Prop :=
 We will now pose several small theorems about consistency of count formulas and environments and provide proofs for them (see listing~\ref{lst:inconsistenttheorems}).
 
 \lstset{language=Coq}
+%\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}[frame=single, caption={Inconsistent Environment}, label={lst:inconsistenttheorems}]
 
 Theorem f1_and_f2_are_inconsistent: inconsistent f1 f2.
@@ -225,7 +229,7 @@ intros. unfold inconsistent. intros. intuition. Qed.
 
 
 \end{lstlisting}
-
+%\end{minipage}
 
 
 

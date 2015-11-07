@@ -162,7 +162,7 @@ The \syn{primPolicySet} which was passed to \syn{process_single_ps} was either c
 
 
 \lstset{language=Coq, frame=single, caption={Translation of Policy Set},label={lst:transpsCoq}}
-%\begin{minipage}{\linewidth}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 
 Fixpoint trans_ps
@@ -195,7 +195,7 @@ else (* asset_from_query <> a *)
           (makeResult 
              Unregulated subject_from_query action_from_query asset_from_query)).
 \end{lstlisting}
-%\end{minipage}
+\end{minipage}
 
 
 
@@ -204,7 +204,7 @@ The \syn{trans_policy_PIPS} translation function for a \syn{primInclusivePolicyS
 
 \lstset{language=Coq, frame=single, caption={Translation of Primitive Inclusive Policy Set},
     label={lst:transpipsCoq}}
-%\begin{minipage}{\linewidth}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Definition trans_policy_PIPS
   (e:environment)(prq: preRequisite)(p:policy)(x:subject)
@@ -220,7 +220,7 @@ Definition trans_policy_PIPS
     else (* ~prin *)
       (trans_policy_unregulated e x p a action_from_query).
 \end{lstlisting}
-%\end{minipage}
+\end{minipage}
 
 
 The \syn{trans_policy_PEPS} translation function for a \syn{primExclusivePolicySet} checks whether there is a proof for the subject in question, \syn{x}, being in \syn{prin_u}, by calling the decision procedure \syn{trans_prin_dec}. If not, the translation function \syn{trans_policy_negative} is called. This is because we are translating a \syn{primExclusivePolicySet} so the policy set is exclusive to the agreement's users implying all subjects, not in the \syn{prin_u} are denied access. In case there is a proof for the subject \syn{x} being in \syn{prin_u}, there is a check for whether the prerequisite from the policy set holds or not (by calling the decision procedure \syn{trans_preRequisite_dec}). If so, the translation function \syn{trans_policy_positive} is called, else \syn{trans_policy_unregulated} is called (see listing~\ref{lst:transpepsCoq}).
@@ -308,7 +308,7 @@ Definition trans_policy_positive
 
 \lstset{language=Coq, frame=single, caption={Translation of Negative Policies},
     label={lst:transNegativeCoq}}
-%\begin{minipage}{\linewidth}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Definition process_single_pp_trans_policy_negative
    (pp: primPolicy)(x:subject)
@@ -334,7 +334,7 @@ Fixpoint trans_policy_negative
        | Policy pp_list => trans_pp_list_trans_policy_negative pp_list x a action_from_query
   end.
 \end{lstlisting}
-%\end{minipage}
+\end{minipage}
 
 
 \syn{trans_policy_unregulated} acting on a single \syn{primPolicy} (see process_single_pp_trans_policy_unregulated in listing~\ref{lst:transUnregulatedCoq}), returns a result of Unregulated.
@@ -446,7 +446,7 @@ Note that the only difference between translations for a \syn{Count} and a \syn{
 
 
 \lstset{language=Coq, frame=single, caption={Translation of Count},label={lst:transcountCoq}}
-%\begin{minipage}[c]{0.95\textwidth}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Fixpoint trans_count
   (e:environment)(n:nat)(IDs:nonemptylist policyId)
@@ -455,7 +455,7 @@ Fixpoint trans_count
   let running_total := trans_count_aux e ids_and_subjects in
   running_total < n.
 \end{lstlisting}
-%\end{minipage}
+\end{minipage}
 
 
 To implement the translation for a \syn{Count} or a \syn{CountByPrin} we start by calling an auxiliary function \syn{process_two_lists} (see listing~\ref{lst:transcountprocesstwolistsCoq}) that effectively returns a new list composed of pairs of members of the first list and the second list (the cross-product of the two input lists). In the case of \syn{trans_count}, the call is ``\syn{process_two_lists} \syn{IDs} \syn{prin_u}'' which returns a list of pairs of \syn{policyId} and \syn{subject} namely \syn{ids_and_subjects}. \syn{ids_and_subjects} is then passed to a locally defined function called \syn{trans_count_aux}.

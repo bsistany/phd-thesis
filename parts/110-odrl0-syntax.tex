@@ -137,14 +137,14 @@ A primitive policy specifies an action to be performed on an asset, depending on
 A policy is made up of primitive policies. Primitive policies are grouped together using the conjunction combining operator (see listing~\ref{lst:policyast}).
 
 % policy
-
 \lstset{mathescape, language=AST, escapechar=\&}  
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}[frame=single, caption={policy},label={lst:policyast}]
 <policy> ::=  
  'and'[ <primPolicy$_{1}$>, ..., 
                  <primPolicy$_{m}$> ]	&\Comment{; conjunction }&
 \end{lstlisting}
-
+\end{minipage}
 
 An action (\syn{<act>}) is represented as a natural number. Similar to assets and subjects, actions are application specific. Some example actions taken from~\cite{pucella2006} are \syn{Display} and \syn{Print} (see listing~\ref{lst:actast}).
 
@@ -179,9 +179,11 @@ Constraints are either of the principal kind, the count kind, or the count by pr
 
 % constraint
 \lstset{mathescape, language=AST, escapechar=\&}  
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}[frame=single, caption={constraint},label={lst:constraintast}]
 <constraint> ::=  
 	<prin> &\Comment{; principal}&
 	'Count' [N] &\Comment{; number of executions}&
 	<prin> ('Count' [N]) &\Comment{; number of executions by prin}&
 \end{lstlisting}
+\end{minipage}
