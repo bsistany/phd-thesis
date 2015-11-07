@@ -73,21 +73,31 @@ Fixpoint getCount
 
 \section{The \syn{sumbool} Type}\label{sec:sumboolsection}
 
-\syn{sumbool} is a boolean type defined in the Coq standard library module \syn{Coq.Init.Specif}. \syn{sumbool} captures the idea of program values that indicate which of two propositions is true~\cite{chlipalacpdt2011}. \syn{sumbool} is a boolean type equipped with the justification of their value, which really helps with proofs. \syn{sumbool A B}, which is written \syn{\{A\}+\{B\}}, is the informative disjunction ``A or B'', where A and B are logical propositions. Its extraction is isomorphic to the type of booleans. A boolean is either true or false, and this is decidable~\cite{Coq:manual}. See listing~\ref{lst:sumbooltypeCoq} for the definition of \syn{sumbool} and \syn{sumbool_of_bool}; note the notational convenience where curly braces around each proposition along with the addition symbol are used to represent the \syn{sumbool} type.
-
-With \syn{sumbool}s similar to \syn{bool} and other 2-constructor inductive types, one can use the ``if then else'' construct to select the desired case when doing proofs which makes for much more readability of the given proofs.
+\syn{sumbool} is a boolean type defined in the Coq standard library module \syn{Coq.Init.Specif}. The \syn{sumbool} type captures the idea of program values that indicate which of two propositions is true~\cite{chlipalacpdt2011}. The \syn{sumbool} type is equipped with the justification of their value~\cite{Coq:manual} which help with proofs. Using a tactic like \syn{destruct}~\cite{Coq:manual} two subgoals are generated, one for each form of the \syn{sumbool} instance, however the justifications also show up as hypothesis helping with discharging of the subgoals. The definition of \syn{sumbool} from Coq library module \syn{Coq.Init.Specif} is listed in listing~\ref{lst:sumbooltypeCoq}; notice the use of the \syn{where} clause in this listing, which allows notation to be simultaneously defined (and used) when presenting a new inductive definition.
 
 \lstset{language=Coq, frame=single, caption={\syn{sumbool} type},label={lst:sumbooltypeCoq}}
-\begin{minipage}[c]{0.95\textwidth}
+%\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Inductive sumbool (A B:Prop) : Set :=
   | left : A -> {A} + {B}
   | right : B -> {A} + {B}
  where "{ A } + { B }" := (sumbool A B) : type_scope.
- 
- Definition sumbool_of_bool : forall b:bool, {b = true} + {b = false}.
 \end{lstlisting}
-\end{minipage}
+%\end{minipage}
+
+As an example of how \syn{sumbool} type is used in the Coq standard library, see the listing~\ref{lst:sumboolofbooltypeCoq}, for the definition of the type \syn{sumbool_of_bool}. The definition in listing~\ref{lst:sumboolofbooltypeCoq} and the following description are taken from the library \syn{Coq.Bool.Sumbool}~\cite{Coq:manual}.
+\begin{quote}
+\syn{sumbool A B}, which is written \syn{A+B}, is the informative disjunction ``A or B'', where A and B are logical propositions. Its extraction is isomorphic to the type of booleans. A boolean is either true or false, and this is decidable. 
+\end{quote}
+
+\lstset{language=Coq, frame=single, caption={\syn{sumbool_of_bool} type},label={lst:sumboolofbooltypeCoq}}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Definition sumbool_of_bool : forall b:bool, {b = true} + {b = false}.
+\end{lstlisting}
+%\end{minipage}
+With \syn{sumbool}s similar to \syn{bool} and other 2-constructor inductive types, one can use the ``if then else'' construct to select the desired case when doing proofs which makes for much more readability of the given proofs.
+
 
 We have used the \syn{sumbool} type to declare and prove decision procedures that we have subsequently used in the translation functions implementing the semantics and also in the proofs. We will list the decision procedures in section~\ref{sec:decprocs} after reviewing the translation functions in section~\ref{sec:translationfuncs}.
 
