@@ -175,7 +175,7 @@ Theorem trans_agreement_not_NotPerm_and_not_Perm_implies_Unregulated_dec:
 \end{minipage}
 
 
-\section{Decidable As An Inductive Predicate}
+\section{Decidable as an Inductive Predicate}
 
 We encode the cases discussed in section~\ref{sec:maintheorems} in an inductively defined predicate called \syn{decidable} in listing~\ref{lst:inductivepredicatedecidablecoq}. Recall that the nonempty list that the agreement translation function \syn{trans_agreement} returns will return a set of results one per each \syn{primPolicy}.There are three cases. First when there is at least a \syn{NotPermitted} result in the set and there is no \syn{Permitted} result, second when there is at least a \syn{Permitted} result in the set and no \syn{NotPermitted} result, and third when there are no \syn{Permitted} and no \syn{NotPermitted} results in the set. We encode these three cases in three constructors for the type \syn{decidable}. The constructors are: \syn{Denied}, \syn{Granted} and \syn{NotApplicable}. Notice that we use \syn{Denied}, \syn{Granted} and \syn{NotApplicable} synonymously with \syn{NotPermitted}, \syn{Permitted} and \syn{Unregulated}. The reason is a practical one and is due to Coq; we needed to use new names for the \syn{decidable} constructors since we already used \syn{NotPermitted}, \syn{Permitted} and \syn{Unregulated} as constructors for \syn{answer}. 
 
