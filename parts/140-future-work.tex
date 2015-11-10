@@ -145,3 +145,48 @@ $deny (T1, T2, C, P)$ $\lor$ $\lnot (E$ $consistent$ $wrt$ <T1, R1, U1> $\land$ 
 As future work, we will be investigating the question of decidability for answering queries given an \ac{selinux} policy. We will first state a decidability theorem similar to the theorem in listing~\ref{lst:agreementdecidablecoq} (minor adjustments may be needed to allow for differences with \ac{selinux} policy language) and present a proof for it in Coq. Most policy based access-control languages typically use a two-valued decision set to indicate whether an access request is granted or denied. The literature for the \ac{selinux} implies only these two outcomes are possible so initially we will attempt to prove this conjecture in Coq. 
 
 As a next step for future work on \ac{selinux}, we will add constraint relations to our simplified \ac{selinux} policy language and prove the decidability results stand for the augmented policy language.
+
+\section{Related Work}
+
+Policies in some \ac{pbac} based languages such as \ac{xacml} and \ac{odrl} are expressed in \ac{xml}. Authors of~\cite{ArdagnaDVS04} argue that \ac{xml}-based \ac{pbac} systems are well suitable for the Internet context where simplicity and easy integration with existing technology and tools must be ensured. \ac{xml}-based languages are also well suited for the easy interchange of policies~\cite{ArdagnaDVS04}. Access rules along with conditions under which access is granted or denied in such languages are expressed in a declarative manner using fragments of a natural language like English, resulting in ambiguity with regards to the intended behaviour of the system encoded in these access rules. The ambiguity in semantics of these languages may lead to implementations varying in their interpretations of the access-control language and ultimately making real the possibility of security breaches (e.g. access granted to unauthorized subjects). MENTION MORE XML based languages HERE...
+
+Whether a \ac{pbac} based language is based on \ac{xml} or not, formal specification of how an access-control mechanism should behave, is typically given in some sort of logic, often a subset of first order logic. MENTION SOME RELATED WORK that have formal semantics....
+
+To show that an access-control system actually behaves correctly with respect to its specification, proofs are needed, however the proofs that are often presented in the literature are hard or impossible to formally verify. The verification difficulty is partly due to the fact that the language used to do the proofs while mathematical in nature, utilizes intuitive justifications to derive the proofs. Intuitive language in proofs means that the proofs could be incomplete and/or contain subtle errors. SHOW SOME RELATED WORK (pucella) that have proofs but the proofs cannot be formally verified.
+
+
+NOW bring in AMY's WORKS...
+
+NOW CLOSE WITH YOUR WORK
+
+
+GO OVER MY CONCLUSIONS/CONTRIBUTIONS AGAIN
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
