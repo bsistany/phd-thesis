@@ -148,9 +148,37 @@ As a next step for future work on \ac{selinux}, we will add constraint relations
 
 \section{Related Work}
 
-Policies in some \ac{pbac} based languages such as \ac{xacml} and \ac{odrl} are expressed in \ac{xml}. Authors of~\cite{ArdagnaDVS04} argue that \ac{xml}-based \ac{pbac} systems are well suitable for the Internet context where simplicity and easy integration with existing technology and tools must be ensured. \ac{xml}-based languages are also well suited for the easy interchange of policies~\cite{ArdagnaDVS04}. Access rules along with conditions under which access is granted or denied in such languages are expressed in a declarative manner using fragments of a natural language like English, resulting in ambiguity with regards to the intended behaviour of the system encoded in these access rules. The ambiguity in semantics of these languages may lead to implementations varying in their interpretations of the access-control language and ultimately making real the possibility of security breaches (e.g. access granted to unauthorized subjects). MENTION MORE XML based languages HERE...
+Policies in some \ac{pbac} based languages such as \ac{xacml} and \ac{odrl} are expressed in \ac{xml}. Authors of~\cite{ArdagnaDVS04} argue that \ac{xml}-based \ac{pbac} systems are well suitable for the Internet context where simplicity and easy integration with existing technology and tools must be ensured. \ac{xml}-based languages are also well suited for the easy interchange of policies~\cite{ArdagnaDVS04}. Access rules along with conditions under which access is granted or denied in such languages are expressed in a declarative manner using fragments of a natural language like English, resulting in ambiguity with regards to the intended behaviour of the system encoded in these access rules. The ambiguity in semantics of these languages may lead to implementations varying in their interpretations of the access-control language and ultimately making real the possibility of security breaches (e.g. access granted to unauthorized subjects). 
 
-Whether a \ac{pbac} based language is based on \ac{xml} or not, formal specification of how an access-control mechanism should behave, is typically given in some sort of logic, often a subset of first order logic. MENTION SOME RELATED WORK that have formal semantics....
+\section{MENTION MORE XML based languages HERE}
+
+\subsection{ODRL}
+
+\ac{odrl} is a declarative XML based \ac{rel} which has been accepted as part of the W3C community with the mandate of standardizing how rights and policies, related to the usage of digital content on the Open Web Platform, OWP~\cite{openwebplatform}, are expressed. \ac{odrl} is also used to express the conditions under which users' rights may be exercised. \ac{odrl} 2.0 supports expression of rights and also privacy rules for social media while \ac{odrl} 1.0 was only dealing with the mobile ecosystem. 
+
+\subsection{xrml}
+\ac{xrml} is another popular declarative XML based language used for writing software licenses~\cite{HalpernW08}. \ac{xrml} has been selected by the Moving Picture Experts Group (MPEG) to be the \ac{rel} for MPEG-21 which is an ISO standard for multimedia applications. First released in 2000, \ac{xrml} received the support of many technology providers, content owners, distributors, and retailers with some agreeing to build products and/or services that are \ac{xrml} compliant~\cite{HalpernW08}.
+
+\subsection{xacml}
+A widely used \ac{pbac} based XML based language is \ac{xacml}, an OASIS standard. \ac{xacml} defines a language for expression of policies and access requests, and a workflow to achieve policy enforcement~\cite{DBLP:conf/essos/MasiPT12}. \ac{xacml} also defines a standard format to be used to transport policies
+between disparate access control systems~\cite{ArdagnaDVS04}.
+
+\subsection{WS-Policy}
+WS-Policy is a XML based specification which has been accepted as part of the W3C community since September 2007. WS-Policy is used to describe policies for Web services on security, trust, quality, etc and for Web service clients to advertise their policy requirements~\cite{wspolicy}.
+According to~\cite{wspolicy} WS-Policy's scope is limited to allowing endpoints to specify requirements and capabilities needed for establishing a connection, therefore WS-Policy is not a language for expressing complex and application specific policies that take effect after the connection is established. WS-Policy uses a simple and extensible grammar for expressing policies which are composed of assertions and alternatives~\cite{wspolicy}. Assertions are requirements to be met by the policy's consumers (client Web services) and alternatives are mutually exclusive assertions. 
+
+\section{MENTION SOME languages that have FORMAL semantics}
+
+Whether a \ac{pbac} based language is based on \ac{xml} or not, formal specification of how an access-control mechanism should behave, is typically given in some sort of logic, often a subset of first order logic. 
+
+
+
+odrl has formal semantics that are based on logic
+xrml has formal semantics that are based on logic
+
+xacml: 
+Formalisation and Implementation of the XACML Access Control Mechanism
+Core Xacml is "Towards Reasonability Properties for Access-Control Policy Languages"
 
 To show that an access-control system actually behaves correctly with respect to its specification, proofs are needed, however the proofs that are often presented in the literature are hard or impossible to formally verify. The verification difficulty is partly due to the fact that the language used to do the proofs while mathematical in nature, utilizes intuitive justifications to derive the proofs. Intuitive language in proofs means that the proofs could be incomplete and/or contain subtle errors. SHOW SOME RELATED WORK (pucella) that have proofs but the proofs cannot be formally verified.
 
