@@ -154,6 +154,44 @@ Authors of~\cite{ArdagnaDVS04} argue that \ac{xml}-based \ac{pbac} systems are w
 
 Access rules along with conditions under which access is granted or denied in such languages are expressed in a declarative manner using fragments of a natural language like English, resulting in ambiguity with regards to the intended behaviour of the system encoded in these access rules. The ambiguity in semantics of these languages may lead to implementations varying in their interpretations of the access-control language and ultimately making real the possibility of security breaches (e.g. access granted to unauthorized subjects). 
 
+SO WE NEED SEMANTICS. NOW TALK ABOUT FORMAL SEMANTICS: HOW THIS IS DONE. OPERATIONAL, WEB ONTOLOGY, AND LOGIC.
+
+Trace based: Gunter and Xiang
+Logic based:
+  datalog based: According to Garcia-Molina et al (as cited in Halpern and Weissman),  ?. 
+  The policy languages that are perhaps closest in spirit to Lithium are the approaches that are based on some variant of Datalog. Examples of such languages include Delegation Logic [Li et al. 2003], the RT (Role-based Trust-management) framework [Li et al. 2002], Binder [DeTreville 2002], SD3 [Jim 2001], FAF (Flexible Authorization Framework) [Jajodia et al. 2001], and Cassandra [Becker and Sewell 2004]). Datalog is an efficient well-understood reasoning engine that is restricted to function-free negation-free Horn clauses; these restrictions are made to ensure tractability. The variants, such as safe stratified Datalog [Garcia-Molina et al. 2002] or Datalog with constraints, allow limited use of functions and negation while preserving tractability.
+  
+ Halpern, Weissman, Pucella : Lithium
+ 
+ \section{Lithium}
+Halpern and Weissman~\cite{Halpern2008} use \ac{fol} to represent and reason about policies. They restrict \ac{fol} to get tractability for answering the query of whether a request to access a resource may be granted or denied, given a policy and argue that despite the tractability results their language is still expressive. They contrast their approach with approaches based on Datalog~\cite{datalog} and point out that Datalog based work is made tractable by restricting function symbols and negation but at the cost of losing some expressive power. For example, Datalog based languages cannot distinguish between rendering explicit forbidden decisions vs unregulated ones.
+
+Halpern and Weissman~\cite{Halpern2008} focus on satisfying three requirements in the design of Lithium:
+\begin{quote}
+\begin{enumerate}
+  \item It must be expressive enough to capture in an easy and natural way the policies that people want to discuss.
+  \item It must be tractable enough to allow interesting queries about policies to be answered efficiently.
+  \item It must be usable by non-experts, because we cannot expect policymakers and administrators to be well-versed in logic or programming languages.
+\end{enumerate}
+\end{quote}
+ 
+ 
+  \section{Diff ACCPL and Lithium}
+The second key difference between XACML and Lithium is the treatment of negation. In XACML, the semantics of negation is somewhat nonstandard. For example, in XACML, the policies ?if Alice is good, then she may play? and ?if Alice is not good, then she may play? together do not necessarily imply that Alice may play. The policies imply the permission only if the environment says either that Alice is good or that she is not good. So, given a set of XACML policies, we can replace every literal of the form ¬R(t1, . . . , tn) by NotR(t1, . . . , tn), where NotR is a fresh predicate symbol, without changing the meaning of the policies. Thus, although XACML seems to allow the unrestricted use of negation, it is actually less expressive than Lithium in its use of negation. Moreover, we believe that the nonstandard usage of negation may well confuse users.
+LOGIC IS MOSTLY BASED ON DATALOG. WE FOLLOW LITHIUM'S APPROACH 
+
+Barth and Mitchell express semantics of digital rights using propositional linear logic. Linear logic deals with dynamic properties or finite resources; according to Girard, ``Linear logic is a resource conscious logic''. Bart and Mitchell introduce the notion of monotonicity which captures the idea that acquiring extra rights by a user should not lead to the user having fewer rights and show that the algorithm the \ac{oma} uses for assigning actions to rights is non-monotonic.
+ 
+Barth and Mitchell consider whether a sequence of actions complies with a license and show that answering this question for the \ac{oma} language is NP-complete. They propose an algorithm based on propositional linear logic to evaluate sequences of actions that is monotonic.
+
+Automata-based Semantics: Holzer
+Operational semantics based: Sheppard and Safavi-Naini
+
+
+
+
+
+
 \section{MENTION MORE XML based languages HERE}
 
 \subsection{ODRL}
@@ -175,8 +213,8 @@ According to~\cite{wspolicy} WS-Policy's scope is limited to allowing endpoints 
 
 Whether a \ac{pbac} based language is based on \ac{xml} or not, formal specification of how an access-control mechanism should behave, is typically given in some sort of logic, often a subset of first order logic. 
 
-odrl has formal semantics that are based on logic
-xrml has formal semantics that are based on logic
+odrl has formal semantics that are based on logic: Lithium based leading to Pucella's fragment
+xrml has formal semantics that are based on logic: Lithium based.
 
 xacml: 
 Formalisation and Implementation of the XACML Access Control Mechanism
