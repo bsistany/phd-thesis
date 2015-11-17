@@ -174,10 +174,16 @@ Halpern and Weissman~\cite{Halpern2008} focus on satisfying three requirements i
   \item It must be usable by non-experts, because we cannot expect policymakers and administrators to be well-versed in logic or programming languages.
 \end{enumerate}
 \end{quote}
+ We note that \ac{ACCPL} is a good candidate to satisfy Halpern and Weissman's first goal although we have not undertaken a study similar to the one the authors have done where they have studied real-life policies written in natural language and determined that those same policies could be written in Lithium. As far as the authors' second goal, we note that for \ac{ACCPL} tractability of answering an access query was not a goal; instead \ac{ACCPL} focused on achieving decidability results with respect to answering the access query. The third requirement Lithium was designed to satisfy, namely the usability of the language for non-experts was simply not a goal for \ac{ACCPL}. 
+
+\section{Trace-based}
+Gunter, et al~\cite{GunterWW01} propose an abstract model and a formal language to express access and usage rights. A set of ``realities'' representing a sequence of \emph{payment} and \emph{render} (e.g. work is rendered by a device) actions make up a license. Semantics in the authors' model are expressed as a function mapping terms of the language to elements of the domain of licenses. The authors argue that their semantics is similar to those used for concurrency where language constructs are modelled as traces of allowed events.
+
+Xiang, et al~\cite{xiang2008formal} use \ac{ots} modeling to describe licenses to use digital assets. In this formalism licenses and \ac{drm} systems are modeled as \ac{ots}s, described in CafeOBJ~\cite{cafeobj} which is an algebraic specification language. The authors' approach not only models static properties of licenses, dynamic evolutions or traces of licenses can also be observed and denoted by the actions in \ac{ots}s, respectively. Finally, formal verification of licenses expressed in CafeOBJ may be performed using a theorem proving facility which provides an integrated platform for the formal modeling, specification, and verification of licenses and \ac{drm} systems. This feature enables one to analyze and prove the licenses as well as \ac{drm} systems in a more effective way.
+
+
  
- 
-  \section{Diff ACCPL and Lithium}
-The second key difference between XACML and Lithium is the treatment of negation. In XACML, the semantics of negation is somewhat nonstandard. For example, in XACML, the policies ?if Alice is good, then she may play? and ?if Alice is not good, then she may play? together do not necessarily imply that Alice may play. The policies imply the permission only if the environment says either that Alice is good or that she is not good. So, given a set of XACML policies, we can replace every literal of the form ¬R(t1, . . . , tn) by NotR(t1, . . . , tn), where NotR is a fresh predicate symbol, without changing the meaning of the policies. Thus, although XACML seems to allow the unrestricted use of negation, it is actually less expressive than Lithium in its use of negation. Moreover, we believe that the nonstandard usage of negation may well confuse users.
+
 LOGIC IS MOSTLY BASED ON DATALOG. WE FOLLOW LITHIUM'S APPROACH 
 
 Barth and Mitchell express semantics of digital rights using propositional linear logic. Linear logic deals with dynamic properties or finite resources; according to Girard, ``Linear logic is a resource conscious logic''. Bart and Mitchell introduce the notion of monotonicity which captures the idea that acquiring extra rights by a user should not lead to the user having fewer rights and show that the algorithm the \ac{oma} uses for assigning actions to rights is non-monotonic.
