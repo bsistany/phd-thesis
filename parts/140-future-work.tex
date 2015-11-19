@@ -1,44 +1,10 @@
 %======================================================================
-\chapter{Further Future Work Directions}
+\chapter{Future Work and Conclusion}
 %======================================================================
 
 %----------------------------------------------------------------------
-%\section{Summary}
-%
-%We started off by looking at \ac{drel}s and specifically at \ac{odrl} and considered its formal semantics as captured by~\cite{pucella2006}. We presented the encodings and semantics of the constructs for a significant subset of \ac{odrl} in Coq and then defined what queries looked like and what the decision problem was in this context. We have also encoded the decision algorithms as presented in~\cite{pucella2006} in Coq in order to perform formal verification of theorems of interest. We noted the common thread between \ac{rel}s and policy languages for access control systems such as those between \ac{odrl} and \ac{selinux}. We discussed the goal of generalizing the concept of a policy language from strictly representing subsets of \ac{odrl}, to representing (subsets of) both \ac{odrl} and \ac{selinux} policy languages with the goal of applying the decision algorithms to both types of policies, in a unified manner.
-%%----------------------------------------------------------------------
-%
-%
-%\section{Machine-Checked Proof of Decidability of Queries}
-%
-%By defining formal semantics for \ac{odrl} authors of~\cite{pucella2006} were able to show some important results. First result is that answering the question of whether a set of ODRL statements imply a permission, denial or other possibilities is decidable and also that its complexity is NP-hard.
-%
-%The authors of~\cite{pucella2006} then prove that by removing the construct $not[policySet]$ from \ac{odrl}'s syntax answering the same query remains decidable and efficient (polynomial time complexity). 
-%
-%We will prove equivalent results as above starting with the decidability result of answering a query in ODRL0 (which does not include $not[policySet]$). The theorem in listing~\ref{lst:decidabilityodrl0coq} states that for all environments, all single agreements, all subjects, all actions and all assets, either permission is granted, permission is denied, permission is unregulated or query is inconsistent. 
-%
-%\lstset{language=Coq, frame=single, caption={Environments and Counts},label={lst:decidabilityodrl0coq}}
-%\begin{minipage}[c]{0.95\textwidth}
-%\begin{lstlisting}
-%Theorem queriesAreDecidable: forall (e:environment), 
-%                forall (agr: agreement),
-%                forall (s:subject),
-%                forall (action:act),
-%                forall (a:asset),
-%
-%(permissionGranted e [agr] s action a) \/
-%(permissionDenied e [agr] s action a)  \/
-%(queryInconsistent e [agr] s action a) \/
-%(permissionUnregulated e [agr] s action a).
-%
-%\end{lstlisting}
-%\end{minipage}
-%
-%We will then augment ODRL0 with the constructs we omitted from the full ODRL (resulting in what we have earlier called ODRL1 or ODRL2) including the troublesome construct $not[policySet]$ and attempt to prove that the decidability results remain intact. There is a chance that a proof is not possible due to particulars of the Coq encoding we have used, in in which case, we will adjust our encoding.
-
  
-We have designed \ac{ACCPL} as a suitable core policy language for \ac{pbac} systems that can be used for expressing general access-control expressions and also as a target language for deploying
-policies written in other languages. We could capture, implement and study the semantics of these other policy-based access-control using the \ac{ACCPL} translation function framework and ultimately certify the semantics of those languages with respect to their specifications the same way \ac{ACCPL} has been certified.
+We have designed \ac{ACCPL} as a suitable core policy language for \ac{pbac} systems that can be used for expressing general access-control expressions and also as a target language for deploying policies written in other languages. We could capture, implement and study the semantics of these other policy-based access-control using the \ac{ACCPL} translation function framework and ultimately certify the semantics of those languages with respect to their specifications the same way \ac{ACCPL} has been certified.
 
 \section{SELinux}
 
@@ -146,76 +112,16 @@ As future work, we will be investigating the question of decidability for answer
 
 As a next step for future work on \ac{selinux}, we will add constraint relations to our simplified \ac{selinux} policy language and prove the decidability results stand for the augmented policy language.
 
-\section{Related Work}
+\section{Conclusion}
 
-Policies in some \ac{pbac} languages such as \ac{xacml} and \ac{odrl} are expressed in \ac{xml}. Authors of~\cite{surveyXML} do a survey of XML-based access control languages describing and comparing the following languages and systems: Author-X, FASTER, \ac{odrl}, \ac{xrml}, \ac{xacl}, \ac{saml}, \ac{xacml} and the language designed by the authors called \ac{spl}. Other examples are WS-Policy, \ac{wsdl} and \ac{wspl} reviewed in~\cite{ArdagnaDVS04}.
+%----------------------------------------------------------------------
 
-Authors of~\cite{ArdagnaDVS04} argue that \ac{xml}-based \ac{pbac} systems are well suitable for the Internet context where simplicity and easy integration with existing technology and tools must be ensured. \ac{xml}-based languages are also well suited for the easy interchange of policies~\cite{ArdagnaDVS04}. 
+In this thesis, we presented the design and implementation of \ac{ACCPL} as a minimal certified policy language. \ac{ACCPL} is a \ac{pbac} system that can be used to express general access-control rules and policies. In addition we have defined formal semantics for \ac{ACCPL} where we have discovered and added all possible cases when answering a query on whether to allow or deny an action to be performed on an asset. We have subsequently used the Coq Proof Assistant to state theorems about the expected behaviour of \ac{ACCPL} when evaluating a request with respect to a given policy, to develop proofs for those theorems and to machine-check the proofs ensuring correctness guarantees are provided. We have in particular stated, developed and proved a decidability result for \ac{ACCPL}. 
 
-While policies in \ac{xml}-based languages are expressed using \ac{xml}, the meaning of the policy statements in such languages are expressed using fragments of a natural language like English, resulting in ambiguity with regards to the intended behaviour of the system encoded in these policy statements. The ambiguity in semantics of these languages may lead to implementations varying in their interpretations of the access-control language and ultimately making real the possibility of security breaches (e.g. access granted to unauthorized subjects). 
+We have also studied \ac{ACCPL} in terms of Tschantz and Krishnamurthi's~\cite{Tschantz} reasonability properties which make policy languages more amenable to reasoning and concluded that, since \ac{ACCPL} supported these properties, \ac{ACCPL} was significantly more amenable to analysis and reasoning than other access-control policy languages. 
 
-In the following sections we will review related work and approaches to define semantics for \ac{pbac} based languages such that one can determine without any ambiguity whether a permission or prohibition follows from a set of policy statements.
- 
-\section{Lithium}
-Halpern and Weissman~\cite{Halpern2008} use \ac{fol} to represent and reason about policies; policies describes the conditions under which a request to perform an action, such as reading a file, is granted or denied. They restrict \ac{fol} to get tractability for answering the query of whether a request to access a resource may be granted or denied, given a policy, and argue that despite the tractability results their language is still expressive. They contrast their approach with approaches based on Datalog~\cite{datalog} and point out that Datalog based work is made tractable by restricting function symbols and negation but at the cost of losing some expressive power. For example, Datalog based languages cannot distinguish between rendering explicitly forbidden decisions vs unregulated ones.
-
-Halpern and Weissman~\cite{Halpern2008} focus on satisfying three requirements in the design of Lithium:
-\begin{quote}
-\begin{enumerate}
-  \item It must be expressive enough to capture in an easy and natural way the policies that people want to discuss.
-  \item It must be tractable enough to allow interesting queries about policies to be answered efficiently.
-  \item It must be usable by non-experts, because we cannot expect policymakers and administrators to be well-versed in logic or programming languages.
-\end{enumerate}
-\end{quote}
-We note although \ac{ACCPL} may be a good candidate to satisfy Halpern and Weissman's first goal, this was not a primary goal for \ac{ACCPL}. \ac{ACCPL} was designed as a core policy language with certified semantics such that it could be extended in various ways to add expressiveness as long as the semantics would remain certified with respect to various results established for \ac{ACCPL} (e.g. decidability results).  
-
-As far as the Halpern and Weissman's second goal, we note that for \ac{ACCPL} tractability of answering an access query was not a goal; instead \ac{ACCPL} focused on achieving decidability results with respect to answering the access query. The third requirement Lithium was designed to satisfy, namely the usability of the language for non-experts was simply not a goal for \ac{ACCPL}. 
-
-\section{Trace-based Semantics}
-Gunter, et al~\cite{GunterWW01} propose an abstract model and a formal language to express access and usage rights for digital assets. A set of ``realities'' representing a sequence of \emph{payment} and \emph{render} (e.g. work is rendered by a device) actions make up a license. Semantics in the authors' model are expressed as a function mapping terms of the language to elements of the domain of licenses. The authors argue that their semantics is similar to those used for concurrency where language constructs are modelled as traces of allowed events.
-
-Xiang, et al~\cite{xiang2008formal} use \ac{ots} modeling to describe licenses to use digital assets. In this formalism licenses and \ac{drm} systems are modeled as \ac{ots}s, described in CafeOBJ~\cite{cafeobj} which is an algebraic specification language. The authors' approach not only models static properties of licenses, dynamic evolutions or traces of licenses can also be observed and denoted by the actions in \ac{ots}s, respectively. Finally, formal verification of licenses expressed in CafeOBJ may be performed using a theorem proving facility which provides an integrated platform for the formal modeling, specification, and verification of licenses and \ac{drm} systems. This feature enables one to analyze and prove the licenses as well as \ac{drm} systems in a more effective way.
-
-\section{Semantics Based on Linear Logic}
-
-Barth and Mitchell~\cite{BarthM06} express semantics of digital rights using propositional linear logic. Linear logic deals with dynamic properties or finite resources, while classical logic deals with stable truths, or static properties~\cite{Girard87}. According to Girard as cited by Lincoln~\cite{Lincoln}, ``Linear logic is a resource conscious logic''. Bart and Mitchell introduce the notion of monotonicity which captures the idea that acquiring extra rights by a user should not lead to the user having fewer rights and show that the algorithm the \ac{oma} uses for assigning actions to rights is non-monotonic. Barth and Mitchell consider whether a sequence of actions complies with a license and show that answering this question for the \ac{oma} language is NP-complete. They propose an algorithm based on propositional linear logic to evaluate sequences of actions that is monotonic.
-
-\section{Automata-based Semantics}
-Holzer, et al~\cite{Holzer} give a semantics for \ac{odrl} that models the actions that are allowed according to a contract or an agreement. This model is presented in terms of automata. Each trace through the automaton represents a valid sequence of actions for each participant. The states of the automaton encode the state of the license at each point in time, meaning, which actions are allowed at what point considering the action that have taken place in the past. \ac{odrl} requirements and constraints are modeled as labels that are associated with edges in the automaton: an edge can only be taken if the related requirement is satisfied. 
-
-Sheppard and Safavi-Naini~\cite{SheppardS09} point out that Holzer et al, don't present an algorithm in~\cite{Holzer} for building their automaton, leading to the conclusion that the examples in their paper are constructed by hand.
-
-\section{Operational Semantics Based}
-Sheppard and Safavi-Naini~\cite{SheppardS09} propose an operational model for both formalizing and enforcing digital rights using a \emph{right expression compiler}. They use their model to develop operational semantics for \ac{oma}, from which an interpreter could be derived. The authors argue their semantics provide for 
-\begin{quote}
-\begin{itemize}
-  \item Actions whose effects are neither instantaneous nor fallible.
-  \item Constraints whose satisfaction changes over time.
-  \item Constraints that modify the form of an action rather than permit or prohibit it outright. The quality and watermark constraintsof \ac{odrl}, for example, modify an action by altering the resolution of the output and inserting a watermark, respectively.
-\end{itemize}
-\end{quote}
-
-
-To show that an \ac{pbac} systems actually behaves correctly with respect to its specification, proofs are needed, however the proofs that are often presented in the literature (e.g.~\cite{Halpern2008, pucella2006, Tschantz}), are hard or impossible to formally verify. The verification difficulty is partly due to the fact that the language used to do the proofs while mathematical in nature, utilizes intuitive justifications to derive the proofs. Intuitive language in proofs means that the proofs could be incomplete and/or contain subtle errors. 
-
-\section{Conflict Detection Algorithms}
-
-In the following we will review some related work to ours where the authors have used the Coq Proof Assistant to develop conflict detection algorithms (for policies in particular \ac{pbac} languages), to state theorems and specifications about the behaviour of their algorithms, to develop formal proofs of those theorems and finally to machine-check those proofs. The resulting proofs are certified, meaning they provide strong correctness guarantees, due to the fact that they are machine-checked.
-
-Capretta et al~\cite{CaprettaSFM07} present an conflict detection algorithm for the Cisco firewall specification~\cite{ciscofirewall} and formalize a correctness proof for it in the Coq proof assistant. They define two rules being in conflict as, given a access request, one rule would allow access while the another rule would deny access. The authors present their algorithm in Coq's functional programming language along with access rules and requests which are also encoded in Coq. An OCaml version of
-the algorithm is extracted and successfully used on actual firewall specifications. The extracted program, according to the authors, can detect conflicts in firewalls with hundreds of thousands of rules. Capretta et al also prove in~\cite{CaprettaSFM07} that their algorithm finds all conflicts and only the correct conflicts in a set of rules. The algorithm is therefore verified formally to be both sound and complete.
-
-St-Martin and Felty~\cite{Stmartin} represent policies for a fragment of \ac{xacml} 2.0 in the Coq proof assistant and propose an algorithm for detecting conflicts in \ac{xacml} policies. They state and prove correctness of their algorithm in the Coq proof assistant. Their \ac{xacml} subset includes some complex conditions such as time constraints. The authors compare their work with the conflict detection presented in~\cite{CaprettaSFM07} and conclude that conflict detection in \ac{xacml} is more complex and results in having to consider many cases including many subtle corner cases. 
-
-St-Martin and Felty's definition of a conflict is the usual one and is similar to the one defined in~\cite{CaprettaSFM07} for firewall rules: when one rule in a policy permits a request and another denies the same request. Since \ac{xacml} allows conflicts by design, rule-combining is also provided. A rule-combining algorithm is meant to resolve conflicts if more than one rule applies. For example, one strategy (or algorithm) for resolving conflicts would be to use the first applicable rule that applies. Policy writers often make use of rule-combining algorithms, but unintended errors such as of conflicts are common.St-Martin and Felty's conflict detection algorithm provides a tool for static analysis and policy debugging and it finds all conflicts, whether intended or not. Policy maintainers may then use the results of running the algorithm on their policies to decide which errors or conflicts were intended and which were not.
-
-
-NOW CLOSE WITH YOUR WORK
-
-
-GO OVER MY CONCLUSIONS/CONTRIBUTIONS AGAIN
-
-
+In this thesis, we described why certain design choices were made and how they contributed to the ease of reasoning for \ac{ACCPL}. Admittedly some expressive power present in other access-control policy languages, were omitted from \ac{ACCPL} in order to achieve the reported correctness proofs. For example, in \ac{ACCPL} we only support base policy sets (policy sets that are not composed of other policy sets) i.e. no combining of base policy sets using conjunctions or other combining operators are supported in \ac{ACCPL}. Such omitted features and/or other extensions could be added to \ac{ACCPL} provided the proofs for the stated theorems could still be derived. 
+The translation function framework we have developed for \ac{ACCPL} is meant to be used by policy language designers to keep the delicate balance between adding in expressiveness while keeping the theorems provable. This is an instance of an important lesson we learned while developing \ac{ACCPL}: the process of designing a certifiable policy language cannot be done in isolation since while certifiability of the language derives the design one way, expressiveness requirements of the language usually drive it in the opposite direction. Certifiability cannot be a post-design activity as the changes it will impose are often fundamental ones.
 
 
 
