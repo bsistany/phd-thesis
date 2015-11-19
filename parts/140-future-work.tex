@@ -148,23 +148,16 @@ As a next step for future work on \ac{selinux}, we will add constraint relations
 
 \section{Related Work}
 
-Policies in some \ac{pbac} based languages such as \ac{xacml} and \ac{odrl} are expressed in \ac{xml}. Authors of~\cite{surveyXML} do a survey of XML-based access control languages describing and comparing the following languages and systems: Author-X, FASTER, \ac{odrl}, \ac{xrml}, \ac{xacl}, \ac{saml}, \ac{xacml} and the language designed by the authors called \ac{spl}. Other examples are WS-Policy, \ac{wsdl} and \ac{wspl} reviewed in~\cite{ArdagnaDVS04}.
+Policies in some \ac{pbac} languages such as \ac{xacml} and \ac{odrl} are expressed in \ac{xml}. Authors of~\cite{surveyXML} do a survey of XML-based access control languages describing and comparing the following languages and systems: Author-X, FASTER, \ac{odrl}, \ac{xrml}, \ac{xacl}, \ac{saml}, \ac{xacml} and the language designed by the authors called \ac{spl}. Other examples are WS-Policy, \ac{wsdl} and \ac{wspl} reviewed in~\cite{ArdagnaDVS04}.
 
 Authors of~\cite{ArdagnaDVS04} argue that \ac{xml}-based \ac{pbac} systems are well suitable for the Internet context where simplicity and easy integration with existing technology and tools must be ensured. \ac{xml}-based languages are also well suited for the easy interchange of policies~\cite{ArdagnaDVS04}. 
 
-Access rules along with conditions under which access is granted or denied in such languages are expressed in a declarative manner using fragments of a natural language like English, resulting in ambiguity with regards to the intended behaviour of the system encoded in these access rules. The ambiguity in semantics of these languages may lead to implementations varying in their interpretations of the access-control language and ultimately making real the possibility of security breaches (e.g. access granted to unauthorized subjects). 
+While policies in \ac{xml}-based languages are expressed using \ac{xml}, the meaning of the policy statements in such languages are expressed using fragments of a natural language like English, resulting in ambiguity with regards to the intended behaviour of the system encoded in these policy statements. The ambiguity in semantics of these languages may lead to implementations varying in their interpretations of the access-control language and ultimately making real the possibility of security breaches (e.g. access granted to unauthorized subjects). 
 
-SO WE NEED SEMANTICS. NOW TALK ABOUT FORMAL SEMANTICS: HOW THIS IS DONE. OPERATIONAL, WEB ONTOLOGY, AND LOGIC.
-
-Trace based: Gunter and Xiang
-Logic based:
-  datalog based: According to Garcia-Molina et al (as cited in Halpern and Weissman),  ?. 
-  The policy languages that are perhaps closest in spirit to Lithium are the approaches that are based on some variant of Datalog. Examples of such languages include Delegation Logic [Li et al. 2003], the RT (Role-based Trust-management) framework [Li et al. 2002], Binder [DeTreville 2002], SD3 [Jim 2001], FAF (Flexible Authorization Framework) [Jajodia et al. 2001], and Cassandra [Becker and Sewell 2004]). Datalog is an efficient well-understood reasoning engine that is restricted to function-free negation-free Horn clauses; these restrictions are made to ensure tractability. The variants, such as safe stratified Datalog [Garcia-Molina et al. 2002] or Datalog with constraints, allow limited use of functions and negation while preserving tractability.
-  
- Halpern, Weissman, Pucella : Lithium
+In the following sections we will review related work and approaches to define semantics for \ac{pbac} based languages such that one can determine without any ambiguity whether a permission or prohibition follows from a set of policy statements.
  
- \section{Lithium}
-Halpern and Weissman~\cite{Halpern2008} use \ac{fol} to represent and reason about policies. They restrict \ac{fol} to get tractability for answering the query of whether a request to access a resource may be granted or denied, given a policy and argue that despite the tractability results their language is still expressive. They contrast their approach with approaches based on Datalog~\cite{datalog} and point out that Datalog based work is made tractable by restricting function symbols and negation but at the cost of losing some expressive power. For example, Datalog based languages cannot distinguish between rendering explicit forbidden decisions vs unregulated ones.
+\section{Lithium}
+Halpern and Weissman~\cite{Halpern2008} use \ac{fol} to represent and reason about policies; policies describes the conditions under which a request to perform an action, such as reading a file, is granted or denied. They restrict \ac{fol} to get tractability for answering the query of whether a request to access a resource may be granted or denied, given a policy, and argue that despite the tractability results their language is still expressive. They contrast their approach with approaches based on Datalog~\cite{datalog} and point out that Datalog based work is made tractable by restricting function symbols and negation but at the cost of losing some expressive power. For example, Datalog based languages cannot distinguish between rendering explicitly forbidden decisions vs unregulated ones.
 
 Halpern and Weissman~\cite{Halpern2008} focus on satisfying three requirements in the design of Lithium:
 \begin{quote}
@@ -174,23 +167,25 @@ Halpern and Weissman~\cite{Halpern2008} focus on satisfying three requirements i
   \item It must be usable by non-experts, because we cannot expect policymakers and administrators to be well-versed in logic or programming languages.
 \end{enumerate}
 \end{quote}
- We note that \ac{ACCPL} is a good candidate to satisfy Halpern and Weissman's first goal although we have not undertaken a study similar to the one the authors have done where they have studied real-life policies written in natural language and determined that those same policies could be written in Lithium. As far as the authors' second goal, we note that for \ac{ACCPL} tractability of answering an access query was not a goal; instead \ac{ACCPL} focused on achieving decidability results with respect to answering the access query. The third requirement Lithium was designed to satisfy, namely the usability of the language for non-experts was simply not a goal for \ac{ACCPL}. 
+We note although \ac{ACCPL} may be a good candidate to satisfy Halpern and Weissman's first goal, this was not a primary goal for \ac{ACCPL}. \ac{ACCPL} was designed as a core policy language with certified semantics such that it could be extended in various ways to add expressiveness as long as the semantics would remain certified with respect to various results established for \ac{ACCPL} (e.g. decidability results).  
 
-\section{Trace-based}
-Gunter, et al~\cite{GunterWW01} propose an abstract model and a formal language to express access and usage rights. A set of ``realities'' representing a sequence of \emph{payment} and \emph{render} (e.g. work is rendered by a device) actions make up a license. Semantics in the authors' model are expressed as a function mapping terms of the language to elements of the domain of licenses. The authors argue that their semantics is similar to those used for concurrency where language constructs are modelled as traces of allowed events.
+As far as the Halpern and Weissman's second goal, we note that for \ac{ACCPL} tractability of answering an access query was not a goal; instead \ac{ACCPL} focused on achieving decidability results with respect to answering the access query. The third requirement Lithium was designed to satisfy, namely the usability of the language for non-experts was simply not a goal for \ac{ACCPL}. 
+
+\section{Trace-based Semantics}
+Gunter, et al~\cite{GunterWW01} propose an abstract model and a formal language to express access and usage rights for digital assets. A set of ``realities'' representing a sequence of \emph{payment} and \emph{render} (e.g. work is rendered by a device) actions make up a license. Semantics in the authors' model are expressed as a function mapping terms of the language to elements of the domain of licenses. The authors argue that their semantics is similar to those used for concurrency where language constructs are modelled as traces of allowed events.
 
 Xiang, et al~\cite{xiang2008formal} use \ac{ots} modeling to describe licenses to use digital assets. In this formalism licenses and \ac{drm} systems are modeled as \ac{ots}s, described in CafeOBJ~\cite{cafeobj} which is an algebraic specification language. The authors' approach not only models static properties of licenses, dynamic evolutions or traces of licenses can also be observed and denoted by the actions in \ac{ots}s, respectively. Finally, formal verification of licenses expressed in CafeOBJ may be performed using a theorem proving facility which provides an integrated platform for the formal modeling, specification, and verification of licenses and \ac{drm} systems. This feature enables one to analyze and prove the licenses as well as \ac{drm} systems in a more effective way.
 
-\section{Linear Logic}
+\section{Semantics Based on Linear Logic}
 
 Barth and Mitchell~\cite{BarthM06} express semantics of digital rights using propositional linear logic. Linear logic deals with dynamic properties or finite resources, while classical logic deals with stable truths, or static properties~\cite{Girard87}. According to Girard as cited by Lincoln~\cite{Lincoln}, ``Linear logic is a resource conscious logic''. Bart and Mitchell introduce the notion of monotonicity which captures the idea that acquiring extra rights by a user should not lead to the user having fewer rights and show that the algorithm the \ac{oma} uses for assigning actions to rights is non-monotonic. Barth and Mitchell consider whether a sequence of actions complies with a license and show that answering this question for the \ac{oma} language is NP-complete. They propose an algorithm based on propositional linear logic to evaluate sequences of actions that is monotonic.
 
 \section{Automata-based Semantics}
-Holzer, et al~\cite{HolzerKS04} give a semantics for \ac{odrl} that models the actions that are allowed according to a contract or agreement. This model is presented in terms of automata. Each trace through the automaton represents a valid sequence of actions for each participant. The states of the automaton encode the state of the license at each point in time, meaning, which actions are allowed at what point considering the action that have taken place in the past. \ac{odrl} requirements and constraints are modeled as labels that are associated with edges in the automaton: an edge can only be taken if the requirement is satisfied. 
+Holzer, et al~\cite{Holzer} give a semantics for \ac{odrl} that models the actions that are allowed according to a contract or an agreement. This model is presented in terms of automata. Each trace through the automaton represents a valid sequence of actions for each participant. The states of the automaton encode the state of the license at each point in time, meaning, which actions are allowed at what point considering the action that have taken place in the past. \ac{odrl} requirements and constraints are modeled as labels that are associated with edges in the automaton: an edge can only be taken if the related requirement is satisfied. 
 
-Sheppard and Safavi-Naini~\cite{SheppardS09} point out that Holzer et al, don't present an algorithm in~\cite{HolzerKS04} for building their automaton, leading to the conclusion that the examples in their paper are constructed by hand.
+Sheppard and Safavi-Naini~\cite{SheppardS09} point out that Holzer et al, don't present an algorithm in~\cite{Holzer} for building their automaton, leading to the conclusion that the examples in their paper are constructed by hand.
 
-\section{Operational semantics based}
+\section{Operational Semantics Based}
 Sheppard and Safavi-Naini~\cite{SheppardS09} propose an operational model for both formalizing and enforcing digital rights using a \emph{right expression compiler}. They use their model to develop operational semantics for \ac{oma}, from which an interpreter could be derived. The authors argue their semantics provide for 
 \begin{quote}
 \begin{itemize}
@@ -200,52 +195,20 @@ Sheppard and Safavi-Naini~\cite{SheppardS09} propose an operational model for bo
 \end{itemize}
 \end{quote}
 
+
+To show that an \ac{pbac} systems actually behaves correctly with respect to its specification, proofs are needed, however the proofs that are often presented in the literature (e.g.~\cite{Halpern2008, pucella2006, Tschantz}), are hard or impossible to formally verify. The verification difficulty is partly due to the fact that the language used to do the proofs while mathematical in nature, utilizes intuitive justifications to derive the proofs. Intuitive language in proofs means that the proofs could be incomplete and/or contain subtle errors. 
+
 \section{Conflict Detection Algorithms}
+
+In the following we will review some related work to ours where the authors have used the Coq Proof Assistant to develop conflict detection algorithms (for policies in particular \ac{pbac} languages), to state theorems and specifications about the behaviour of their algorithms, to develop formal proofs of those theorems and finally to machine-check those proofs. The resulting proofs are certified, meaning they provide strong correctness guarantees, due to the fact that they are machine-checked.
+
 Capretta et al~\cite{CaprettaSFM07} present an conflict detection algorithm for the Cisco firewall specification~\cite{ciscofirewall} and formalize a correctness proof for it in the Coq proof assistant. They define two rules being in conflict as, given a access request, one rule would allow access while the another rule would deny access. The authors present their algorithm in Coq's functional programming language along with access rules and requests which are also encoded in Coq. An OCaml version of
 the algorithm is extracted and successfully used on actual firewall specifications. The extracted program, according to the authors, can detect conflicts in firewalls with hundreds of thousands of rules. Capretta et al also prove in~\cite{CaprettaSFM07} that their algorithm finds all conflicts and only the correct conflicts in a set of rules. The algorithm is therefore verified formally to be both sound and complete.
 
 St-Martin and Felty~\cite{Stmartin} represent policies for a fragment of \ac{xacml} 2.0 in the Coq proof assistant and propose an algorithm for detecting conflicts in \ac{xacml} policies. They state and prove correctness of their algorithm in the Coq proof assistant. Their \ac{xacml} subset includes some complex conditions such as time constraints. The authors compare their work with the conflict detection presented in~\cite{CaprettaSFM07} and conclude that conflict detection in \ac{xacml} is more complex and results in having to consider many cases including many subtle corner cases. 
 
-St-Martin and Felty's definition of a conflict is the usual one and is similar to the one defined in~\cite{CaprettaSFM07} for firewall rules: when one rule in a policy permits a request and another denies the same request. Since \ac{xacml} allows conflicts by design, rule-combining is also provided. A rule-combining algorithm is meant to resolve conflicts if more than one rule applies. For example, one strategy (or algorithm) for resolving conflicts would be to use the first applicable rule that applies. Policy writers often make use of rule-combining algorithms, but unintended errors such as of conflicts are common.St-Martin and Felty's conflict detection algorithm provides a tool for static analysis and policy debugging and it finds all conflicts, whether intended or not. Policy maintainers may then use the results of the running the algorithm on their policies to decide which errors or conflicts were intended and which were not.
+St-Martin and Felty's definition of a conflict is the usual one and is similar to the one defined in~\cite{CaprettaSFM07} for firewall rules: when one rule in a policy permits a request and another denies the same request. Since \ac{xacml} allows conflicts by design, rule-combining is also provided. A rule-combining algorithm is meant to resolve conflicts if more than one rule applies. For example, one strategy (or algorithm) for resolving conflicts would be to use the first applicable rule that applies. Policy writers often make use of rule-combining algorithms, but unintended errors such as of conflicts are common.St-Martin and Felty's conflict detection algorithm provides a tool for static analysis and policy debugging and it finds all conflicts, whether intended or not. Policy maintainers may then use the results of running the algorithm on their policies to decide which errors or conflicts were intended and which were not.
 
-
-
-
-\section{MENTION MORE XML based languages HERE}
-
-\subsection{ODRL}
-
-\ac{odrl} is a declarative XML based \ac{rel} which has been accepted as part of the W3C community with the mandate of standardizing how rights and policies, related to the usage of digital content on the Open Web Platform, OWP~\cite{openwebplatform}, are expressed. \ac{odrl} is also used to express the conditions under which users' rights may be exercised. \ac{odrl} 2.0 supports expression of rights and also privacy rules for social media while \ac{odrl} 1.0 was only dealing with the mobile ecosystem. 
-
-\subsection{xrml}
-\ac{xrml} is another popular declarative XML based language used for writing software licenses~\cite{HalpernW08}. \ac{xrml} has been selected by the Moving Picture Experts Group (MPEG) to be the \ac{rel} for MPEG-21 which is an ISO standard for multimedia applications. First released in 2000, \ac{xrml} received the support of many technology providers, content owners, distributors, and retailers with some agreeing to build products and/or services that are \ac{xrml} compliant~\cite{HalpernW08}.
-
-\subsection{xacml}
-A widely used \ac{pbac} based XML based language is \ac{xacml}, an OASIS standard. \ac{xacml} defines a language for expression of policies and access requests, and a workflow to achieve policy enforcement~\cite{DBLP:conf/essos/MasiPT12}. \ac{xacml} also defines a standard format to be used to transport policies
-between disparate access control systems~\cite{ArdagnaDVS04}.
-
-\subsection{WS-Policy}
-WS-Policy is a XML based specification which has been accepted as part of the W3C community since September 2007. WS-Policy is used to describe policies for Web services on security, trust, quality, etc and for Web service clients to advertise their policy requirements~\cite{wspolicy}.
-According to~\cite{wspolicy} WS-Policy's scope is limited to allowing endpoints to specify requirements and capabilities needed for establishing a connection, therefore WS-Policy is not a language for expressing complex and application specific policies that take effect after the connection is established. WS-Policy uses a simple and extensible grammar for expressing policies which are composed of assertions and alternatives~\cite{wspolicy}. Assertions are requirements to be met by the policy's consumers (client Web services) and alternatives are mutually exclusive assertions. 
-
-\section{MENTION SOME languages that have FORMAL semantics}
-
-Whether a \ac{pbac} based language is based on \ac{xml} or not, formal specification of how an access-control mechanism should behave, is typically given in some sort of logic, often a subset of first order logic. 
-
-odrl has formal semantics that are based on logic: Lithium based leading to Pucella's fragment
-xrml has formal semantics that are based on logic: Lithium based.
-
-xacml: 
-Formalisation and Implementation of the XACML Access Control Mechanism
-Core Xacml is "Towards Reasonability Properties for Access-Control Policy Languages"
-
-WS-Policy:
-Representing Web Service Policies in OWL-DL
-
-To show that an access-control system actually behaves correctly with respect to its specification, proofs are needed, however the proofs that are often presented in the literature are hard or impossible to formally verify. The verification difficulty is partly due to the fact that the language used to do the proofs while mathematical in nature, utilizes intuitive justifications to derive the proofs. Intuitive language in proofs means that the proofs could be incomplete and/or contain subtle errors. SHOW SOME RELATED WORK (pucella) that have proofs but the proofs cannot be formally verified.
-
-
-NOW bring in AMY's WORKS...
 
 NOW CLOSE WITH YOUR WORK
 
