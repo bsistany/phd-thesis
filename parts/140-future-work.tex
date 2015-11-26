@@ -9,22 +9,35 @@ In this thesis, we presented the design and implementation of \ac{ACCPL} as a mi
 
 We have also studied \ac{ACCPL} in terms of Tschantz and Krishnamurthi's~\cite{Tschantz} reasonability properties which make policy languages more amenable to reasoning and concluded that, since \ac{ACCPL} supported these properties, \ac{ACCPL} was significantly more amenable to analysis and reasoning than other access-control policy languages. 
 
-We additionally described why certain design choices were made and how they contributed to the ease of reasoning for \ac{ACCPL}. Admittedly some expressive power present in other access-control policy languages, were omitted from \ac{ACCPL} in order to achieve the reported correctness proofs. For example, in \ac{ACCPL} we only support base policy sets (policy sets that are not composed of other policy sets) i.e. no combining of base policy sets using conjunctions or other combining operators are supported in \ac{ACCPL}. Such omitted features and/or other extensions could be added to \ac{ACCPL} provided the proofs for the stated theorems could still be derived. 
-The translation function framework we have developed for \ac{ACCPL} is meant to be used by policy language designers to keep the delicate balance between adding in expressiveness while keeping the theorems provable. This is an instance of an important lesson we learned while developing \ac{ACCPL}: the process of designing a certifiable policy language cannot be done in isolation since while certifiability of the language derives the design one way, expressiveness requirements of the language usually drive it in the opposite direction. Certifiability cannot be a post-design activity as the changes it will impose are often fundamental ones.
+We additionally described why certain design choices were made and how they contributed to the ease of reasoning for \ac{ACCPL}. Admittedly some expressive power present in other access-control policy languages, were omitted from \ac{ACCPL} in order to achieve the reported correctness proofs. For example, in \ac{ACCPL} we only support base policy sets (policy sets that are not composed of other policy sets) i.e. no combining of base policy sets using conjunctions or other combining operators are supported in \ac{ACCPL}.  
 
 
 \section{Future Work}
 
-\ac{ACCPL} was also designed as a target language for deploying policies written in other languages. We could capture, implement and study the semantics of these other policy-based access-control using the \ac{ACCPL} translation function framework and ultimately certify the semantics of those languages with respect to their specifications the same way \ac{ACCPL} has been certified.
+There are a number of directions that can be taken as future work. In the following we list three distinct directions that could be combined at various stages.
 
-While \ac{xacml} is a high-level and platform independent access control system, \ac{selinux} is platform dependent (e.g. Linux based) and low-level. \ac{selinux} enhances the \ac{DAC} that most unix based systems employ by \ac{MAC} where designed access control policies are applied throughout the system possibly overriding whatever \ac{DAC} is in place by the system users. 
+ 
+\subsection{Reasonability Properties}\label{subsec:reasonprop}
+
+In chapter~\ref{chap:landscapechap} we presented a set of properties to analyze the behaviour of policies in light of additional and/or explicit environmental facts and policy growth and decomposition~\cite{Tschantz}. We conjectured that \ac{ACCPL} is deterministic, total, safe, has independent composition property and supports a monotonic policy combinator. However, we have not represented these definitions in Coq for \ac{ACCPL}, nor have we proved \ac{ACCPL} having these properties, as we claim. We defer proving these properties for \ac{ACCPL} as future work.  
+
+\subsection{Additional Expressibility}
+
+A direction for future work is to explore different ways \ac{ACCPL} could be made more expressible. For example, we can add various policy combinators and their semantics to \ac{ACCPL} using the translation function framework. The translation function framework we have developed for \ac{ACCPL} is meant to keep the delicate balance between addition of expressiveness while maintaining provability of current and future results (e.g. decidability and results mentioned in~\ref{subsec:reasonprop} respectively).
+
+This future work direction embodies an important lesson we learned while developing \ac{ACCPL}: the process of designing a certifiable policy language cannot be done in isolation since while certifiability of the language derives the design one way, expressiveness requirements of the language usually drive it in the opposite direction. Certifiability cannot be a post-design activity as the changes it will impose are often fundamental ones.
+
+\subsection{Certifying other PBAC Systems}
+A design goal for \ac{ACCPL} was to make it a target language for deploying policies written in other languages. We could capture, implement and study the semantics of these other policy-based access-control systems using the \ac{ACCPL} translation function framework and ultimately certify the semantics of those languages with respect to their specifications the same way \ac{ACCPL} has been certified. For example, we can take another \ac{pbac} system such as \ac{xrml} and \ac{odrl}, implement them in Coq as additional (or modifications of) existing \ac{ACCPL} constructs, analyze and reason about them, etc. In the following we outline at a very high-level how one \ac{pbac} system in particular can be implemented in Coq using \ac{ACCPL}.
+
+While \ac{xacml} is a high-level and platform independent access control system, \ac{selinux}\\~\cite{selinux} is platform dependent (e.g. Linux based) and low-level. \ac{selinux} enhances the \ac{DAC} that most Unix based systems employ by \ac{MAC} where designed access control policies are applied throughout the system possibly overriding whatever \ac{DAC} is in place by the system users. 
 
 \ac{selinux} uses Linux's extended file attributes to attach a \emph{security context} to passive entities (e.g. files, directories, sockets) and also to each active entity, typically a Linux user space process. Security context is a data structure that is composed of a user, a role and a domain (or type). While users can map directly to ordinary user names they can also be defined separately. Roles are meant to group users and add flexibility when assigning permissions and are the basis for \ac{rbac} in \ac{selinux}. Finally domains or types are the basis for defining common access control requirements for both passive and active entities. 
 
 
 The enforcement of \ac{selinux} policies are performed by the \emph{security server}. Whenever a security operation is requested from the Linux kernel by a program running in user space, the security server is invoked to arbitrate the operation and either allow the operation or to deny it. Each operation is identified by two pieces of information: an object class (e.g. file) and a permission (e.g. read, write). When an operation is requested to be performed on an object, the class and the permissions associated with the object along with security contexts of the source (typically the source entity is a process) and the object are passed to the security server. The security server consults the loaded policy (loaded at boot time) and allows or denies the access request~\cite{Sarna}.
 
-\section{SELinux Policy Language}
+%\section{SELinux Policy Language}
 
 The \ac{selinux} policy has four different kinds of statements: declarations, rules, constraints and assertions~\cite{ArcherLP03}. Assertions are compile time checks that the \syn{checkpolicy} tool performs at compile time. The other three kinds of statements however are evaluated at run-time. 
 
@@ -76,7 +89,7 @@ Constraints are additional conditions on permissions in the form of boolean expr
 \end{lstlisting}
 %\end{minipage}
 
-\section{Agreements in SELinux}
+%\section{Agreements in SELinux}
 
 We will start by limiting the \ac{selinux} policy language to only allow AV rules. As mentioned earlier an operation not covered by an allow rule is denied by default in \ac{selinux} proper. We will make up explicit deny rules, such that an agreement is defined to be a combination of allow and deny rules. Allow and deny rules as mappings are defined in listing~\ref{lst:allowmappingastselinux}.
 
@@ -91,11 +104,11 @@ AV rule : $T \times (T \times C) \rightarrow 2^{P}$
 \end{lstlisting}
 
 
-\section{Environments}
+%\section{Environments}
 
 Environments are collections of \emph{role-type} and \emph{user-role} relations. A role-type relation \syn{role(R, T)} simply associates a role with a type. A user-role relation \syn{user(U, R)} associates a user with a role. An environment is consistent with respect to a security context \syn{<T, R, U>}, if and only if \syn{role(R, T)} and \syn{user(U, R)} relations hold in the environment. 
 
-\section{Queries in SELinux}
+%\section{Queries in SELinux}
 
 The decision problem in \ac{selinux} access control is whether an entity with security context \syn{<T1, R1, U1>} may perform action \syn{P1} to entity with object class \syn{C1} with security context \syn{<T2, R2, U2>}.
 
@@ -115,21 +128,12 @@ $deny (T1, T2, C, P)$ $\lor$ $\lnot (E$ $consistent$ $wrt$ <T1, R1, U1> $\land$ 
 
 \end{lstlisting}
 
-\section{Decidability of Queries in SELinux}
+%\section{Decidability of Queries in SELinux}
 
-As future work, we will be investigating the question of decidability for answering queries given an \ac{selinux} policy. We will first state a decidability theorem similar to the theorem in listing~\ref{lst:agreementdecidablecoq} (minor adjustments may be needed to allow for differences with \ac{selinux} policy language) and present a proof for it in Coq. Most policy based access-control languages typically use a two-valued decision set to indicate whether an access request is granted or denied. The literature for the \ac{selinux} implies only these two outcomes are possible so initially we will attempt to prove this conjecture in Coq. 
-
-As a next step for future work on \ac{selinux}, we will add constraint relations to our simplified \ac{selinux} policy language and prove the decidability results stand for the augmented policy language.
-
+Most policy based access-control languages use a two-valued decision set to indicate whether an access request is granted or denied. The literature for \ac{selinux} implies only these two outcomes are possible as well, however formally proving this conjecture in Coq would be an important future work to undertake. Investigating the question of decidability for answering queries given an \ac{selinux} policy would be another important and interesting future work, since as far as we know such results have not been formally proven elsewhere. 
 
 
 %----------------------------------------------------------------------
-
-\section{Reasonability Properties}
-
-% determinism and total
-In this chapter we have conjectured that \ac{ACCPL} is deterministic, total, safe, has independent composition property and supports a monotonic policy combinator. However, we have not represented these definitions in Coq for \ac{ACCPL}, nor have we proved \ac{ACCPL} having these properties, as we claim. We defer proving these properties for \ac{ACCPL} as future work.  
-
 
 
 
