@@ -1,12 +1,21 @@
 %======================================================================
-\chapter{Future Work and Conclusion}
+\chapter{Conclusions and Future Work}
 %======================================================================
 
 %----------------------------------------------------------------------
- 
-We have designed \ac{ACCPL} as a suitable core policy language for \ac{pbac} systems that can be used for expressing general access-control expressions and also as a target language for deploying policies written in other languages. We could capture, implement and study the semantics of these other policy-based access-control using the \ac{ACCPL} translation function framework and ultimately certify the semantics of those languages with respect to their specifications the same way \ac{ACCPL} has been certified.
+\section{Conclusions}
 
-\section{SELinux}
+In this thesis, we presented the design and implementation of \ac{ACCPL} as a minimal and certified policy language. \ac{ACCPL} is a \ac{pbac} system that can be used to express general access-control rules and policies. In addition we have defined formal semantics for \ac{ACCPL} where we have discovered and added all possible cases when answering a query on whether to allow or deny an action to be performed on an asset. We have subsequently used the Coq Proof Assistant to state theorems about the expected behaviour of \ac{ACCPL} when evaluating a request with respect to a given policy, to develop proofs for those theorems and to machine-check the proofs ensuring correctness guarantees are provided. We have in particular stated, developed and proved a decidability result for \ac{ACCPL}. 
+
+We have also studied \ac{ACCPL} in terms of Tschantz and Krishnamurthi's~\cite{Tschantz} reasonability properties which make policy languages more amenable to reasoning and concluded that, since \ac{ACCPL} supported these properties, \ac{ACCPL} was significantly more amenable to analysis and reasoning than other access-control policy languages. 
+
+We additionally described why certain design choices were made and how they contributed to the ease of reasoning for \ac{ACCPL}. Admittedly some expressive power present in other access-control policy languages, were omitted from \ac{ACCPL} in order to achieve the reported correctness proofs. For example, in \ac{ACCPL} we only support base policy sets (policy sets that are not composed of other policy sets) i.e. no combining of base policy sets using conjunctions or other combining operators are supported in \ac{ACCPL}. Such omitted features and/or other extensions could be added to \ac{ACCPL} provided the proofs for the stated theorems could still be derived. 
+The translation function framework we have developed for \ac{ACCPL} is meant to be used by policy language designers to keep the delicate balance between adding in expressiveness while keeping the theorems provable. This is an instance of an important lesson we learned while developing \ac{ACCPL}: the process of designing a certifiable policy language cannot be done in isolation since while certifiability of the language derives the design one way, expressiveness requirements of the language usually drive it in the opposite direction. Certifiability cannot be a post-design activity as the changes it will impose are often fundamental ones.
+
+
+\section{Future Work}
+
+\ac{ACCPL} was also designed as a target language for deploying policies written in other languages. We could capture, implement and study the semantics of these other policy-based access-control using the \ac{ACCPL} translation function framework and ultimately certify the semantics of those languages with respect to their specifications the same way \ac{ACCPL} has been certified.
 
 While \ac{xacml} is a high-level and platform independent access control system, \ac{selinux} is platform dependent (e.g. Linux based) and low-level. \ac{selinux} enhances the \ac{DAC} that most unix based systems employ by \ac{MAC} where designed access control policies are applied throughout the system possibly overriding whatever \ac{DAC} is in place by the system users. 
 
@@ -19,7 +28,7 @@ The enforcement of \ac{selinux} policies are performed by the \emph{security ser
 
 The \ac{selinux} policy has four different kinds of statements: declarations, rules, constraints and assertions~\cite{ArcherLP03}. Assertions are compile time checks that the \syn{checkpolicy} tool performs at compile time. The other three kinds of statements however are evaluated at run-time. 
 
-Declaration statements are used to declare types, roles and users. Type declaration statements are used to introduce new types. Roles are declared and authorized for particular domains (types) through role declarations, and finally user declarations are used to define each user and to specify the set of authorized roles for each of these users (see~\ref{lst:declsselinux}). In the following listings we will present a simplified and modified version of the official \ac{selinux} syntax that accomadates better the use of the \ac{ACCPL} Coq framework.
+Declaration statements are used to declare types, roles and users. Type declaration statements are used to introduce new types. Roles are declared and authorized for particular domains (types) through role declarations, and finally user declarations are used to define each user and to specify the set of authorized roles for each of these users (see~\ref{lst:declsselinux}). In the following listings we will present a simplified and modified version of the official \ac{selinux} syntax that accommodates better the use of the \ac{ACCPL} Coq framework.
 
 \lstset{language=selinux}
 \begin{lstlisting}[frame=single, caption={Declaration Statements},label={lst:declsselinux}]
@@ -112,16 +121,18 @@ As future work, we will be investigating the question of decidability for answer
 
 As a next step for future work on \ac{selinux}, we will add constraint relations to our simplified \ac{selinux} policy language and prove the decidability results stand for the augmented policy language.
 
-\section{Conclusion}
+
 
 %----------------------------------------------------------------------
 
-In this thesis, we presented the design and implementation of \ac{ACCPL} as a minimal certified policy language. \ac{ACCPL} is a \ac{pbac} system that can be used to express general access-control rules and policies. In addition we have defined formal semantics for \ac{ACCPL} where we have discovered and added all possible cases when answering a query on whether to allow or deny an action to be performed on an asset. We have subsequently used the Coq Proof Assistant to state theorems about the expected behaviour of \ac{ACCPL} when evaluating a request with respect to a given policy, to develop proofs for those theorems and to machine-check the proofs ensuring correctness guarantees are provided. We have in particular stated, developed and proved a decidability result for \ac{ACCPL}. 
+\section{Reasonability Properties}
 
-We have also studied \ac{ACCPL} in terms of Tschantz and Krishnamurthi's~\cite{Tschantz} reasonability properties which make policy languages more amenable to reasoning and concluded that, since \ac{ACCPL} supported these properties, \ac{ACCPL} was significantly more amenable to analysis and reasoning than other access-control policy languages. 
+% determinism and total
+In this chapter we have conjectured that \ac{ACCPL} is deterministic, total, safe, has independent composition property and supports a monotonic policy combinator. However, we have not represented these definitions in Coq for \ac{ACCPL}, nor have we proved \ac{ACCPL} having these properties, as we claim. We defer proving these properties for \ac{ACCPL} as future work.  
 
-In this thesis, we described why certain design choices were made and how they contributed to the ease of reasoning for \ac{ACCPL}. Admittedly some expressive power present in other access-control policy languages, were omitted from \ac{ACCPL} in order to achieve the reported correctness proofs. For example, in \ac{ACCPL} we only support base policy sets (policy sets that are not composed of other policy sets) i.e. no combining of base policy sets using conjunctions or other combining operators are supported in \ac{ACCPL}. Such omitted features and/or other extensions could be added to \ac{ACCPL} provided the proofs for the stated theorems could still be derived. 
-The translation function framework we have developed for \ac{ACCPL} is meant to be used by policy language designers to keep the delicate balance between adding in expressiveness while keeping the theorems provable. This is an instance of an important lesson we learned while developing \ac{ACCPL}: the process of designing a certifiable policy language cannot be done in isolation since while certifiability of the language derives the design one way, expressiveness requirements of the language usually drive it in the opposite direction. Certifiability cannot be a post-design activity as the changes it will impose are often fundamental ones.
+
+
+
 
 
 

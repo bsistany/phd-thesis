@@ -125,13 +125,6 @@ We argue that \ac{ACCPL} has the independent composition property with respect t
 
 Tschantz and Krishnamurthi~\cite{Tschantz} discuss the notion of monotonicity of policy combinators. Intuitively, in a language with a policy combinator that is monotonic, adding another primitive policy, cannot change the combined decision to go from granting to non-granting. In \ac{ACCPL}, \syn{Unregulated} results are only possible if \syn{trans_prin} does not hold. Assume the combined (global) decision is already \syn{Permitted} for a certain agreement. In the case when \syn{trans_prin} does not hold, adding a primitive policy to the agreement will not change the \syn{Permitted} result to a \syn{NotPermitted} result, since a primitive policy is composed of a \syn{preRequisite} and an \syn{act} only. In the case where \syn{trans_prin} does hold, there are two cases. Either the \syn{preRequisite} of the added policy holds and the decision is another \syn{Permitted} result, or the \syn{preRequisite} of the added policy does not hold, and the decision is an \syn{Unregulated} which won't affect the combined decision.
 
-\section{Future Work}
-
-% determinism and total
-In this chapter we have conjectured that \ac{ACCPL} is deterministic, total, safe, has independent composition property and supports a monotonic policy combinator. However, we have not represented these definitions in Coq for \ac{ACCPL}, nor have we proved \ac{ACCPL} having these properties, as we claim. We defer proving these properties for \ac{ACCPL} as future work.  
-
-
-
 
 
 
