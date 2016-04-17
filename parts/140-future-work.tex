@@ -9,7 +9,7 @@ In this thesis, we presented the design and implementation of \ac{ACCPL} as a mi
 
 We have also studied \ac{ACCPL} in terms of Tschantz and Krishnamurthi's~\cite{Tschantz} reasonability properties which make policy languages more amenable to reasoning and concluded that, since \ac{ACCPL} supported these properties, \ac{ACCPL} was significantly more amenable to analysis and reasoning than other access-control policy languages. 
 
-We additionally described why certain design choices were made and how they contributed to the ease of reasoning for \ac{ACCPL}. Admittedly some expressive power present in other access-control policy languages, were omitted from \ac{ACCPL} in order to achieve the reported correctness proofs. For example, in \ac{ACCPL} we only support base policy sets (policy sets that are not composed of other policy sets) i.e. no combining of base policy sets using conjunctions or other combining operators are supported in \ac{ACCPL}.  
+We additionally described why certain design choices were made and how they contributed to the ease of reasoning for \ac{ACCPL}. Admittedly some expressive power present in other access-control policy languages, were omitted from \ac{ACCPL} in order to achieve the reported correctness proofs. For example, in \ac{ACCPL} we only support base policy sets (policy sets that are not composed of other policy sets) i.e. no combining of base policy sets using conjunctions or other combining operators are supported in \ac{ACCPL}. 
 
 
 \section{Future Work}
@@ -19,7 +19,7 @@ There are a number of directions that can be taken as future work. In the follow
  
 \subsection{Reasonability Properties}\label{subsec:reasonprop}
 
-In chapter~\ref{chap:landscapechap} we presented a set of properties to analyze the behaviour of policies in light of additional and/or explicit environmental facts and policy growth and decomposition~\cite{Tschantz}. We conjectured that \ac{ACCPL} is deterministic, total, safe, has independent composition property and supports a monotonic policy combinator. However, we have not represented these definitions in Coq for \ac{ACCPL}, nor have we proved \ac{ACCPL} having these properties, as we claim. We defer proving these properties for \ac{ACCPL} as future work.  
+In chapter~\ref{chap:landscapechap} we presented a set of properties to analyze the behaviour of policies in light of additional and/or explicit environmental facts and policy growth and decomposition~\cite{Tschantz}. We conjectured that \ac{ACCPL} is deterministic, total, safe, has independent composition property and supports a monotonic policy combinator. However, we have not represented these definitions in Coq for \ac{ACCPL}, nor have we proved \ac{ACCPL} having these properties, as we claim. We defer proving these properties for \ac{ACCPL} as future work. 
 
 \subsection{Additional Expressibility}
 

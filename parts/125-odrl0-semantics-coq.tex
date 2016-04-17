@@ -287,7 +287,7 @@ Definition process_single_pp_trans_policy_positive
           else
             (Single 
               (makeResult Unregulated x action_from_query a))
-               else (* prin /\ prq /\ ~prq' *)
+        else (* prin /\ prq /\ ~prq' *)
           (Single 
               (makeResult Unregulated x action_from_query a))
       end.
@@ -303,7 +303,7 @@ Definition trans_policy_positive
 \end{minipage}
 
 
-\syn{trans_policy_negative} acting on a single \syn{primPolicy} (see \syn{process_single_pp_trans_policy_negative} in listing~\ref{lst:transNegativeCoq}), first checks that there is a proof for the equality of \syn{action_from_query} and \syn{action} (the \syn{action} from the agreement) by calling the decision procedure \syn{eq_nat_dec}. If so, the translation function returns a result of \syn{NotPermitted}. Otherwise, a result of \syn{Unregulated} is returned. Note that compared to \syn{trans_policy_positive} we don't check for whether \syn{preRequisite} from the policy holds or not, since \syn{trans_policy_negative} is only called for policy sets of type \syn{primExclusivePolicySet}.
+\syn{trans_policy_negative} acting on a single \syn{primPolicy} (see \syn{process_single_pp_trans_policy_negative} in listing~\ref{lst:transNegativeCoq}), first checks that there is a proof for the equality of \syn{action_from_query} and \syn{action} (the \syn{action} from the agreement) by calling the decision procedure \syn{eq_nat_dec}. If so, the translation function returns a result of \syn{NotPermitted}. Otherwise, a result of \syn{Unregulated} is returned. Note that \syn{trans_policy_negative} is called from a context where \syn{trans_prin_dec} is not provable, which means that subject \syn{x}, is not in \syn{prin_u}. Also note that compared to \syn{trans_policy_positive} we don't check for whether \syn{preRequisite} from the policy holds or not, since \syn{trans_policy_negative} is only called for policy sets of type \syn{primExclusivePolicySet}.
 
 
 \lstset{language=Coq, frame=single, caption={Translation of Negative Policies},
