@@ -50,7 +50,39 @@
 \titlepage
 \end{frame}
 
+
 %% normal frame 1
+\begin{frame}{Access Control}
+\begin{itemize}
+   \item Definition: Process of rendering a decision to allow access to a resource or asset of interest.
+   \item Unauthorized access requests to resources must be controlled and ultimately denied, hence the term ``access-control''
+\end{itemize}
+\end{frame}
+
+%% normal frame 2
+\begin{frame}{Access Control Models}
+\LARGE
+\begin{itemize}
+   \item Access Control Lists (ACL)
+   \item Capabilities based Access-Control 
+   \item Role-based Access-Control (RBAC)
+   \item Attribute-based Access-Control (ABAC)
+   \item Policy-based Access-Control (PBAC)
+\end{itemize}
+\end{frame}
+
+%% normal frame 3
+\begin{frame}{Access-Control Policy Languages}
+\begin{itemize}
+   \item Expressing general access-control rules in a PBAC system is often done by using a policy language
+   \item XACML, ODRL and XrML are all full-blown and custom PBAC based languages 
+   \item ODRL and XrML focus on digital assets protection and digital rights management (DRM)
+   \item XACML is a high-level and platform independent general access-control system including a language to define policies and access requests
+\end{itemize}
+\end{frame}
+
+%% Prepending slides to this point
+%% normal frame 2
 \begin{frame}{DRM}
 \begin{itemize}
    \item Digital Rights Management (DRM):
@@ -75,7 +107,6 @@
    \item Anyone who pays 5\$ may watch the movie ``Terminator''
    \end{itemize}
 \item Rights are Expressed Using Rights Expression Languages (REL)
-\item Examples are ODRL and XrML
 \end{itemize}
 \end{frame}
 %% slide 4
@@ -91,6 +122,7 @@
    \end{itemize}
 \end{itemize}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%% Review thesis intro and update the next few slides %%%%%%%%%%%%%%%
 %% slide 5
 \begin{frame}[fragile]{ODRL and Rights Expressions: Syntax}
 \lstset{language=XML}
