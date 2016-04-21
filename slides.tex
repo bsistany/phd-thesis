@@ -50,6 +50,25 @@
 \titlepage
 \end{frame}
 
+%% normal frame 0
+\begin{frame}{ACCPL (1)}
+\LARGE
+\begin{itemize}
+   \item ACCPL was designed to express access-control rules and policies
+   \item Why not use an existing language such as eXtensible Access Control Markup Language (XACML)? 
+   \item Such languages lack formal semantics so it isn't always clear what the behaviour of the system would be given a set of access-control rules
+\end{itemize}
+\end{frame}
+
+\begin{frame}{ACCPL (2)}
+\begin{itemize}
+   \item Even with formal semantics, one needs to prove that the system actually behaves correctly with respect to its formal semantics
+   \item Proofs presented in the access-control literature are hard or impossible to formally verify so we needed machine-checked proofs
+   \item Machine-checked proofs are hard to develop specially for languages for which this level of formal verification was not a design goal
+   \item So we needed a small or minimal access-control policy language designed from the ground up to be formally verifiable using machine-checked proofs
+   \item We needed a Certifiable Core Policy Language, or ACCPL
+\end{itemize}
+\end{frame}
 
 %% normal frame 1
 \begin{frame}{Access Control}
@@ -78,6 +97,23 @@
    \item XACML, ODRL and XrML are all full-blown and custom PBAC based languages 
    \item ODRL and XrML focus on digital assets protection and digital rights management (DRM)
    \item XACML is a high-level and platform independent general access-control system including a language to define policies and access requests
+   \item All three languages suffer from a lack of formal semantics
+   \begin{itemize}
+     \item They also cover much more than policy expressions
+     \item For example, ODRL and XrML additionally address enforcement of policies beyond where the policies were generated
+     \item They are also not extendible, for example expressing hierarchical role-based access-control in XACML requires a fairly complex encoding
+   \end{itemize}
+\end{itemize}
+\end{frame}
+
+
+%% normal frame 4
+\begin{frame}{Access-Control Policy Languages (2)}
+\begin{itemize}
+   \item XACML, ODRL and XrML all suffer from a lack of formal semantics
+    \item They also cover much more than policy expressions     
+    \item For example, ODRL and XrML additionally address enforcement of policies beyond where the policies were generated
+     \item They are also not extendible, for example expressing hierarchical role-based access-control in XACML requires a fairly complex encoding
 \end{itemize}
 \end{frame}
 
@@ -122,6 +158,26 @@
    \end{itemize}
 \end{itemize}
 \end{frame}
+
+
+%% slide 5
+\begin{frame}[fragile]{RELs}
+\LARGE
+\begin{itemize}
+\item Both XrML and ODRL are XML based and declarative
+\item Adoption and Usage is Still Limited
+   \begin{itemize}
+   \item Due to Complexity 
+   \item And the fact that they try to cover Enforcement and Tracking Aspects of DRM
+   \item Instead of focusing on Expressing Rights
+   \end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%% Review thesis intro and update the next few slides %%%%%%%%%%%%%%%
 %% slide 5
 \begin{frame}[fragile]{ODRL and Rights Expressions: Syntax}
