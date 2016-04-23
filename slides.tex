@@ -176,7 +176,7 @@
 %% slide 13
 \begin{frame}[fragile]{Closed World Assumption: CWA}
 \begin{itemize}
-  \item Pucella's ODRL subset use ``Closed World Assumptions'' where the semantics only specify explicitly Permitted and ~Permitted answers
+  \item Pucella's ODRL subset use ``Closed World Assumptions'' where the semantics only specify explicitly Permitted and \textasciitilde Permitted answers
   \item Therefore the semantics as stated by Pucella et al. are not complete and also not verifiable by machine-proof checkers like Coq
   \item Could we have simply fixed their semantics by making it complete?
   \item An important lesson learned was, verifiable (policy) languages must be designed with verifiability in mind
@@ -191,29 +191,28 @@
 \begin{frame}[fragile]{Coq: Why Coq?}
 \small
 \begin{itemize}
-\item Coq is known first and foremost as a proof-assistant.
-\item Coq uses a much more expressive version of typed lambda calculus called CIC (Calculus of Inductive Constructions) as its logical foundation
-    \begin{itemize}
-       \item Where proofs and programs can both be represented.
-       \item CIC adds polymorphism (terms depending on types), type operators (types depending on types) and dependent types (types depending on terms).
-       \item Assertions or propositions are statements about values in Coq such as `3<8` or `8<3` that may be true, false or even be only conjectures. 
-       \item Only those propositions are considered to be true, which are provable constructively, i.e., by providing an explicit proof term, that inhabits them.
-       \item Verification of complex proofs is possible because one can verify the intermediate proofs or sub-goals in steps, each step being derived from the previous by following precise derivation rules. 
-       \item The Coq proof engine solves successive goals by using tactics. Coq tactics are commands to manipulate the local context and to decompose a goal into simpler goals or sub-goals
-   \end{itemize}
+  \item Coq is known first and foremost as a proof-assistant.
+  \item Coq uses a much more expressive version of typed lambda calculus called CIC (Calculus of Inductive Constructions) as its logical foundation 
+  \item Where proofs and programs can both be represented.
+  \item CIC adds polymorphism (terms depending on types), type operators (types depending on types) and dependent types (types depending on terms).
+  \item Assertions or propositions are statements about values in Coq such as `3<8` or `8<3` that may be true, false or even be only conjectures. 
+  \item Only those propositions are considered to be true, which are provable constructively, i.e., by providing an explicit proof term, that inhabits them.
 \end{itemize}
 \end{frame}
 %% slide 10.5
-\begin{frame}[fragile]{Coq: Why Coq? The Real Reasons :-)}
-\Large
+\begin{frame}[fragile]{Coq: Why Coq? (2)}
 \begin{itemize}
-\item Familiarity with Coq 
-\item A very active community and the Coq mailing lists
-\item A wealth of information on Coq such as tutorials and several books, meant that:
-   \begin{itemize}
-       \item Coq was quite suitable or formal program verification
-       \item And in particular for developing Certified Policies and Policy Languages
-   \end{itemize}
+  \item Verification of complex proofs is possible because one can verify the intermediate proofs or sub-goals in steps, each step being derived from the previous by following precise derivation rules. 
+  \item The Coq proof engine solves successive goals by using tactics
+  \item Coq tactics are commands to manipulate the local context and to decompose a goal into simpler goals or sub-goals
+  \item Other reasons for Why:
+  \begin{itemize}
+    \item Familiarity with Coq 
+    \item A very active community and the Coq mailing lists
+    \item A wealth of information on Coq such as tutorials and several books, meant that:
+    \item Coq was quite suitable or formal program verification
+    \item And in particular for developing Certified Policies and Policy Languages
+  \end{itemize}
 \end{itemize}
 \end{frame}
 
@@ -280,26 +279,26 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Review thesis intro and update the next few slides %%%%%%%%%%%%%%%
 %% slide 5
-\begin{frame}[fragile]{ODRL and Rights Expressions: Syntax}
-\begin{itemize}
-  \item Rights expressions in RELs are used to arbitrate users access to assets under conditions
-  \item This is similar to how access control conditions are expressed in access control policy languages
-  \item ODRL is XML based and declarative
-  \item Main construct in ODRL is the ``agreement'' which specifies users, asset(s) and access conditions
-\end{itemize}
-\lstset{language=XML}
-\begin{lstlisting}[caption={Syntax of an Agreement in ODRL in XML}]
-<agreement> 
-  <asset> Terminator </asset> 
-    <permission>   <watch> </watch>  
-      <requirement>   
-        <payment> 5.00$ </payment>
-      </requirement> 
-    </permission> 
-  <party> Anyone </party>
-</agreement>
-\end{lstlisting}
-\end{frame}
+%\begin{frame}[fragile]{ODRL and Rights Expressions: Syntax}
+%\begin{itemize}
+%  \item Rights expressions in RELs are used to arbitrate users access to assets under conditions
+%  \item This is similar to how access control conditions are expressed in access control policy languages
+%  \item ODRL is XML based and declarative
+%  \item Main construct in ODRL is the ``agreement'' which specifies users, asset(s) and access conditions
+%\end{itemize}
+%\lstset{language=XML}
+%\begin{lstlisting}[caption={Syntax of an Agreement in ODRL in XML}]
+%<agreement> 
+%  <asset> Terminator </asset> 
+%    <permission>   <watch> </watch>  
+%      <requirement>   
+%        <payment> 5.00$ </payment>
+%      </requirement> 
+%    </permission> 
+%  <party> Anyone </party>
+%</agreement>
+%\end{lstlisting}
+%\end{frame}
 %% slide 6
 %\begin{frame}[fragile]{ODRL and Rights Expressions: Semantics}
 %\Large
@@ -315,29 +314,29 @@
 %\end{frame}
 %% slide 7
 %% slide 11
-\begin{frame}[fragile]{ACCPL}
-\begin{itemize}
-\item Started with encoding and representing Pucella et al`s ODRL subset Including their Semantics in Coq
-\item Reduced and modified by Allowing only one kind of Environmental Fact (e.g. Counts)
-   \begin{itemize}
-      \item The other two Facts are similar to Counts and don`t add anything significant or interesting in terms of provability 
-   \end{itemize}
-\item Made other changes in the Grammar to accommodate Coq`s requirement for Clearly Terminating Recursion
-    \begin{itemize}
-        \item ForEachMember is a direct PreRequisite
-        \item As Opposed to being a Constraint (which is a PreRequisite)
-    \end{itemize}
-\item This is what we had called ACCPL at Proposal time
-\end{itemize}
-\end{frame}
+%\begin{frame}[fragile]{ACCPL}
+%\begin{itemize}
+%\item Started with encoding and representing Pucella et al`s ODRL subset Including their Semantics in Coq
+%\item Reduced and modified by Allowing only one kind of Environmental Fact (e.g. Counts)
+%   \begin{itemize}
+%      \item The other two Facts are similar to Counts and don`t add anything significant or interesting in terms of provability 
+%   \end{itemize}
+%\item Made other changes in the Grammar to accommodate Coq`s requirement for Clearly Terminating Recursion
+%    \begin{itemize}
+%        \item ForEachMember is a direct PreRequisite
+%        \item As Opposed to being a Constraint (which is a PreRequisite)
+%    \end{itemize}
+%\item This is what we had called ACCPL at Proposal time
+%\end{itemize}
+%\end{frame}
 %% slide 12
 \begin{frame}[fragile]{Queries}
 \begin{itemize}
-\item Policy Statements describing an Agreement are used to Enforce those Agreements 
-\item To Enforce Policy, Access Queries are asked from the Policy Engine
+\item Policy statements describing an agreement are used to enforce those agreements 
+\item To enforce policy, access queries are asked from the policy engine
     \begin{itemize}
-       \item Access is Granted or Denied based on the Answer.
-       \item A Query encodes the Question of Whether a set of Agreements Imply that a subject may Perform an Action on an Asset given an Environment.
+       \item Access is Granted or Denied based on the answer.
+       \item A Query encodes the question of whether a set of agreements imply that a subject may perform an action on an asset given an environment.
      \end{itemize}
 %\item Answering Queries in Pucella et al`s ODRL subset are Decidable
 %\item We set out to develop a proof in Coq on whether Answering Queries in ACCPL was also Decidable
@@ -359,67 +358,67 @@
 %\end{itemize}
 %\end{frame}
 % slide 15
-\begin{frame}[fragile]{ACCPL Syntax in Coq}
-\lstset{language=Coq}
-\begin{lstlisting}
-Inductive agreement : Set :=
-  | Agreement : prin -> asset -> policySet -> agreement.
-
-Inductive policySet : Set :=
-  | PrimitivePolicySet : preRequisite -> policy -> policySet 
-  | PrimitiveExclusivePolicySet : preRequisite -> policy  -> policySet 
-  | AndPolicySet : nonemptylist policySet -> policySet.
-
-Inductive policy : Set :=
-  | PrimitivePolicy : preRequisite -> policyId -> act -> policy 
-  | AndPolicy : nonemptylist policy -> policy.
-
-\end{lstlisting}
-\end{frame}
+%\begin{frame}[fragile]{ACCPL Syntax in Coq}
+%\lstset{language=Coq}
+%\begin{lstlisting}
+%Inductive agreement : Set :=
+%  | Agreement : prin -> asset -> policySet -> agreement.
+%
+%Inductive policySet : Set :=
+%  | PrimitivePolicySet : preRequisite -> policy -> policySet 
+%  | PrimitiveExclusivePolicySet : preRequisite -> policy  -> policySet 
+%  | AndPolicySet : nonemptylist policySet -> policySet.
+%
+%Inductive policy : Set :=
+%  | PrimitivePolicy : preRequisite -> policyId -> act -> policy 
+%  | AndPolicy : nonemptylist policy -> policy.
+%
+%\end{lstlisting}
+%\end{frame}
 % slide 16
-\begin{frame}[fragile]{ACCPL Semantics: trans\_ps}
-\lstset{language=Coq}
-\begin{lstlisting}
-
-    match ps with
-    | PrimitivePolicySet prq p => 
-          forall x, (((trans_prin x prin_u) /\ 
-                  (trans_preRequisite e x prq (getId p) prin_u)) -> 
-                              (trans_policy_positive e x p prin_u a))  
-    | PrimitiveExclusivePolicySet prq p => 
-          forall x, ((((trans_prin x prin_u) /\ 
-                  (trans_preRequisite e x prq (getId p) prin_u)) -> 
-                           (trans_policy_positive e x p prin_u a)) /\ ((not (trans_prin x prin_u)) -> 
-                              (trans_policy_negative e x p a)))                  
-    | AndPolicySet ps_list => 
-    end.
-\end{lstlisting}
-\end{frame}
+%\begin{frame}[fragile]{ACCPL Semantics: trans\_ps}
+%\lstset{language=Coq}
+%\begin{lstlisting}
+%
+%    match ps with
+%    | PrimitivePolicySet prq p => 
+%          forall x, (((trans_prin x prin_u) /\ 
+%                  (trans_preRequisite e x prq (getId p) prin_u)) -> 
+%                              (trans_policy_positive e x p prin_u a))  
+%    | PrimitiveExclusivePolicySet prq p => 
+%          forall x, ((((trans_prin x prin_u) /\ 
+%                  (trans_preRequisite e x prq (getId p) prin_u)) -> 
+%                           (trans_policy_positive e x p prin_u a)) /\ ((not (trans_prin x prin_u)) -> 
+%                              (trans_policy_negative e x p a)))                  
+%    | AndPolicySet ps_list => 
+%    end.
+%\end{lstlisting}
+%\end{frame}
 % slide 17
-\begin{frame}[fragile]{ACCPL Semantics: trans\_policy\_positive}
-\lstset{language=Coq}
-\begin{lstlisting}
-
-  match p with
-    | PrimitivePolicy prq policyId action => ((trans_preRequisite e x prq (Single policyId) prin_u) ->
-                                              (Permitted x action a))
-    | AndPolicy p_list => 
-  end.
-\end{lstlisting}
-\end{frame}
+%\begin{frame}[fragile]{ACCPL Semantics: trans\_policy\_positive}
+%\lstset{language=Coq}
+%\begin{lstlisting}
+%
+%  match p with
+%    | PrimitivePolicy prq policyId action => ((trans_preRequisite e x prq (Single policyId) prin_u) ->
+%                                              (Permitted x action a))
+%    | AndPolicy p_list => 
+%  end.
+%\end{lstlisting}
+%\end{frame}
 
 % slide 18
-\begin{frame}[fragile]{ACCPL Semantics: trans\_policy\_negative}
-\lstset{language=Coq}
-\begin{lstlisting}
-match p with
-    | PrimitivePolicy prq policyId action => not (Permitted x action a)
-    | AndPolicy p_list => 
-  end.
-\end{lstlisting}
-\end{frame}
+%\begin{frame}[fragile]{ACCPL Semantics: trans\_policy\_negative}
+%\lstset{language=Coq}
+%\begin{lstlisting}
+%match p with
+%    | PrimitivePolicy prq policyId action => not (Permitted x action a)
+%    | AndPolicy p_list => 
+%  end.
+%\end{lstlisting}
+%\end{frame}
 % slide 19
-\begin{frame}[fragile]{YACPL Syntax (1)}
+\begin{frame}[fragile]{ACCPL Syntax (1)}
 \lstset{language=Coq}
 \begin{lstlisting}
 Inductive agreement : Set :=
@@ -433,7 +432,7 @@ Inductive policy : Set :=
 \end{lstlisting}
 \end{frame}
 % slide 20
-\begin{frame}[fragile]{YACPL Syntax (2)}
+\begin{frame}[fragile]{ACCPL Syntax (2)}
 \lstset{language=Coq}
 \begin{lstlisting}
 Inductive primInclusivePolicySet : Set :=
@@ -491,7 +490,7 @@ Inductive result : Set :=
 \end{frame}
 
 % slide 23
-\begin{frame}[fragile]{YACPL Semantics: trans\_ps (1)}
+\begin{frame}[fragile]{ACCPL Semantics: trans\_ps (1)}
 \lstset{language=Coq}
 \begin{lstlisting}
 if (eq_nat_dec asset_from_query a)
@@ -507,7 +506,7 @@ else (* asset_from_query <> a *)
 \end{lstlisting}
 \end{frame}
 % slide 24
-\begin{frame}[fragile]{YACPL Semantics: trans\_ps (2)}
+\begin{frame}[fragile]{ACCPL Semantics: trans\_ps (2)}
 \lstset{language=Coq}
 \begin{lstlisting}
 
@@ -526,7 +525,7 @@ else (* asset_from_query <> a *)
 \end{lstlisting}
 \end{frame}
 % slide 25
-\begin{frame}[fragile]{YACPL Semantics: trans\_policy\_PIPS}
+\begin{frame}[fragile]{ACCPL Semantics: trans\_policy\_PIPS}
 \lstset{language=Coq}
 \begin{lstlisting}
 if (trans_prin_dec x prin_u)
@@ -543,7 +542,7 @@ if (trans_prin_dec x prin_u)
 \end{frame}
 
 % slide 26
-\begin{frame}[fragile]{YACPL Semantics: trans\_policy\_PEPS}
+\begin{frame}[fragile]{ACCPL Semantics: trans\_policy\_PEPS}
 \lstset{language=Coq}
 \begin{lstlisting}
   if (trans_prin_dec x prin_u)
@@ -560,7 +559,7 @@ if (trans_prin_dec x prin_u)
 \end{frame}
 
 % slide 27
-\begin{frame}[fragile]{YACPL Semantics: trans\_policy\_positive}
+\begin{frame}[fragile]{ACCPL Semantics: trans\_policy\_positive}
 \lstset{language=Coq}
 \begin{lstlisting}
 match pp with
@@ -581,7 +580,7 @@ match pp with
 \end{lstlisting}
 \end{frame}
 % slide 28
-\begin{frame}[fragile]{YACPL Semantics: trans\_policy\_negative}
+\begin{frame}[fragile]{ACCPL Semantics: trans\_policy\_negative}
 \lstset{language=Coq}
 \begin{lstlisting}
 match pp with
@@ -600,7 +599,7 @@ match pp with
 \end{lstlisting}
 \end{frame}
 % slide 29
-\begin{frame}[fragile]{YACPL Semantics: trans\_policy\_unregulated}
+\begin{frame}[fragile]{ACCPL Semantics: trans\_policy\_unregulated}
 \lstset{language=Coq}
 \begin{lstlisting}
 match pp with
@@ -623,7 +622,7 @@ match pp with
                     \item Let $D$ represent $G \cup N$ 
                     \item Policy $p$ assigns a decision of $d \in D$ to the query $q \in Q$
                 \end{itemize}
-          \item $L$ also defines a partial order on decisions such that $d < d'$ if either $d, d' \in N$ or $d, d' \in G$ or $d \in N$ and $d' \in G$, so for example $NotPermitted < Permitted$ in YACPL
+          \item $L$ also defines a partial order on decisions such that $d < d'$ if either $d, d' \in N$ or $d, d' \in G$ or $d \in N$ and $d' \in G$, so for example $NotPermitted < Permitted$ in ACCPL
     \end{itemize}
 \end{itemize}
 \end{frame}
@@ -636,7 +635,7 @@ match pp with
        \item Subject: performs actions
        \item Object: actions are performed on objects
        \item Action: specific actions that a subject may perform on an object
-       \item Environments: any relevant information such as time of day, location or some history of the previous actions, or in the case of ACCPL and YACPL the Count of how many times each principal has used a policy to perform an action
+       \item Environments: any relevant information such as time of day, location or some history of the previous actions, or in the case of ACCPL and ACCPL the Count of how many times each principal has used a policy to perform an action
        \end{itemize}
 \end{itemize}
 \end{frame}
@@ -649,39 +648,40 @@ match pp with
 \item However in this case whenever a request cannot be granted, a default $deny$ is returned as decision (to err on the side of safety)
 \item This will include cases where neither $permit$ or $deny$ really applies
 \item This strategy makes difficult the composition of policies where policies` don`t care becomes a $deny$. 
-\item Some languages therefore include a explicit ``Don`t Care'' or ``Unregulated'' decision (this is the case for YACPL) 
+\item Some languages therefore include a explicit ``Don`t Care'' or ``Unregulated'' decision (this is the case for ACCPL) 
 \end{itemize}
 \end{frame}
 % slide 33
 \begin{frame}[fragile]{Policy Combinators: Composing policies or Primitive Policies}
 \begin{itemize}
-\item Some languages such as YACPL provide a single combinator (Conjunction of Policies)
+\item Some languages such as ACCPL provide a single combinator (Conjunction of Policies)
 \item While others may have multiple combinators.
 \item Some languages such as ODRL and ACCPL have nested policies and sub-policies in which case a different combinator may be applied at each different layer
-\item In YACPL, we use a variation on the `ALL SEEN` combinator where a set containing all decisions reached by all policies are returned
+\item In ACCPL, we use a variation on the `ALL SEEN` combinator where a set containing all decisions reached by all policies are returned
      \begin{itemize}
-         \item Since we prove that `Permit' and `Deny' are mutually exclusive in YACPL, we take the existence of a single `Permit' or `Deny' to make the decision for that query a `Permit' or `Deny'
+         \item Since we prove that `Permit' and `Deny' are mutually exclusive in ACCPL, we take the existence of a single `Permit' or `Deny' to make the decision for that query a `Permit' or `Deny'
          \item If no `Permit' or `Deny' is seen in the set of decisions that are returned, this means that the decision is `Unregulated'
      \end{itemize}
 \end{itemize}
 \end{frame}
 % slide 34
 \begin{frame}[fragile]{Main Decidability Theorem Proved}
-
+\small
 \lstset{language=Coq}
 \begin{lstlisting}
-Theorem trans_agreement_dec:
+Theorem trans_agreement_dec2:
   forall (e:environment)(ag:agreement)(action_from_query:act)
    (subject_from_query:subject)(asset_from_query:asset),
-   
- (isResultInQueryResult
-    (Result Permitted subject_from_query action_from_query asset_from_query) (trans_agreement)
-\/
- (isResultInQueryResult
-    (Result NotPermitted subject_from_query action_from_query asset_from_query) (trans_agreement)
-\/
- (isResultInQueryResult
-    (Result Unregulated subject_from_query action_from_query asset_from_query) (trans_agreement)
+ (isResultInQueryResult 
+    (Result Permitted subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query))      \/
+ (isResultInQueryResult 
+    (Result NotPermitted subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query))      \/
+ (~(isResultInQueryResult (Result Permitted subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query))      /\
+  ~(isResultInQueryResult (Result NotPermitted subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query))).
 \end{lstlisting}
 \end{frame}
 % slide 35
@@ -699,10 +699,10 @@ Theorem trans_agreement_dec:
 \begin{frame}[fragile]{Conclusion}
 \Large
 \begin{itemize}
-\item A Core Policy Language Potentially Suitable for both DRM and general purpose Access-Control systems with 
-\item Formal Semantics 
-\item Where Answering a Query is Certifiably Decidable
-\item Executable Programs can be Extracted from the Proof and used to Answer Queries for specific Policies.
+\item A core policy language potentially suitable for both DRM and general purpose Access-Control systems with 
+\item Formal semantics 
+\item Where answering a query is certifiably decidable
+\item Executable programs can be extracted from the proof and used to answer queries for specific policies.
 \item You can access the source code at https://github.com/bsistany/yacpl.git
 \end{itemize}
 \end{frame}
