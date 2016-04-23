@@ -51,28 +51,29 @@
 \end{frame}
 
 %% normal frame 0
-\begin{frame}{ACCPL (1)}
+\begin{frame}{ACCPL}
 \begin{itemize}
    \item ACCPL was designed to express access-control rules and policies
-   \item Why not use an existing language such as eXtensible Access Control Markup Language (XACML)? 
-   \item For starters, such languages lack formal semantics 
-     \begin{itemize}
-       \item Instead they use natural language to express behaviour but natural language is ambiguous 
-        \item It isn't always clear what the behaviour of the system would be given a set of access-control rules
-     \end{itemize}
-   \item Even when formal semantics are added, one still needs to prove the system actually behaves correctly with respect to its formal semantics
+   \item Why not just use an existing language such as eXtensible Access Control Markup Language (XACML)? 
+   \item Before answering that question, let's review ``Access Control'' in general
+%   \item For starters, such languages lack formal semantics 
+%     \begin{itemize}
+%       \item Instead they use natural language to express behaviour but natural language is ambiguous 
+%        \item It isn't always clear what the behaviour of the system would be given a set of access-control rules
+%     \end{itemize}
+%   \item Even when formal semantics are added, one still needs to prove the system actually behaves correctly with respect to its formal semantics
 \end{itemize}
 \end{frame}
 
-\begin{frame}{ACCPL (2)}
-\begin{itemize}
-   \item Proofs in the access-control literature are hard or impossible to formally verify because the justifications used are informal
-   \item We need formal proofs verified by a trusted proof-checker, also known as machine-checked proofs
-   \item Machine-checked proofs are hard to develop specially for languages for which this level of formal verification was not a design goal
-   \item So we needed a small or minimal access-control policy language designed from the ground up to be formally verifiable
-   \item We needed a Certifiable Core Policy Language, or ACCPL
-\end{itemize}
-\end{frame}
+%\begin{frame}{ACCPL (2)}
+%\begin{itemize}
+%   \item Proofs in the access-control literature are hard or impossible to formally verify because the justifications used are informal
+%   \item We need formal proofs verified by a trusted proof-checker, also known as machine-checked proofs
+%   \item Machine-checked proofs are hard to develop specially for languages for which this level of formal verification was not a design goal
+%   \item So we needed a small or minimal access-control policy language designed from the ground up to be formally verifiable
+%   \item We needed a Certifiable Core Policy Language, or ACCPL
+%\end{itemize}
+%\end{frame}
 
 %% normal frame 1
 \begin{frame}{What is Access Control?}
