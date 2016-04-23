@@ -52,28 +52,32 @@
 
 %% normal frame 0
 \begin{frame}{ACCPL (1)}
-\LARGE
 \begin{itemize}
    \item ACCPL was designed to express access-control rules and policies
    \item Why not use an existing language such as eXtensible Access Control Markup Language (XACML)? 
-   \item Such languages lack formal semantics so it isn't always clear what the behaviour of the system would be given a set of access-control rules
+   \item For starters, such languages lack formal semantics 
+     \begin{itemize}
+       \item Instead they use natural language to express behaviour but natural language is ambiguous 
+        \item It isn't always clear what the behaviour of the system would be given a set of access-control rules
+     \end{itemize}
+   \item Even when formal semantics are added, one still needs to prove the system actually behaves correctly with respect to its formal semantics
 \end{itemize}
 \end{frame}
 
 \begin{frame}{ACCPL (2)}
 \begin{itemize}
-   \item Even with formal semantics, one needs to prove that the system actually behaves correctly with respect to its formal semantics
-   \item Proofs presented in the access-control literature are hard or impossible to formally verify so we needed machine-checked proofs
+   \item Proofs in the access-control literature are hard or impossible to formally verify because the justifications used are informal
+   \item We need formal proofs verified by a trusted proof-checker, also known as machine-checked proofs
    \item Machine-checked proofs are hard to develop specially for languages for which this level of formal verification was not a design goal
-   \item So we needed a small or minimal access-control policy language designed from the ground up to be formally verifiable using machine-checked proofs
+   \item So we needed a small or minimal access-control policy language designed from the ground up to be formally verifiable
    \item We needed a Certifiable Core Policy Language, or ACCPL
 \end{itemize}
 \end{frame}
 
 %% normal frame 1
-\begin{frame}{Access Control}
+\begin{frame}{What is Access Control?}
 \begin{itemize}
-   \item Definition: Process of rendering a decision to allow access to a resource or asset of interest.
+   \item Process of rendering a decision to allow access to a resource or asset of interest or not
    \item Unauthorized access requests to resources must be controlled and ultimately denied, hence the term ``access-control''
 \end{itemize}
 \end{frame}
@@ -95,14 +99,8 @@
 \begin{itemize}
    \item Expressing general access-control rules in a PBAC system is often done by using a policy language
    \item XACML, ODRL and XrML are all full-blown and custom PBAC based languages 
-   \item ODRL and XrML focus on digital assets protection and digital rights management (DRM)
+   \item ODRL and XrML are examples of Rights Expressions Languages (RELs) and focus on digital assets protection and digital rights management (DRM)
    \item XACML is a high-level and platform independent general access-control system including a language to define policies and access requests
-   \item All three languages suffer from a lack of formal semantics
-   \begin{itemize}
-     \item They also cover much more than policy expressions
-     \item For example, ODRL and XrML additionally address enforcement of policies beyond where the policies were generated
-     \item They are also not extendible, for example expressing hierarchical role-based access-control in XACML requires a fairly complex encoding
-   \end{itemize}
 \end{itemize}
 \end{frame}
 
@@ -110,117 +108,16 @@
 %% normal frame 4
 \begin{frame}{Access-Control Policy Languages (2)}
 \begin{itemize}
-   \item XACML, ODRL and XrML all suffer from a lack of formal semantics
-    \item They also cover much more than policy expressions     
+    \item In addition to the lack of formal semantics
+    \item XACML, ODRL and XrML are complex and cover much more than policy expressions     
     \item For example, ODRL and XrML additionally address enforcement of policies beyond where the policies were generated
-     \item They are also not extendible, for example expressing hierarchical role-based access-control in XACML requires a fairly complex encoding
-\end{itemize}
-\end{frame}
-
-%% Prepending slides to this point
-%% normal frame 2
-\begin{frame}{DRM}
-\begin{itemize}
-   \item Digital Rights Management (DRM):
-   \begin{itemize}
-      \item Digital management of rights associated with the access or usage of digital assets.
-   \end{itemize}
-   \item DRM is Concerned with Four Areas:
-     \begin{itemize}
-	\item Defining Rights
-	\item Distributing/Acquiring Rights
-	\item Enforcing Rights
-	\item Tracking Usage.
-     \end{itemize}
-\end{itemize}
-\end{frame}
-%% slide 3
-\begin{frame}[fragile]{Defining Rights}
-\LARGE
-\begin{itemize}
-\item Rights Expressions
-   \begin{itemize}
-   \item Anyone who pays 5\$ may watch the movie ``Terminator''
-   \end{itemize}
-\item Rights are Expressed Using Rights Expression Languages (REL)
-\end{itemize}
-\end{frame}
-%% slide 4
-\begin{frame}[fragile]{RELs}
-\LARGE
-\begin{itemize}
-\item Both XrML and ODRL are XML based and declarative
-\item Adoption and Usage is Still Limited
-   \begin{itemize}
-   \item Due to Complexity 
-   \item And the fact that they try to cover Enforcement and Tracking Aspects of DRM
-   \item Instead of focusing on Expressing Rights
-   \end{itemize}
+    \item They are also not extendible, for example expressing hierarchical role-based access-control in XACML requires a fairly complex encoding
+    \item A policy language that was designed with logic and formal semantics and also one that was minimal and extendible was clearly needed 
+    \item Halpern's Lithium and Pucella and Weissman's subset of ODRL were candidates
 \end{itemize}
 \end{frame}
 
 
-%% slide 5
-\begin{frame}[fragile]{RELs}
-\LARGE
-\begin{itemize}
-\item Both XrML and ODRL are XML based and declarative
-\item Adoption and Usage is Still Limited
-   \begin{itemize}
-   \item Due to Complexity 
-   \item And the fact that they try to cover Enforcement and Tracking Aspects of DRM
-   \item Instead of focusing on Expressing Rights
-   \end{itemize}
-\end{itemize}
-\end{frame}
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%% Review thesis intro and update the next few slides %%%%%%%%%%%%%%%
-%% slide 5
-\begin{frame}[fragile]{ODRL and Rights Expressions: Syntax}
-\lstset{language=XML}
-\begin{lstlisting}[caption={Syntax of Policies in XML}]
-<agreement> 
-<asset> Terminator </asset> 
-	<permission>   <watch> </watch>  
-		<requirement>   
-			<payment> 5.00$ </payment>
-		</requirement> 
-	</permission> 
-<party> Anyone </party>
-</agreement>
-\end{lstlisting}
-\end{frame}
-%% slide 6
-\begin{frame}[fragile]{ODRL and Rights Expressions: Semantics}
-\Large
-\begin{itemize}
-\item Formal Methods ensure a System behaves wrt the Specification of Desired Property
-\item The Specification of Desired Behavior is called the Semantics of the System
-\item Precise and Formal Semantics are needed to make Reasoning about the system Properties possible
-\item Current RELs use Natural Language (e.g. English) for Semantics
-   \begin{itemize}
-    \item Which doesn`t help with Analysis and Reasoning because policies are Ambiguous and Open to Interpretation
-    \end{itemize}    
-\end{itemize}
-\end{frame}
-%% slide 7
-\begin{frame}[fragile]{ODRL and Rights Expressions: Formal Semantics}
-\LARGE
-\begin{itemize}
-\item Several approaches to Formalizing the Semantics of RELs and ODRL:
-   \begin{itemize}
-      \item Logic Based
-      \item Finite Automata
-      \item Operational Semantics and Interpreter based
-      \item Web Ontology
-    \end{itemize}
-\item Not surprisingly we are interested in the Logic Based approach
-\end{itemize}
-\end{frame}
 %% slide 8
 \begin{frame}[fragile]{A Formal Foundation for ODRL: \newline Riccardo Pucella and Vicky Weissman}
 \Large
@@ -243,6 +140,102 @@
 
 \end{itemize}
 \end{frame}
+
+%% Prepending slides to this point
+%% normal frame 2
+%\begin{frame}{DRM}
+%\begin{itemize}
+%   \item Digital Rights Management (DRM):
+%   \begin{itemize}
+%      \item Digital management of rights associated with the access or usage of digital assets.
+%   \end{itemize}
+%   \item DRM is Concerned with Four Areas:
+%     \begin{itemize}
+%	\item Defining Rights
+%	\item Distributing/Acquiring Rights
+%	\item Enforcing Rights
+%	\item Tracking Usage.
+%     \end{itemize}
+%\end{itemize}
+%\end{frame}
+%% slide 3
+\begin{frame}[fragile]{Defining Rights in RELs}
+\begin{itemize}
+\item Rights expressions in RELs are used to arbitrate users access to assets under conditions
+\item This is similar to how access control conditions are expressed in access control policy languages
+\item For example, a rights expression given in English may look like:
+   \begin{itemize}
+   \item Anyone who pays 5\$ may watch the movie ``Terminator''
+   \end{itemize}
+\end{itemize}
+\end{frame}
+%% slide 4
+%\begin{frame}[fragile]{RELs}
+%\LARGE
+%\begin{itemize}
+%\item Both XrML and ODRL are XML based and declarative
+%\item Adoption and Usage is Still Limited
+%   \begin{itemize}
+%   \item Due to Complexity 
+%   \item And the fact that they try to cover Enforcement and Tracking Aspects of DRM
+%   \item Instead of focusing on Expressing Rights
+%   \end{itemize}
+%\end{itemize}
+%\end{frame}
+%
+%
+%%% slide 5
+%\begin{frame}[fragile]{RELs}
+%\LARGE
+%\begin{itemize}
+%\item Both XrML and ODRL are XML based and declarative
+%\item Adoption and Usage is Still Limited
+%   \begin{itemize}
+%   \item Due to Complexity 
+%   \item And the fact that they try to cover Enforcement and Tracking Aspects of DRM
+%   \item Instead of focusing on Expressing Rights
+%   \end{itemize}
+%\end{itemize}
+%\end{frame}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Review thesis intro and update the next few slides %%%%%%%%%%%%%%%
+%% slide 5
+\begin{frame}[fragile]{ODRL and Rights Expressions: Syntax}
+\begin{itemize}
+  \item ODRL is XML based and declarative
+  \item Main construct in ODRL is the ``agreement'' which specifies users, asset(s) and access conditions
+\end{itemize}
+\lstset{language=XML}
+\begin{lstlisting}[caption={Syntax of an Agreement in ODRL in XML}]
+<agreement> 
+  <asset> Terminator </asset> 
+    <permission>   <watch> </watch>  
+      <requirement>   
+        <payment> 5.00$ </payment>
+      </requirement> 
+    </permission> 
+  <party> Anyone </party>
+</agreement>
+\end{lstlisting}
+\end{frame}
+%% slide 6
+%\begin{frame}[fragile]{ODRL and Rights Expressions: Semantics}
+%\Large
+%\begin{itemize}
+%\item Formal Methods ensure a System behaves wrt the Specification of Desired Property
+%\item The Specification of Desired Behavior is called the Semantics of the System
+%\item Precise and Formal Semantics are needed to make Reasoning about the system Properties possible
+%\item Current RELs use Natural Language (e.g. English) for Semantics
+%   \begin{itemize}
+%    \item Which doesn`t help with Analysis and Reasoning because policies are Ambiguous and Open to Interpretation
+%    \end{itemize}    
+%\end{itemize}
+%\end{frame}
+%% slide 7
 %% slide 9
 \begin{frame}[fragile]{Paper-Proofs}
 \begin{itemize}
