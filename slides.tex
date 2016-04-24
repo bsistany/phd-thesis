@@ -667,20 +667,28 @@ match pp with
 % slide 34
 \begin{frame}[fragile]{Main Decidability Theorem Proved}
 \small
-\lstset{language=Coq}
+\lstset{language=Coq, basicstyle=\tiny}
 \begin{lstlisting}
 Theorem trans_agreement_dec2:
-  forall (e:environment)(ag:agreement)(action_from_query:act)
+  forall
+  (e:environment)(ag:agreement)(action_from_query:act)
    (subject_from_query:subject)(asset_from_query:asset),
+
  (isResultInQueryResult 
     (Result Permitted subject_from_query action_from_query asset_from_query)
-    (trans_agreement e ag action_from_query subject_from_query asset_from_query))      \/
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+\/
+
  (isResultInQueryResult 
     (Result NotPermitted subject_from_query action_from_query asset_from_query)
-    (trans_agreement e ag action_from_query subject_from_query asset_from_query))      \/
- (~(isResultInQueryResult (Result Permitted subject_from_query action_from_query asset_from_query)
-    (trans_agreement e ag action_from_query subject_from_query asset_from_query))      /\
-  ~(isResultInQueryResult (Result NotPermitted subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query))
+\/
+
+ (~(isResultInQueryResult 
+    (Result Permitted subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query)) /\
+  ~(isResultInQueryResult 
+    (Result NotPermitted subject_from_query action_from_query asset_from_query)
     (trans_agreement e ag action_from_query subject_from_query asset_from_query))).
 \end{lstlisting}
 \end{frame}
@@ -691,8 +699,61 @@ Theorem trans_agreement_dec2:
 \item $(Permitted) \implies  \neg (NotPermitted) $
 \item $(NotPermitted) \implies  \neg (Permitted) $
 \item $(\neg Permitted \land \neg NotPermitted) \implies Unregulated$
-\item $\neg (Permitted \land NotPermitted)$
+\item $\neg (Permitted \land NotPermitted)$        // in ACCPL rendering conflicting decisions is not possible given an agreement.
 \end{itemize}
+\end{frame}
+
+% slide 36
+\begin{frame}[fragile]{Decidable as an Inductive Predicate}
+\begin{itemize}
+\item The agreement translation function trans_agreement returns a set of results one per primPolicy
+\item There are 3 cases:
+  \begin{itemize}
+    \item First when there is at least a ``NotPermitted'' result in the set and there is no ``Permitted'' result
+    \item Second when there is at least a ``Permitted'' result in the set and no ``NotPermitted'' result
+    \item Third when there are no ``Permitted'' and no ``NotPermitted'' results in the set
+  \end{itemize}
+\item Encode these three cases in three constructors for the type ``decidable'': Denied, Granted and NotApplicable
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{ACCPL Decidablity in terms of the decidable type}
+\small
+\lstset{language=Coq, basicstyle=\tiny}
+\begin{lstlisting}
+Inductive decidable : environment -> agreement -> act -> subject -> asset -> Prop :=
+
+     | Denied : forall (e:environment)(ag:agreement)(action_from_query:act)
+                              (subject_from_query:subject)(asset_from_query:asset), 
+ (isResultInQueryResult 
+    (Result NotPermitted subject_from_query action_from_query asset_from_query)
+       (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+  -> 
+  ~(isResultInQueryResult 
+    (Result Permitted subject_from_query action_from_query asset_from_query)
+       (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+                   -> decidable e ag action_from_query subject_from_query asset_from_query
+     | Granted : forall (e:environment)(ag:agreement)(action_from_query:act)
+                                (subject_from_query:subject)(asset_from_query:asset), 
+ (isResultInQueryResult 
+    (Result Permitted subject_from_query action_from_query asset_from_query)
+       (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+ ->
+ ~(isResultInQueryResult 
+    (Result NotPermitted subject_from_query action_from_query asset_from_query)
+       (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+                  -> decidable e ag action_from_query subject_from_query asset_from_query
+     | NonApplicable : forall (e:environment)(ag:agreement)(action_from_query:act)
+                                          (subject_from_query:subject)(asset_from_query:asset), 
+  ~(isResultInQueryResult 
+    (Result Permitted subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
+  ->
+  ~(isResultInQueryResult 
+    (Result NotPermitted subject_from_query action_from_query asset_from_query)
+    (trans_agreement e ag action_from_query subject_from_query asset_from_query))              
+                 -> decidable e ag action_from_query subject_from_query asset_from_query.
+\end{lstlisting}
 \end{frame}
 
 % slide 40
