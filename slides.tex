@@ -762,6 +762,21 @@ Inductive decidable : environment -> agreement -> act -> subject -> asset -> Pro
 \end{lstlisting}
 \end{frame}
 
+% slide ??
+\begin{frame}[fragile]{Usage of the decidable Inductive Predicate}
+\begin{itemize}
+\item Using the inductive predicate we can build specific proof terms for  a specific decision rendered
+\item For example, we can prove, that a specific policy and a request, must be Granted
+\item In other words, we can ``certify'' the rendered decision for specific requests, given a policy
+\lstset{language=Coq, basicstyle=\tiny}
+\begin{lstlisting}
+Parameters (permittedIsThere:        isResultInQueryResult         (Result Permitted Alice Print TheReport)         (trans_agreement eA1 AgreeCan Print Alice TheReport)).Parameters (notPermittedIsNotThere:        ~(isResultInQueryResult               (Result NotPermitted Alice Print TheReport)         (trans_agreement eA1 AgreeCan Print Alice TheReport))).
+Check (Granted eA1 AgreeCan Print Alice TheReport permittedIsThere notPermittedIsNotThere).
+//=> Granted eA1 AgreeCan Print Alice TheReport permittedIsThere  notPermittedIsNotThere     : decidable eA1 AgreeCan Print Alice TheReport
+\end{lstlisting}  
+\end{itemize}
+\end{frame}
+
 % slide 40
 \begin{frame}[fragile]{Conclusion}
 \Large
