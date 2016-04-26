@@ -113,7 +113,7 @@
     \item XACML, ODRL and XrML are complex and cover much more than policy expressions     
     \item For example, ODRL and XrML additionally address enforcement of policies beyond where the policies were generated
     \item They are also not extendible, for example expressing hierarchical role-based access-control in XACML requires a fairly complex encoding
-    \item A policy language that was designed with logic and formal semantics and also one that was minimal and extendible was clearly needed 
+    \item A policy language that was designed with logic and formal semantics and also one that was small and extendible was clearly needed 
     \item Halpern's Lithium and Pucella and Weissman's subset of ODRL were considered
 \end{itemize}
 \end{frame}
@@ -418,38 +418,46 @@
 %\end{lstlisting}
 %\end{frame}
 % slide 19
-\begin{frame}[fragile]{ACCPL Syntax (1)}
-\lstset{language=Coq}
+\begin{frame}[fragile]{ACCPL Syntax}
+ \begin{itemize}
+       \item An agreement in ODRL parlance is simply a policy rule
+       \item It is composed of user(s) or principals, an asset and a policySet or a set of primitive policy rules
+     \end{itemize}
+\lstset{language=Coq, basicstyle=\tiny}
 \begin{lstlisting}
 Inductive agreement : Set :=
   | Agreement : prin -> asset -> policySet -> agreement.
 
-Inductive primPolicy : Set :=
-  | PrimitivePolicy : preRequisite -> policyId -> act -> primPolicy.
+Inductive policySet : Set :=
+  | PPS : primPolicySet -> policySet.
+  
+Inductive primPolicySet : Set :=
+  | PIPS : primInclusivePolicySet -> primPolicySet
+  | PEPS : primExclusivePolicySet -> primPolicySet.
 
-Inductive policy : Set :=
-  | Policy : nonemptylist primPolicy -> policy.
-\end{lstlisting}
-\end{frame}
-% slide 20
-\begin{frame}[fragile]{ACCPL Syntax (2)}
-\lstset{language=Coq}
-\begin{lstlisting}
 Inductive primInclusivePolicySet : Set :=
   | PrimitiveInclusivePolicySet : preRequisite -> policy -> primInclusivePolicySet.
 
 Inductive primExclusivePolicySet : Set :=
   | PrimitiveExclusivePolicySet : preRequisite -> policy  -> primExclusivePolicySet.
 
-Inductive primPolicySet : Set :=
-  | PIPS : primInclusivePolicySet -> primPolicySet
-  | PEPS : primExclusivePolicySet -> primPolicySet.
-
-Inductive policySet : Set :=
-  | PPS : primPolicySet -> policySet.
-
+Inductive policy : Set :=
+  | Policy : nonemptylist primPolicy -> policy.
+  
+Inductive primPolicy : Set :=
+  | PrimitivePolicy : preRequisite -> policyId -> act -> primPolicy.
 \end{lstlisting}
 \end{frame}
+%% slide 20
+%\begin{frame}[fragile]{ACCPL Syntax (2)}
+%\lstset{language=Coq}
+%\begin{lstlisting}
+%
+%
+%
+%
+%\end{lstlisting}
+%\end{frame}
 % slide 21
 \begin{frame}[fragile]{Decision Procedures and the sumbool type}
 \lstset{language=Coq}
@@ -463,7 +471,7 @@ Inductive sumbool (A B:Prop) : Set :=
 \item sumbool is a boolean type equipped with the justification of their value, which really helps with proofs
 \item Like bool and other 2-constructor inductive types, one can use the ``if then else'' construct to select the case. 
 \item See ahead the trans\_policy\_PIPS slide and others for an example of how ``if then else'' is used
-\item trans\_prin\_dec has been defined as below and proven in the source code
+\item The trans\_prin\_dec theorem basically declares that x is either in p or it is not, and this is decidable
 \end{itemize}
 \lstset{language=Coq}
 \begin{lstlisting}
@@ -481,8 +489,6 @@ Inductive answer : Set :=
   | Permitted : answer
   | Unregulated : answer
   | NotPermitted : answer.
-
-
 
 Inductive result : Set :=
   | Result : answer -> subject -> act -> asset -> result.
@@ -648,7 +654,7 @@ match pp with
 \item However in this case whenever a request cannot be granted, a default $deny$ is returned as decision (to err on the side of safety)
 \item This will include cases where neither $permit$ or $deny$ really applies
 \item This strategy makes difficult the composition of policies where policies` don`t care becomes a $deny$. 
-\item Some languages therefore include a explicit ``Don`t Care'' or ``Unregulated'' decision (this is the case for ACCPL) 
+\item Some languages therefore include a explicit ``Don`t Care'' or ``Not Applicable'' decision (this is the case for ACCPL) 
 \end{itemize}
 \end{frame}
 % slide 33
