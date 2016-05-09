@@ -2,6 +2,10 @@
 \chapter{Introduction}
 %======================================================================
 
+In this thesis, we describe the design of \ac{ACCPL} and its implementation in the Coq Proof Assistant. Using Coq to implement \ac{ACCPL} as it was being defined was an important factor in its design, allowing us to address the trade-off between expressive power and ease of formal proof of correctness. We argue that \ac{ACCPL} is significantly more amenable to analysis and reasoning than other access-control policy languages, while still retaining sufficient expressive power, and we describe how the design choices that were made contributed to this ease of reasoning. 
+
+The semantics of \ac{ACCPL} are specified by translation from policy statements together with an access request and an environment containing all relevant facts, to decisions. We present decidability results for the decision problem that asks whether a request to access a resource may be granted or denied, given a policy. The translation functions also cover the case where a given policy does not apply to a request in which case a decision of ``request is unregulated'' is rendered. We show that the translation algorithm terminates on all input policies with a decision of granted, denied or unregulated. Furthermore, we show that the translation algorithm meets its specification and computes the correct decision, with respect to its specification, given a policy. 
+
 To put \ac{ACCPL} in context, we need to go back to the origins of access-control and review the progression of the models from the most basic and perhaps oldest to the model \ac{ACCPL} implements. We will start the review of access-control models based on the survey done in~\cite{nist}, in section~\ref{sec:models}, but first the definition of ``access-control'' is in order.
 
 Authorization refers to the process of rendering a decision to allow access to a resource or asset of interest. By the same token all unauthorized access requests to resources must be controlled and ultimately denied, hence the term ``access-control''. 
