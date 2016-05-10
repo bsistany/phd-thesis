@@ -31,7 +31,7 @@ Because of the cited advantages of \ac{pbac} and its generality and wide spread 
 
 \section{A Core Policy Language for PBAC Systems} 
 
-Does there already exist a suitable policy language that can be used for expressing general access-control expressions? How about \ac{xacml}, \ac{odrl}~\cite{odrloneone} or \ac{xrml}~\cite{Wang}? 
+Does there already exist a suitable policy language that can be used for expressing general access-control expressions? How about \ac{xacml}~\cite{xacml3pdf}, \ac{odrl}~\cite{odrloneone} or \ac{xrml}~\cite{Wang}? 
 
 Currently the most popular \ac{rel}s are \ac{xrml}, and \ac{odrl}. Both of these languages are XML based and are considered declarative languages. \ac{xrml} has been selected by the the Moving Picture Experts Group, MPEG, to be the \ac{rel} for \emph{MPEG-21} which is an ISO standard for multimedia applications. \ac{odrl} is also a standards-based \ac{rel} which has been accepted as part of the W3C community with the mandate of standardizing how rights and policies, related to the usage of digital content on the Open Web Platform, \emph{OWP}~\cite{openwebplatform}, are expressed. \ac{odrl} 2.0 supports expression of rights and also privacy rules for social media while \ac{odrl} 1.0 was only dealing with the mobile ecosystem -- \ac{odrl} 1.0 was adopted by the Open Mobile Alliance, \emph{OMA} in 2000.
 
@@ -39,8 +39,14 @@ Currently the most popular \ac{rel}s are \ac{xrml}, and \ac{odrl}. Both of these
 
 As popular as both \ac{xrml} and \ac{odrl} are, their adoption and usage is still somewhat limited in practice. Both Apple and Microsoft for example have defined their own lightweight \ac{rel}s~\cite{problemwithrels} in FairPlay~\cite{fairplay} and in PlayReady~\cite{playready}. The authors of~\cite{problemwithrels} argue that both these \ac{rel}s (\ac{xrml} and \ac{odrl}) and others are simply too complex to be used effectively (for expressing rights) since they also try to cover much of the the enforcement and tracking aspects of \ac{drm}s.
 
-\ac{drm} refers to the digital management of rights associated with the access or usage of digital assets. There are various aspects of rights management however. According to the authors of the white paper ``A digital rights management ecosystem model for the education community,''(~\cite{collier})
- digital rights management systems cover the following four areas: 1) defining rights 2) distributing/acquiring rights 3) enforcing rights and 4) tracking usage.
+\ac{drm} refers to the digital management of rights associated with the access or usage of digital assets. There are various aspects of rights management however. According to the authors of the white paper ``A digital rights management ecosystem model for the education community''~\cite{collier} digital rights management systems cover the following four areas: 
+
+\begin{enumerate}
+  \item Defining rights 
+  \item Distributing/Acquiring rights 
+  \item Enforcing rights 
+  \item Tracking usage
+\end{enumerate}
 
 \ac{xacml} is a high-level and platform independent access control system that is also XML based. \ac{xacml} is an OASIS standard which defines a language for the definition of policies and access requests, and a workflow to achieve policy enforcement~\cite{DBLP:conf/essos/MasiPT12}. According to Masi et al~\cite{DBLP:conf/essos/MasiPT12} designing XACML access control policies is difficult and error prone. Furthermore \ac{xacml} comes without a formal semantics as do both \ac{xrml} and \ac{odrl}. The \ac{xacml} standard is written in prose and contains quite a number of loose points that may give rise to different interpretations and lead to different implementation choices~\cite{DBLP:conf/essos/MasiPT12}.
 
