@@ -1,5 +1,5 @@
 %======================================================================
-\chapter{ACCPL Syntax In Coq}\label{chap:odrl0syntaxcoq}
+\chapter{ACCPL Syntax in Coq}\label{chap:odrl0syntaxcoq}
 %======================================================================
 
 % ---------------------------------- COQ -----------------------
@@ -13,7 +13,7 @@ Assertions or propositions are statements about values in Coq such as \syn{3<8} 
 
 \section{ACCPL Syntax}\label{sec:agreementConstructor}
 
-\ac{ACCPL} productions were presented as high level abstract syntax in section~\ref{sec:productionast} of chapter~\ref{chap:odrl0syntax}. Below we present the corresponding encodings in Coq. 
+\ac{ACCPL} productions were presented as high level abstract syntax in Section~\ref{sec:productionast} of chapter~\ref{chap:odrl0syntax}. Below we present the corresponding encodings in Coq. 
 
 An \syn{agreement} is a new inductive type in Coq by the same name. The constructor \syn{Agreement} takes a \syn{prin}, an \syn{asset} and a \syn{policySet}. \syn{prin} is defined to be a nonempty list of \syn{subject}s (see listing~\ref{lst:agreementcoq}). 
 
