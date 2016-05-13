@@ -44,30 +44,21 @@ Definition e1 : environment :=
 %\end{minipage}
   
 
-We also define a \syn{getCount} function (see listing~\ref{lst:getCountcoq}) that given a pair consisting of a subject and policy id, looks for a corresponding count in the environment. \syn{getCount} assumes the given environment is consistent (meaning it won't return two different counts for the same pair of subject and policy id), so it returns the first matched \syn{count} it sees for a \syn{(subject, id)} pair. If a \syn{count} for a \syn{(subject, id)} pair is not found it returns 0. The use of keyword \syn{Fixpoint} is shown in the listing; \syn{Fixpoint} is used for recursive functions written in Coq's functional programming language. Note the use of the \syn{match} construct and pattern matching, one of the features of this language. 
+We also define a \syn{getCount} function that given a pair consisting of a subject and policy id, looks for a corresponding count in the environment. The \syn{getCount} function assumes the given environment is consistent (meaning it won't return two different counts for the same pair of subject and policy id), so it returns the first matched \syn{count} it sees for a \syn{(subject, id)} pair. If a \syn{count} for a \syn{(subject, id)} pair is not found it returns 0. 
 
+We have defined the necessary representations in Coq in the form of an inductive predicate (called \syn{env_consistent}) to verify the consistency assumption mentioned above (see listing~\ref{lst:envsConsistentcoq}). For a given environment \syn{e1}, we would require a proof of the proposition ``\syn{env_consistent e1}'' before translation begins. Note that we have defined helper lemmas to help complete such proofs. In the listing~\ref{lst:envsConsistentcoq}, we have also shown the definition of the function \syn{inconsistent} which states that two \syn{count_equality} values are inconsistent for the same pair of subject and policy id, if the counts are different. Another helper definition shown in listing~\ref{lst:envsConsistentcoq} is the function \syn{formula_inconsistent_with_env} which captures the proposition ``this environment is inconsistent with this environment''.
 
-\lstset{language=Coq, frame=single, caption={\syn{getCount} Function},label={lst:getCountcoq}}
+%Another option would be to restrict the environment type to a subset (consistent environments only) using Coq's \syn{sig} type defined in the Coq standard library module \syn{Coq.Init.Specif}. According to~\cite{Coq:manual} \syn{(sig A P)} or the notationally convenient \syn{\{x:A | P x\}}, represents the subset of elements of the type A which satisfy the predicate P. 
+
+\lstset{language=Coq, frame=single, caption={\syn{getCount} Function},label={lst:envsConsistentcoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Fixpoint getCount 
-  (e:environment)(s:subject)(id: policyId): nat :=
-  match e with
-  | SingleEnv f  => 
-      match f with 
-	  | CountEquality s1 id1 n1 => 
-          if (beq_nat s s1) 
-          then if (beq_nat id id1) then n1 else 0 
-          else 0  
-      end			
-  | ConsEnv f rest =>
-      match f with 
-	  | CountEquality s1 id1 n1 => 
-          if (beq_nat s s1)
-          then if (beq_nat id id1) then n1 else (getCount rest s id)  
-          else (getCount rest s id)
-      end
-  end.
+
+Inductive env_consistent : environment -> Prop := | consis_1 : forall f, env_consistent (SingleEnv f) | consis_2 : forall f g, ~(inconsistent f g) -> env_consistent (ConsEnv f (SingleEnv g)) | consis_more : forall f e,    env_consistent e -> ~(formula_inconsistent_with_env f e) -> env_consistent (ConsEnv f e).
+
+Definition inconsistent (f1 f2 : count_equality) : Prop :=   match f1 with (CountEquality s1 id1 n1) =>     match f2 with (CountEquality s2 id2 n2) =>       s1 = s2 -> id1 = id2 -> n1 <> n2     end   end.
+
+Fixpoint formula_inconsistent_with_env (f: count_equality)			  (e : environment) : Prop :=  match e with    | SingleEnv g =>  inconsistent f g    | ConsEnv g rest => (inconsistent f g) \/ (formula_inconsistent_with_env f rest)  end.
 \end{lstlisting}
 \end{minipage}
 
