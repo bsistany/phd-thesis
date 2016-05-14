@@ -126,7 +126,71 @@ Definition makeResult (ans:answer)(s:subject)(ac:act)(ass:asset) : result :=
 
 \section{Translations}\label{sec:translationfuncs}
 
-Intuitively a query or request asks the following question given an agreement: ``may subject \syn{s} perform an action \syn{ac} to asset \syn{a}?''. We represent a query by its components, namely the subject, action and asset that form the query question: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query}. While developing the proofs for the decidability of \ac{ACCPL} we realized we needed this query specific information deep in the translation functions to be able to render unambiguous decisions and ultimately make the proofs work. We therefore pass the query components to all the translation functions starting with the \syn{trans_agreement} function. 
+Intuitively a query or request asks the following question given an agreement: ``May subject \syn{s} perform an action \syn{ac} to asset \syn{a}?''. We represent a query by its components, namely the subject, action and asset that form the query question: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query}. While developing the proofs for the decidability of \ac{ACCPL} we realized we needed this query specific information deep in the translation functions to be able to render unambiguous decisions and ultimately make the proofs work. We therefore pass the query components to all the translation functions starting with the \syn{trans_agreement} function. 
+
+In the following paragraphs, we will describe each translation function in detail however a high-level description of how the main algorithm (encoded in these translation functions) works is in order.
+
+\begin{algorithm}      
+\caption{For an inclusive policy set, given a query, calculate a result with a decision of Permitted, NotPermitted, or Unregulated}       
+\label{inclusivePS}   
+\begin{algorithmic}        
+    \IF{$asset\_from\_query = asset\_from\_agreement$}
+      \IF{$subject\_from\_query$ is in $prin\_u$}
+        \IF{The $preRequisite$ from the policy set holds}
+          \IF{The $preRequisite$ from the policy holds}
+            \IF{$action\_from\_query = action\_from\_agreement$}
+              \STATE $result$ = $subject\_from\_query$ is $Permitted$ to perform $action\_from\_query$ on $asset\_from\_query$
+            \ELSE
+              \STATE $result$ = $Unregulated$
+            \ENDIF            
+          \ELSE
+             \STATE $result$ = $Unregulated$
+          \ENDIF
+        \ELSE
+          \STATE $result$ = $Unregulated$
+        \ENDIF
+      \ELSE
+           \STATE $result$ = $Unregulated$
+      \ENDIF
+    \ELSE
+      \STATE $result$ = $Unregulated$
+    \ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}      
+\caption{For an exclusive policy set, given a query, calculate a result with a decision of Permitted, NotPermitted, or Unregulated}       
+\label{exclusivePS}   
+\begin{algorithmic}        
+    \IF{$asset\_from\_query = asset\_from\_agreement$}
+      \IF{$subject\_from\_query$ is in $prin\_u$}
+        \IF{The $preRequisite$ from the policy set holds}
+          \IF{The $preRequisite$ from the policy holds}
+            \IF{$action\_from\_query = action\_from\_agreement$}
+              \STATE $result$ = $subject\_from\_query$ is $Permitted$ to perform $action\_from\_query$ on $asset\_from\_query$
+            \ELSE
+              \STATE $result$ = $Unregulated$
+            \ENDIF            
+          \ELSE
+             \STATE $result$ = $Unregulated$
+          \ENDIF
+        \ELSE
+          \STATE $result$ = $Unregulated$
+        \ENDIF
+      \ELSE
+            \IF{$action\_from\_query = action\_from\_agreement$}
+              \STATE $result$ = $subject\_from\_query$ is $NotPermitted$ to perform $action\_from\_query$ on $asset\_from\_query$
+            \ELSE
+              \STATE $result$ = $Unregulated$
+            \ENDIF
+      \ENDIF
+    \ELSE
+      \STATE $result$ = $Unregulated$
+    \ENDIF
+\end{algorithmic}
+\end{algorithm}
+
 
 Pattern matching in the body of the \syn{trans_agreement} function (in listing~\ref{lst:transagreement}), on \syn{ag}, the agreement in question, extracts the components of the agreement. These are \syn{ps}, the policy set, \syn{prin_u}, the agreement's user(s), and \syn{a}, the asset mentioned in the agreement. Notice that formal argument \syn{e} of type \syn{environment} is passed as an argument to many translation functions but will only eventually be used to get the count information from the \syn{getCount} function. As mentioned above, the components of the query or request, namely \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query} make up the other parameters that are passed into the next level translation function, which is the translation for a policy set called \syn{trans_ps}.
 
