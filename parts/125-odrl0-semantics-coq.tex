@@ -242,7 +242,9 @@ Definition trans_policy_PEPS
 %\end{minipage}
 
 
-The \syn{trans_policy_positive} translation function (see listing~\ref{lst:transPositiveCoq}) starts by calling the function \syn{trans_pp_list_trans_policy_positive} (see listing~\ref{lst:transListOfPositiveCoq}) on the list of \syn{primPolicy}s.
+\newpage
+
+The \syn{trans_policy_positive} translation function (see listing~\ref{lst:transPositiveCoq}) starts by calling the function \syn{trans_pp_list_trans_policy_positive} (see listing~\ref{lst:transListOfPositiveCoq}) on a list of \syn{primPolicy}s.
  
 \lstset{language=Coq, frame=single, caption={Translation of Positive Policies},
     label={lst:transPositiveCoq}}
@@ -257,9 +259,8 @@ Definition trans_policy_positive
 \end{lstlisting}
 \end{minipage}
 
-The function \syn{process_single_pp_trans_policy_positive} acting on a single \syn{primPolicy} (see  in listing~\ref{lst:transSinglePositivePolicyCoq}), first checks whether the prerequisite from the policy holds or not, by calling the decision procedure \syn{trans_preRequisite_dec}. If so the translation function checks that there is a proof for the equality of \syn{action_from_query} and \syn{action} (the \syn{action} from the agreement) by calling the decision procedure \syn{eq_nat_dec}. If so, the translation function finally returns a result of \syn{Permitted}. In all other cases, a result of \syn{Unregulated} is returned. Intuitively we are just explicitly stating that policies are not applicable to queries about actions that are not mentioned in the agreement. 
+The function \syn{process_single_pp_trans_policy_positive} acting on a single \syn{primPolicy} (see listing~\ref{lst:transSinglePositivePolicyCoq}), first checks whether the prerequisite from the policy holds or not, by calling the decision procedure \syn{trans_preRequisite_dec}. If so the translation function checks that there is a proof for the equality of \syn{action_from_query} and \syn{action} (the \syn{action} from the agreement) by calling the decision procedure \syn{eq_nat_dec}. If so, the translation function finally returns a result of \syn{Permitted}. In all other cases, a result of \syn{Unregulated} is returned. Intuitively we are just explicitly stating that policies are not applicable to queries about actions that are not mentioned in the agreement. 
 
-\newpage
 
 \lstset{language=Coq, frame=single, caption={Translation of a Primitive Positive Policy},
     label={lst:transSinglePositivePolicyCoq}}
@@ -304,11 +305,26 @@ Fixpoint trans_pp_list_trans_policy_positive
 %\end{minipage}
 
 
-\syn{trans_policy_negative} acting on a single \syn{primPolicy} (see \syn{process_single_pp_trans_policy_negative} in listing~\ref{lst:transNegativeCoq}), first checks that there is a proof for the equality of \syn{action_from_query} and \syn{action} (the \syn{action} from the agreement) by calling the decision procedure \syn{eq_nat_dec}. If so, the translation function returns a result of \syn{NotPermitted}. Otherwise, a result of \syn{Unregulated} is returned. Note that \syn{trans_policy_negative} is called from a context where \syn{trans_prin_dec} is not provable, which means that subject \syn{x}, is not in \syn{prin_u}. Also note that compared to \syn{trans_policy_positive} we don't check for whether \syn{preRequisite} from the policy holds or not, since \syn{trans_policy_negative} is only called for policy sets of type \syn{primExclusivePolicySet}.
-
+The \syn{trans_policy_negative} translation function (see listing~\ref{lst:transNegativeCoq}) starts by calling the function \syn{trans_pp_list_trans_policy_negative} on a list of primPolicys. Note that \syn{trans_pp_list_trans_policy_negative} is not listed here since it follows the exact pattern as \syn{trans_pp_list_trans_policy_positive} (see listing~\ref{lst:transListOfPositiveCoq}).
 
 \lstset{language=Coq, frame=single, caption={Translation of Negative Policies},
     label={lst:transNegativeCoq}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Fixpoint trans_policy_negative
+  (e:environment)(x:subject)(p:policy)(a:asset)
+  (action_from_query: act){struct p} : nonemptylist result :=  
+  match p with  
+       | Policy pp_list => trans_pp_list_trans_policy_negative pp_list x a action_from_query
+  end.
+\end{lstlisting}
+\end{minipage}
+
+The function \syn{process_single_pp_trans_policy_negative} acting on a single \\ \syn{primPolicy} (see listing~\ref{lst:transSingleNegativePolicyCoq}), first checks that there is a proof for the equality of \syn{action_from_query} and \syn{action} (the \syn{action} from the agreement) by calling the decision procedure \syn{eq_nat_dec}. If so, the translation function returns a result of \syn{NotPermitted}. Otherwise, a result of \syn{Unregulated} is returned. Note that \syn{trans_policy_negative} is called from a context where \syn{trans_prin_dec} is not provable, which means that subject \syn{x}, is not in \syn{prin_u}. Also note that compared to \syn{trans_policy_positive} we don't check for whether \syn{preRequisite} from the policy holds or not, since \syn{trans_policy_negative} is only called for policy sets of type \syn{primExclusivePolicySet}.
+
+
+\lstset{language=Coq, frame=single, caption={Translation of a Primitive Negative Policy},
+    label={lst:transSingleNegativePolicyCoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Definition process_single_pp_trans_policy_negative
@@ -324,15 +340,9 @@ Definition process_single_pp_trans_policy_negative
             (Single 
               (makeResult Unregulated x action_from_query a))
   end.
-
-Fixpoint trans_policy_negative
-  (e:environment)(x:subject)(p:policy)(a:asset)
-  (action_from_query: act){struct p} : nonemptylist result :=  
-  match p with  
-       | Policy pp_list => trans_pp_list_trans_policy_negative pp_list x a action_from_query
-  end.
 \end{lstlisting}
 \end{minipage}
+
 
 
 \syn{trans_policy_unregulated} acting on a single \syn{primPolicy} (see process_single_pp_trans_policy_unregulated in listing~\ref{lst:transUnregulatedCoq}), returns a result of Unregulated.
