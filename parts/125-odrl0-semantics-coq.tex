@@ -273,9 +273,7 @@ else (* asset_from_query <> a *)
 \end{minipage}
 
 
-
-
-The \syn{trans_policy_PIPS} translation function for a \syn{primInclusivePolicySet} checks whether there is a proof for the subject in question, \syn{x}, being in \syn{prin_u}, by calling the decision procedure \syn{trans_prin_dec}. If so there is a check for whether the \syn{preRequisite} from the policy set holds or not (by calling the decision procedure \syn{trans_preRequisite_dec}). If so the translation function \syn{trans_policy_positive} is called. In all other cases \syn{trans_policy_unregulated} is called (see listing~\ref{lst:transpipsCoq}).
+The \syn{trans_policy_PIPS} (see listing~\ref{lst:transpipsCoq}) translation function for a \\ \syn{primInclusivePolicySet} checks whether there is a proof for the subject in question, \syn{x}, being in \syn{prin_u}, by calling the decision procedure \syn{trans_prin_dec} (see listing~\ref{lst:transprindeccoq}). If so there is a check for whether the \syn{preRequisite} from the policy set holds or not by calling the decision procedure \syn{trans_preRequisite_dec} (see listing~\ref{lst:transpreRequisitedeccoq}). If so the translation function \syn{trans_policy_positive} is called. In all other cases \syn{trans_policy_unregulated} is called.
 
 \lstset{language=Coq, frame=single, caption={Translation of Primitive Inclusive Policy Set},
     label={lst:transpipsCoq}}
