@@ -50,15 +50,29 @@ We have defined the necessary representations in Coq in the form of an inductive
 
 %Another option would be to restrict the environment type to a subset (consistent environments only) using Coq's \syn{sig} type defined in the Coq standard library module \syn{Coq.Init.Specif}. According to~\cite{Coq:manual} \syn{(sig A P)} or the notationally convenient \syn{\{x:A | P x\}}, represents the subset of elements of the type A which satisfy the predicate P. 
 
-\lstset{language=Coq, frame=single, caption={\syn{getCount} Function},label={lst:envsConsistentcoq}}
+\lstset{language=Coq, frame=single, caption={Consistency of Environments},label={lst:envsConsistentcoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 
-Inductive env_consistent : environment -> Prop := | consis_1 : forall f, env_consistent (SingleEnv f) | consis_2 : forall f g, ~(inconsistent f g) -> env_consistent (ConsEnv f (SingleEnv g)) | consis_more : forall f e,    env_consistent e -> ~(formula_inconsistent_with_env f e) -> env_consistent (ConsEnv f e).
+Inductive env_consistent : environment -> Prop :=
+ | consis_1 : forall f, env_consistent (SingleEnv f)
+ | consis_2 : forall f g, ~(inconsistent f g) -> env_consistent (ConsEnv f (SingleEnv g))
+ | consis_more : forall f e,
+    env_consistent e -> ~(formula_inconsistent_with_env f e) -> env_consistent (ConsEnv f e).
 
-Definition inconsistent (f1 f2 : count_equality) : Prop :=   match f1 with (CountEquality s1 id1 n1) =>     match f2 with (CountEquality s2 id2 n2) =>       s1 = s2 -> id1 = id2 -> n1 <> n2     end   end.
+Definition inconsistent (f1 f2 : count_equality) : Prop :=
+   match f1 with (CountEquality s1 id1 n1) =>
+     match f2 with (CountEquality s2 id2 n2) =>
+       s1 = s2 -> id1 = id2 -> n1 <> n2
+     end
+   end.
 
-Fixpoint formula_inconsistent_with_env (f: count_equality)			  (e : environment) : Prop :=  match e with    | SingleEnv g =>  inconsistent f g    | ConsEnv g rest => (inconsistent f g) \/ (formula_inconsistent_with_env f rest)  end.
+Fixpoint formula_inconsistent_with_env (f: count_equality)
+			  (e : environment) : Prop :=
+  match e with
+    | SingleEnv g =>  inconsistent f g
+    | ConsEnv g rest => (inconsistent f g) \/ (formula_inconsistent_with_env f rest)
+  end.
 \end{lstlisting}
 \end{minipage}
 
@@ -128,10 +142,13 @@ Definition makeResult (ans:answer)(s:subject)(ac:act)(ass:asset) : result :=
 
 Intuitively a query or request asks the following question given an agreement: ``May subject \syn{s} perform an action \syn{ac} to asset \syn{a}?''. We represent a query by its components, namely the subject, action and asset that form the query question: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query}. While developing the proofs for the decidability of \ac{ACCPL} we realized we needed this query specific information deep in the translation functions to be able to render unambiguous decisions and ultimately make the proofs work. We therefore pass the query components to all the translation functions starting with the \syn{trans_agreement} function. 
 
-In the following paragraphs, we will describe each translation function in detail however a high-level description of how the main algorithm (encoded in these translation functions) works is in order.
+In the following paragraphs, we will describe each translation function in detail the \syn{trans_agreement} function, however a high-level description of how the main algorithm (encoded in these translation functions) works is now in order. We will show the main algorithm in two separate listings based on whether the policy set in question is inclusive or exclusive. 
 
+The first listing (Algorithm~\ref{inclusivePS}) for inclusive policy sets, shows how a positive answer to a query in the form of a \syn{Permitted} decision is reached. All cases when a decision of \syn{Unregulated} is rendered are explicitly captured and shown. The second listing (Algorithm~\ref{exclusivePS}) for exclusive policy sets, shows how a negative answer to a query in the form of a \syn{NotPermitted} decision is reached. This listing also shows that a positive decision of \syn{Permitted} is reached in exactly the same way as the case for inclusive policy sets. All cases when a decision of \syn{Unregulated} is rendered are explicitly captured and shown.
+
+ 
 \begin{algorithm}      
-\caption{For an inclusive policy set, given a query, calculate a result with a decision of Permitted, NotPermitted, or Unregulated}       
+\algCaption{Access Decision Pseudocode: Inclusive Policy Sets}       
 \label{inclusivePS}   
 \begin{algorithmic}        
     \IF{$asset\_from\_query = asset\_from\_agreement$}
@@ -160,7 +177,7 @@ In the following paragraphs, we will describe each translation function in detai
 
 
 \begin{algorithm}      
-\caption{For an exclusive policy set, given a query, calculate a result with a decision of Permitted, NotPermitted, or Unregulated}       
+\algCaption{Access Decision Pseudocode: Exclusive Policy Sets}            
 \label{exclusivePS}   
 \begin{algorithmic}        
     \IF{$asset\_from\_query = asset\_from\_agreement$}

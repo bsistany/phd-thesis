@@ -15,6 +15,11 @@
 \usepackage{lstcoq}
 \usepackage{url}
 
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+
+
 
 \definecolor{maroon}{rgb}{0.5,0,0}
 \definecolor{darkgreen}{rgb}{0,0.5,0}
@@ -141,3 +146,10 @@
 
 \newcommand{\notimplies}{%
   \mathrel{{\ooalign{\hidewidth$\not\phantom{=}$\hidewidth\cr$\implies$}}}}
+  
+\newcommand{\algCaption}[1]{
+    \caption{#1}
+    \addcontentsline{lol}{lstlisting}{\protect\numberline{\thealgorithm}#1}
+    \addtocounter{lstlisting}{1}}
+\AtBeginEnvironment{lstlisting}{\addtocounter{algorithm}{1}}
+  
