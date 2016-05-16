@@ -46,15 +46,12 @@ According to Tschantz and Krishnamurthi~\cite{Tschantz} at least three different
 \item Implicit with automatic proof capability: grants access to the query by automatically proving that \syn{$\neg$GoldBundle(s)}. Under this interpretation, proof by contradiction is used to establish \syn{$\neg$GoldBundle(s)}. The assumption \syn{$\neg$GoldBundle(s)} is added to \syn{e1} which already contains \syn{BasicBundle(s)}. Now \syn{p1} permits TheReport to be printed by the subject while \syn{p2} would not permit TheReport to be printed by the subject, leading to a contradiction and the proof of \syn{$\neg$GoldBundle(s)}.
 \end{itemize}
 
-A policy language based on the first and third interpretations are not certifiable, meaning a machine-checked proof of the correctness of their semantics with respect to different properties (such as decidability) may not be possible. The main problem with such languages is the implicitness of their semantics. This was the case for the Pucella and Weissman~\cite{pucella2006} fragment of \ac{odrl}; although the interpretation found in Pucella and Weissman's fragment doesn't necessarily match the first and the third interpretations above, they are certainly in the camp of ``implicit'' interpretations. \ac{ACCPL} matches the second interpretation in the sense of having explicit semantics which leads to certifiable results we discuss elsewhere.
+A policy language based on the first and third interpretations are not certifiable, meaning a machine-checked proof of the correctness of their semantics with respect to different properties (such as decidability) may not be possible. The main problem with such languages is the implicitness of their semantics. This was the case for the Pucella and Weissman~\cite{pucella2006} fragment of \ac{odrl}; although the interpretation found in Pucella and Weissman's fragment doesn't necessarily match the first and the third interpretations above, they are certainly in the camp of ``implicit'' interpretations. \ac{ACCPL} matches the second interpretation in the sense of having explicit semantics which leads to certifiable results we discuss elsewhere. 
 
 
 
 %\section{ACCPL}
 
-%\section{Policy Combinators}\label{sec:policycombinators}
-
-Primitive policies are often developed by independent entities within an organization therefore it is natural to want a way of combining them into a policy for the whole organization using policy combinators. Some languages such as \ac{odrl} have nested sub-policies inside other policies. In such cases one design decision could be to allow for different combinators for different layers to make the language more expressive. Some examples of policy combinators are: conjunction, disjunction, exclusive disjunction, Permitted override (if any of the primitive policies returns a Permitted, return only Permitted), NotPermitted override (if any of the primitive policies returns a NotPermitted, return only NotPermitted)~\cite{Tschantz}.
 
 When designing \ac{ACCPL} and to make the decidability proofs possible, we sought out all the different combinations and cases possible (through interaction with the proof process) and explicitly enumerated them in the translation functions (see the high-level algorithms in listing~\ref{inclusivePS} and in listing~\ref{exclusivePS}). Once we made explicit all the different cases where a decision was possible, we assigned \syn{Permitted} and \syn{NotPermitted} decisions to two specific cases while every other enumerated case was rendered with an \syn{Unregulated} decision. Explicit enumeration of all the different cases has been certified to be complete by the fact that we have the decidability results. Note that we could have made different design choices in assigning the decisions. 
 
@@ -79,9 +76,27 @@ Theorem trans_agreement_dec:
 \end{lstlisting}
 \end{minipage}
 
+\section{Policy Combinators}\label{sec:policycombinators}
+
+Given that basic policies are often developed by independent entities within an organization, it is natural to want a way of combining them into a higher level policy for the whole organization using policy combinators and most policy-based access-control languages provide a way to combine policies. In practice there is a range of possibilities for combining policies. 
+
+According to Li et al.~\cite{LiWQBRLL09} \ac{xacml} defines three policy elements: rules, policies, and policy-sets. A rule is the most basic policy element in \ac{xacml} and is equivalent in concept to \ac{ACCPL}'s primitive policies. In \ac{xacml} a policy contains rules and a policy set contains policies or other policy sets. Both policies and policy sets in provide a way to combine lower level policy elements. A \ac{xacml} policy specifies a rule-combining algorithm (RCA) while a policy set specifies a policy combining algorithm (PCA). The RCA specifieshow the decisions from the rules are combined to yield one decision while the PCA specifies how the results of evaluating the sub-policies are combined toyield one decision. Some examples of PCAs are: permit-override (if any of the sub policies returns a permit, return only permit), deny-override (if any of the sub policies returns a deny, return only deny)~\cite{Tschantz}. 
+
+Some languages such as \ac{odrl} have nested sub-policies inside other policies where different combinators for different layers may be used to make the language more expressive. According to Pucella and Weissman~\cite{pucella2006} \ac{odrl} uses a conjunction operator for both basic policies and policy sets (which contain basic policies).
+
+
+
+
+
+
+
 \section{Policy Based Access-Control Languages}
 
-Tschantz and Krishnamurthi~\cite{Tschantz} define an access-control policy language as a tuple $L = (P, Q, G, N, \left\langle\left\langle . \right\rangle\right\rangle)$ where $P$ is a set of policies, $Q$ is a set of requests or queries, $G$ is the granting decisions, $N$ is the non-granting decisions, $\left\langle\left\langle . \right\rangle\right\rangle$ is a function taking a policy $p \in P$ to a relation between $Q$ and $G \cup N$ where $G \cap N = \emptyset$. Let $D$ represent $G \cup N$. Policy $p$ assigns a decision of $d \in D$ to the query $q \in Q$. $L$ also defines a partial order on decisions such that $d \leq d'$ if either $d, d' \in N$ or $d, d' \in G$ or $d \in N$ and $d' \in G$. Note that for \ac{ACCPL}, $D = \left\{ {\text{Unregulated}, \text{NotPermitted}, \text{Permitted}}\right\}$, $G = \left\{ {\text{Permitted}}\right\}$ and $N = \left\{ {\text{Unregulated}, \text{NotPermitted}}\right\}$.
+Tschantz and Krishnamurthi~\cite{Tschantz} formalize the differences between the interpretations in~\cite{Tschantz} but they also enumerate some common features to all access-control languages. For example, the notion of access requests and decisions are universal in access-control languages. Some languages treat the context or the environment where decisions are rendered separately while other languages may treat environments as part of the access request -- regardless, the notion of an environment is a common feature to access-control languages.
+
+
+Tschantz and Krishnamurthi formally define an access-control policy language as a tuple $L = (P, Q, G, N, \left\langle\left\langle . \right\rangle\right\rangle)$ where $P$ is a set of policies, $Q$ is a set of requests or queries, $G$ is the granting decisions, $N$ is the non-granting decisions, $\left\langle\left\langle . \right\rangle\right\rangle$ is a function taking a policy $p \in P$ to a relation between $Q$ and $G \cup N$ where $G \cap N = \emptyset$. Let $D$ represent $G \cup N$. Policy $p$ assigns a decision of $d \in D$ to the query $q \in Q$. $L$ also defines a partial order on decisions such that $d \leq d'$ if either $d, d' \in N$ or $d, d' \in G$ or $d \in N$ and $d' \in G$. Note that for \ac{ACCPL}, $D = \left\{ {\text{Unregulated}, \text{NotPermitted}, \text{Permitted}}\right\}$, $G = \left\{ {\text{Permitted}}\right\}$ and $N = \left\{ {\text{Unregulated}, \text{NotPermitted}}\right\}$.
+
 
 
 
