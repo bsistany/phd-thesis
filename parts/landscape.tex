@@ -121,7 +121,7 @@ Could we conclude that an access-control policy language with the explicit appro
 Notice that, technically in \ac{ACCPL} we have a partially ordered set, a \syn{poset} of decisions and not a lattice. This is because for \ac{ACCPL} there is no decision acting as the greatest lower bound but we do have a least upper bound in \syn{Permitted}, so we have: \syn{Unregulated} $\leq$ \syn{Permitted} and \syn{NotPermitted} $\leq$ \syn{Permitted}.
 
 
-\section{Independent Composition}
+\section{Independent Composition}\label{sec:indepcompos}
 
 As discussed in Section~\ref{sec:threeinterpretations}, the third interpretation works by taking into account not only the third policy, $p3$, but also $p1$ and $p2$ to render a decision of granted. Under this interpretation, proof by contradiction was used to establish \syn{$\neg$GoldBundle(s)}. The assumption \syn{$\neg$GoldBundle(s)} was added to the assumption \syn{BasicBundle(s)} to make \syn{p1} permit \syn{TheReport} to be printed by the subject while making \syn{p2} not permit \syn{TheReport} to be printed by the subject, leading to a contradiction and hence the proof of \syn{$\neg$GoldBundle(s)}. 
 
