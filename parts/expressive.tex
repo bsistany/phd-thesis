@@ -1,5 +1,5 @@
 %======================================================================
-\chapter{Expressive Power of ACCPL}
+\chapter{Expressive Power of ACCPL}\label{chap:expressivepowerofACCPL}
 %======================================================================
 
 We have mentioned previously about the trade-offs we have made in the design of \ac{ACCPL} between ease of formal proof of correctness and expressive power. We started out by examining Pucella and Weissman's fragment of \ac{odrl}~\cite{pucella2006} focusing on what we believed to be the essence or core of their language in terms of expressive power at the same time staying away from some of the more complex constructs in order to achieve our goal of ease of reasoning about the policies written in \ac{ACCPL} with respect to specific questions such as the decidability problem we discussed in chapter~\ref{chap:intro}. In the following sections we will review differences between \ac{ACCPL} and Pucella and Weissman's fragment of \ac{odrl} including the syntactic constructs we have left out of \ac{ACCPL} and discuss whether and how much expressive power has been lost by making \ac{ACCPL} a small language.
@@ -15,7 +15,7 @@ As mentioned in previous chapters, \ac{ACCPL} forgoes requirements completely an
 One reason \ac{ACCPL} was started small was to establish the correctness proofs for the semantics (as described previously) before we could discuss various ways expressive power could be added to the language. However another reason for the compactness of \ac{ACCPL} was to keep it generic and suitable for various applications. For example, although we have kept many of the prerequisites from 
 \ac{odrl}~\cite{pucella2006}, and in general have treated digital rights as our main access-control application throughout the thesis, there is no reason why we cannot add other arbitrary conditions to \ac{ACCPL} provided they are provable. For example, prerequisites similar in expressive power to \ac{xacml} targets and/or conditions may be added in \ac{ACCPL} for a specific application (e.g. access-control in healthcare). Of course, adding new prerequisites would require additional translation functions, decision procedures and potentially new helper lemmas and theorems.
 
-\section{PolicySet Combinators}  
+\section{PolicySet Combinators}\label{sec:policysetcombo}
 
 Policy sets in \ac{odrl} as specified by~\cite{pucella2006} may be combined using the conjunction operator. This possibility certainly adds to the expressive power of a language, similar to the case of basic policies when they are combined. In \ac{ACCPL} we have only retained basic policy sets that don't contain other policy sets. While this means \ac{ACCPL} is less expressive this design decision was made to make the language respect the ``independent composition'' property (see section~\ref{sec:indepcompos}) and as a consequence be conflict-free (the answer to a access query will be either granting or denying but not both). 
 

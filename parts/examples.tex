@@ -1,0 +1,47 @@
+%======================================================================
+\chapter{Examples}
+%======================================================================
+
+We will start this chapter by presenting an example policy statement expressed using \ac{odrl}'s XML-based syntax. The statement ``the asset TheReport may be printed a total of 2 times by Alice only'' is illustrated in listing~\ref{lst:agreementinxml} (A similar but more complex example is discussed in~\cite{pucella2006}). 
+
+
+\lstset{language=XML}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[caption={Agreement for Alice and Bob in XML},label={lst:agreementinxml}]
+<agreement>
+ <asset> <context> <uid> The Report </uid> </context> </asset>
+ <permission>
+   <print>
+    <constraint> <name> Alice </name> </constraint>
+    <constraint> <count> 2 </count> </constraint>
+   </print>
+ </permission>
+ <party> <context> <name> Alice </name> </context> </party>
+ <party> <context> <name> Bob </name> </context> </party>
+</agreement>
+\end{lstlisting}
+%\end{minipage} 
+
+The statement in listing~\ref{lst:agreementinxml} is shown in listing~\ref{lst:agreementExpressible} using the abstract syntax from~\cite{pucella2006}.
+
+\lstset{language=Pucella2006}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Expressible in ACCPL},label={lst:agreementExpressible}]
+agreement
+ for Alice and Bob 
+ about The Report 
+ with True -> and[Alice, count[2]] => print.
+\end{lstlisting}
+%\end{minipage} 
+
+While the statement in listing~\ref{lst:agreementExpressible} is expressible in \ac{ACCPL}, the statement ``the asset TheReport may be printed a total of 5 times by either Alice or Bob and twice more by Alice only''~\cite{pucella2006} is not expressible in \ac{ACCPL}. This statement is fully expressible in \ac{odrl} and also in Pucella and Weissman's fragment of \ac{odrl}~\cite{pucella2006}. We discuss the design choices that leads to this limitation in expressive power for \ac{ACCPL} in section~\ref{sec:policysetcombo} but at a high-level we have traded off the possibility of combining policy sets (see section~\ref{lst:policySetast}) in exchange for a conflict-free policy language in \ac{ACCPL}.
+
+\lstset{language=Pucella2006}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Not Expressible in ACCPL},label={lst:agreementNotExpressible}]
+agreement
+ for Alice and Bob 
+ about The Report 
+ with and[True -> count[5] => print, True -> and[Alice, count[2]] => print].
+\end{lstlisting}
+\end{minipage}
