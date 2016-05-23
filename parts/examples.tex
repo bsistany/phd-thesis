@@ -26,7 +26,7 @@ The statement in listing~\ref{lst:agreementinxml} is shown in listing~\ref{lst:a
 
 \lstset{language=Pucella2006}
 %\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[mathescape][frame=single, caption={First Agreement for Alice and Bob},label={lst:agreementinAST}]
+\begin{lstlisting}[frame=single, caption={First Agreement for Alice and Bob},label={lst:agreementinAST}, mathescape]
 agreement
  for Alice and Bob 
  about The Report 
@@ -38,19 +38,41 @@ agreement
 \lstset{language=Coq, frame=single, caption={Expressing First Agreement for Alice and Bob in ACCPL}, label={lst:agreementincoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Definition ps_xml_p1prq1:primPreRequisite :=   (Constraint (Principal (Single Alice))).
+Definition ps_xml_p1prq1:primPreRequisite := 
+  (Constraint (Principal (Single Alice))).
 
-Definition ps_xml_p1prq2:primPreRequisite :=   (Constraint (Count 2)).
+Definition ps_xml_p1prq2:primPreRequisite := 
+  (Constraint (Count 2)).
 
-Definition ps_xml_prq:preRequisite :=   (PreRequisite (NewList ps_xml_p1prq1 (Single ps_xml_p1prq2))).
+Definition ps_xml_prq:preRequisite := 
+  (PreRequisite (NewList ps_xml_p1prq1 (Single ps_xml_p1prq2))).
 
-Definition ps_xml_p1:primPolicy :=   (PrimitivePolicy ps_xml_prq id1 Print).Definition ps_xml_p:policy :=   (Policy (Single ps_xml_p1)).Definition ps_xml:primPolicySet :=  PIPS (PrimitiveInclusivePolicySet    (makePreRequisite TruePrq) ps_xml_p).Definition Axml := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_xml).\end{lstlisting}
+Definition ps_xml_p1:primPolicy := 
+  (PrimitivePolicy ps_xml_prq id1 Print).
+
+Definition ps_xml_p:policy := 
+  (Policy (Single ps_xml_p1)).
+
+Definition ps_xml:primPolicySet :=
+  PIPS (PrimitiveInclusivePolicySet
+    (makePreRequisite TruePrq) ps_xml_p).
+
+Definition Axml := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_xml).
+\end{lstlisting}
 \end{minipage} 
 
 \lstset{language=Coq, frame=single, caption={Fully Built First Agreement for Alice and Bob in ACCPL}, label={lst:agreementincoq2}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS               (PrimitiveInclusivePolicySet (PreRequisite [TruePrq])                  (Policy                     [PrimitivePolicy                        (PreRequisite                           (Constraint (Principal [Alice]),                            [Constraint (Count 2)])) id1 Print]))))
+Agreement (Alice, [Bob]) TheReport
+         (PPS
+            (PIPS
+               (PrimitiveInclusivePolicySet (PreRequisite [TruePrq])
+                  (Policy
+                     [PrimitivePolicy
+                        (PreRequisite
+                           (Constraint (Principal [Alice]),
+                            [Constraint (Count 2)])) id1 Print]))))
 
 \end{lstlisting}
 \end{minipage} 
@@ -74,11 +96,11 @@ Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS             
 
 \section{Other Examples (Still Expressible in ACCPL Only): Show Coq code}
 
-The statement in listing~\ref{lst:pucella21exampleAST} (from ~\cite{pucella2006}) expresses that ``the asset TheReport may be printed a total of five times by Alice or Bob'' by the first policy statement. The second policy statement is only allowing Alice to print twice more which means Bob is not allowed to use this policy to print at all.
+The statement in listing~\ref{lst:pucellatwooneexampleAST} (from~\cite{pucella2006}) expresses that ``the asset TheReport may be printed a total of five times by Alice or Bob'' by the first policy statement. The second policy statement is only allowing Alice to print twice more which means Bob is not allowed to use this policy to print at all.
 
 \lstset{language=Pucella2006}
 \begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[mathescape][frame=single, caption={Agreement Example 2.1},label={lst:pucella21exampleAST}]
+\begin{lstlisting}[frame=single, caption={Agreement of Example 2.1},label={lst:pucellatwooneexampleAST}, mathescape]
 agreement
  for Alice and Bob 
  about The Report 
@@ -86,18 +108,36 @@ agreement
 \end{lstlisting}
 \end{minipage} 
 
-\lstset{language=Coq, frame=single, caption={Expressing Example 2.1 agreement in ACCPL}, label={lst:pucella21examplecoq}}
+\lstset{language=Coq, frame=single, caption={Expressing Agreement of Example 2.1 in ACCPL}, label={lst:pucella21examplecoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Definition ps_21_p1:primPolicy :=   (PrimitivePolicy (makePreRequisite (Constraint (Count  5))) id1 Print).Definition ps_21_p2prq1:primPreRequisite :=   (Constraint (Principal (Single Alice))).
+Definition ps_21_p1:primPolicy := 
+  (PrimitivePolicy (makePreRequisite (Constraint (Count  5))) id1 Print).
 
-Definition ps_21_p2prq2:primPreRequisite :=   (Constraint (Count 2)).
+Definition ps_21_p2prq1:primPreRequisite := 
+  (Constraint (Principal (Single Alice))).
 
-Definition ps_21_prq:preRequisite :=   (PreRequisite (NewList ps_21_p2prq1 (Single ps_21_p2prq2))).Definition ps_21_p2:primPolicy :=   (PrimitivePolicy ps_21_prq id2 Print).Definition ps_21_p:policy :=   (Policy (NewList ps_21_p1 (Single ps_21_p2))).Definition ps_21:primPolicySet :=  PIPS (PrimitiveInclusivePolicySet    (makePreRequisite TruePrq) ps_21_p).Definition A21 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_21).
+Definition ps_21_p2prq2:primPreRequisite := 
+  (Constraint (Count 2)).
+
+Definition ps_21_prq:preRequisite := 
+  (PreRequisite (NewList ps_21_p2prq1 (Single ps_21_p2prq2))).
+
+Definition ps_21_p2:primPolicy := 
+  (PrimitivePolicy ps_21_prq id2 Print).
+
+Definition ps_21_p:policy := 
+  (Policy (NewList ps_21_p1 (Single ps_21_p2))).
+
+Definition ps_21:primPolicySet :=
+  PIPS (PrimitiveInclusivePolicySet
+    (makePreRequisite TruePrq) ps_21_p).
+
+Definition A21 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_21).
 \end{lstlisting}
 \end{minipage} 
 
-\lstset{language=Coq, frame=single, caption={Fully Built Example 2.1 agreement in ACCPL}, label={lst:pucella21examplecoq2}}
+\lstset{language=Coq, frame=single, caption={Fully Built Agreement of Example 2.1 in ACCPL}, label={lst:pucella21examplecoq2}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 
@@ -118,67 +158,104 @@ Definition ps_21_prq:preRequisite :=   (PreRequisite (NewList ps_21_p2prq1 (Sin
 
 
 
-
+\section {Another Example}
 \lstset{language=Pucella2006}
-%\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Expressible in ACCPL},label={lst:pucella21example}]
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2},label={lst:pucellatwotwoexampleAST}, mathescape]
 agreement
  for Alice and Bob 
  about The Report 
- with True -> and[Alice, count[2]] => print.
+ with count[5] -> and[True =>$_{id1}$ print, True =>$_{id2}$ display].
 \end{lstlisting}
-
+\end{minipage} 
+%
+\section {Another Example}
 \lstset{language=Pucella2006}
-%\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Expressible in ACCPL},label={lst:agreementExpressible}]
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Agreement of Example 2.3},label={lst:pucellatwothreeexampleAST}, mathescape]
 agreement
  for Alice and Bob 
  about The Report 
- with True -> and[Alice, count[2]] => print.
+ with True -> Alice <count[1]> =>$_{id1}$ print.
 \end{lstlisting}
-
+\end{minipage} 
+%
+\section {Another Example}
 \lstset{language=Pucella2006}
-%\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Expressible in ACCPL},label={lst:agreementExpressible}]
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Agreement of Example 2.4},label={lst:pucellatwofourexampleAST}, mathescape]
 agreement
- for Alice and Bob 
+ for Alice and Bob and Charlie
  about The Report 
- with True -> and[Alice, count[2]] => print.
+ with and[{Alice, Bob}, {Alice, Bob}<count[5]>] -> and[True =>$_{id1}$ print, True =>$_{id2}$ display].
 \end{lstlisting}
-
-\lstset{language=Pucella2006}
+\end{minipage} 
+%
+%\section {Another Example}
+%\lstset{language=Pucella2006}
 %\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Expressible in ACCPL},label={lst:agreementExpressible}]
-agreement
- for Alice and Bob 
- about The Report 
- with True -> and[Alice, count[2]] => print.
-\end{lstlisting}
-
-\lstset{language=Pucella2006}
+%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2},label={lst:pucellatwotwoexampleAST}, mathescape]
+%agreement
+% for Alice and Bob 
+% about The Report 
+% with True -> and[Alice, count[2]] =>$_{id1}$ print.
+%\end{lstlisting}
+%\end{minipage} 
+%
+%\section {Another Example}
+%\lstset{language=Pucella2006}
 %\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Expressible in ACCPL},label={lst:agreementExpressible}]
-agreement
- for Alice and Bob 
- about The Report 
- with True -> and[Alice, count[2]] => print.
-\end{lstlisting}
-
-\lstset{language=Pucella2006}
+%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2},label={lst:pucellatwotwoexampleAST}, mathescape]
+%agreement
+% for Alice and Bob 
+% about The Report 
+% with True -> and[Alice, count[2]] =>$_{id1}$ print.
+%\end{lstlisting}
+%\end{minipage} 
+%
+%\section {Another Example}
+%\lstset{language=Pucella2006}
 %\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Expressible in ACCPL},label={lst:agreementExpressible}]
-agreement
- for Alice and Bob 
- about The Report 
- with True -> and[Alice, count[2]] => print.
-\end{lstlisting}
-
-\lstset{language=Pucella2006}
+%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2},label={lst:pucellatwotwoexampleAST}, mathescape]
+%agreement
+% for Alice and Bob 
+% about The Report 
+% with True -> and[Alice, count[2]] =>$_{id1}$ print.
+%\end{lstlisting}
+%\end{minipage} 
+%
+%\section {Another Example}
+%\lstset{language=Pucella2006}
 %\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Expressible in ACCPL},label={lst:agreementExpressible}]
-agreement
- for Alice and Bob 
- about The Report 
- with True -> and[Alice, count[2]] => print.
-\end{lstlisting}
-
+%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2},label={lst:pucellatwotwoexampleAST}, mathescape]
+%agreement
+% for Alice and Bob 
+% about The Report 
+% with True -> and[Alice, count[2]] =>$_{id1}$ print.
+%\end{lstlisting}
+%\end{minipage} 
+%
+%\section {Another Example}
+%\lstset{language=Pucella2006}
+%\begin{minipage}[c]{0.95\textwidth}
+%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2},label={lst:pucellatwotwoexampleAST}, mathescape]
+%agreement
+% for Alice and Bob 
+% about The Report 
+% with True -> and[Alice, count[2]] =>$_{id1}$ print.
+%\end{lstlisting}
+%\end{minipage} 
+%
+%\section {Another Example}
+%\lstset{language=Pucella2006}
+%\begin{minipage}[c]{0.95\textwidth}
+%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2},label={lst:pucellatwotwoexampleAST}, mathescape]
+%agreement
+% for Alice and Bob 
+% about The Report 
+% with True -> and[Alice, count[2]] =>$_{id1}$ print.
+%\end{lstlisting}
+%\end{minipage} 
+%
+%
+%
