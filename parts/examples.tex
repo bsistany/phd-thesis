@@ -7,7 +7,7 @@ We will start this chapter by presenting an example policy statement expressed u
 
 \lstset{language=XML}
 %\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[caption={First Agreement for Alice and Bob in XML},label={lst:agreementinxml}]
+\begin{lstlisting}[caption={First Agreement for Alice and Bob in XML}, label={lst:agreementinxml}]
 <agreement>
  <asset> <context> <uid> The Report </uid> </context> </asset>
  <permission>
@@ -26,7 +26,7 @@ The statement in listing~\ref{lst:agreementinxml} is shown in listing~\ref{lst:a
 
 \lstset{language=Pucella2006}
 %\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={First Agreement for Alice and Bob},label={lst:agreementinAST}, mathescape]
+\begin{lstlisting}[frame=single, caption={First Agreement for Alice and Bob}, label={lst:agreementinAST}, mathescape]
 agreement
  for Alice and Bob 
  about The Report 
@@ -83,7 +83,7 @@ Agreement (Alice, [Bob]) TheReport
 
 %\lstset{language=Pucella2006}
 %\begin{minipage}[c]{0.95\textwidth}
-%\begin{lstlisting}[frame=single, caption={More than One Policy Set},label={lst:morethanonePS}]
+%\begin{lstlisting}[frame=single, caption={More than One Policy Set}, label={lst:morethanonePS}]
 %agreement
 % for Alice and Bob 
 % about The Report 
@@ -100,7 +100,7 @@ The statement in listing~\ref{lst:pucellatwooneexampleAST} (from~\cite{pucella20
 
 \lstset{language=Pucella2006}
 \begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Agreement of Example 2.1},label={lst:pucellatwooneexampleAST}, mathescape]
+\begin{lstlisting}[frame=single, caption={Agreement of Example 2.1}, label={lst:pucellatwooneexampleAST}, mathescape]
 agreement
  for Alice and Bob 
  about The Report 
@@ -161,7 +161,7 @@ Definition A21 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_21).
 \section {Another Example}
 \lstset{language=Pucella2006}
 \begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2},label={lst:pucellatwotwoexampleAST}, mathescape]
+\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2}, label={lst:pucellatwotwoexampleAST}, mathescape]
 agreement
  for Alice and Bob 
  about The Report 
@@ -172,7 +172,7 @@ agreement
 \section {Another Example}
 \lstset{language=Pucella2006}
 \begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Agreement of Example 2.3},label={lst:pucellatwothreeexampleAST}, mathescape]
+\begin{lstlisting}[frame=single, caption={Agreement of Example 2.3}, label={lst:pucellatwothreeexampleAST}, mathescape]
 agreement
  for Alice and Bob 
  about The Report 
@@ -183,7 +183,7 @@ agreement
 \section {Another Example}
 \lstset{language=Pucella2006}
 \begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Agreement of Example 2.4},label={lst:pucellatwofourexampleAST}, mathescape]
+\begin{lstlisting}[frame=single, caption={Agreement of Example 2.4}, label={lst:pucellatwofourexampleAST}, mathescape]
 agreement
  for Alice and Bob and Charlie
  about The Report 
@@ -191,10 +191,34 @@ agreement
 \end{lstlisting}
 \end{minipage} 
 %
+\section {Another Example}
+\lstset{language=Pucella2006}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Agreement of Example 2.5}, label={lst:pucellatwofiveexampleAST}, mathescape]
+agreement
+ for Alice and Bob 
+ about ebook 
+ with count[10] -> and[forEachMember[{Alice, Bob}; count[5]] =>$_{id1}$ display, 
+                                forEachMember[{Alice, Bob}; count[1]] =>$_{id2}$ print].
+\end{lstlisting}
+\end{minipage} 
+%
+\section {Another Example}
+\lstset{language=Pucella2006}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Agreement of Example 2.6}, label={lst:pucellatwosixexampleAST}, mathescape]
+agreement
+ for Alice and Bob 
+ about latestJingle 
+ with inSeq[prePay[5], attribution[Charlie]] $\mapsto$ (Alice <count[10]> =>$_{id1}$ play). 
+                                    
+\end{lstlisting}
+\end{minipage} 
+%
 %\section {Another Example}
 %\lstset{language=Pucella2006}
 %\begin{minipage}[c]{0.95\textwidth}
-%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2},label={lst:pucellatwotwoexampleAST}, mathescape]
+%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2}, label={lst:pucellatwotwoexampleAST}, mathescape]
 %agreement
 % for Alice and Bob 
 % about The Report 
@@ -205,7 +229,7 @@ agreement
 %\section {Another Example}
 %\lstset{language=Pucella2006}
 %\begin{minipage}[c]{0.95\textwidth}
-%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2},label={lst:pucellatwotwoexampleAST}, mathescape]
+%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2}, label={lst:pucellatwotwoexampleAST}, mathescape]
 %agreement
 % for Alice and Bob 
 % about The Report 
@@ -216,7 +240,7 @@ agreement
 %\section {Another Example}
 %\lstset{language=Pucella2006}
 %\begin{minipage}[c]{0.95\textwidth}
-%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2},label={lst:pucellatwotwoexampleAST}, mathescape]
+%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2}, label={lst:pucellatwotwoexampleAST}, mathescape]
 %agreement
 % for Alice and Bob 
 % about The Report 
@@ -227,29 +251,7 @@ agreement
 %\section {Another Example}
 %\lstset{language=Pucella2006}
 %\begin{minipage}[c]{0.95\textwidth}
-%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2},label={lst:pucellatwotwoexampleAST}, mathescape]
-%agreement
-% for Alice and Bob 
-% about The Report 
-% with True -> and[Alice, count[2]] =>$_{id1}$ print.
-%\end{lstlisting}
-%\end{minipage} 
-%
-%\section {Another Example}
-%\lstset{language=Pucella2006}
-%\begin{minipage}[c]{0.95\textwidth}
-%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2},label={lst:pucellatwotwoexampleAST}, mathescape]
-%agreement
-% for Alice and Bob 
-% about The Report 
-% with True -> and[Alice, count[2]] =>$_{id1}$ print.
-%\end{lstlisting}
-%\end{minipage} 
-%
-%\section {Another Example}
-%\lstset{language=Pucella2006}
-%\begin{minipage}[c]{0.95\textwidth}
-%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2},label={lst:pucellatwotwoexampleAST}, mathescape]
+%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2}, label={lst:pucellatwotwoexampleAST}, mathescape]
 %agreement
 % for Alice and Bob 
 % about The Report 
