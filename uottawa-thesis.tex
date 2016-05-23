@@ -64,7 +64,7 @@
     %\vspace*{5.4cm}                             % Skip some vertical space
     \begin{flushright}{#1}\end{flushright}      % Text right justified
 
-    \thispagestyle{empty}                       % Disable the page number for this page only
+    %\thispagestyle{empty}                       % Disable the page number for this page only
     \newpage                                    % Add a new page
 }
 
@@ -110,6 +110,7 @@
 % Specify the document class, default style attributes, and page dimensions
 % For hyperlinked PDF, suitable for viewing on a computer, use this:
 \documentclass[letterpaper,12pt,titlepage,oneside,final]{book}
+\pagenumbering{roman}
 
 
 \usepackage{acro}
@@ -184,6 +185,7 @@
 %
 % Edit the following 3 files with your abstract, acknowledgements, 
 % and dedication.
+\setcounter{page}{2}
 \input{parts/02-abstract}
 \input{parts/03-acknowledgements}
 \input{parts/04-dedication}
@@ -207,6 +209,7 @@
 %---------------------------------------------------------------------- 
 % Chapters 
 % Include your "sub" source files here (must have extension .tex)
+\pagenumbering{arabic}
 \include{parts/10-introduction}
 \include{parts/examples}
 \include{parts/110-odrl0-syntax} 
