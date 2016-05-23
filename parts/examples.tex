@@ -7,7 +7,7 @@ We will start this chapter by presenting an example policy statement expressed u
 
 \lstset{language=XML}
 %\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[caption={Agreement for Alice and Bob in XML},label={lst:agreementinxml}]
+\begin{lstlisting}[caption={First Agreement for Alice and Bob in XML},label={lst:agreementinxml}]
 <agreement>
  <asset> <context> <uid> The Report </uid> </context> </asset>
  <permission>
@@ -22,7 +22,111 @@ We will start this chapter by presenting an example policy statement expressed u
 \end{lstlisting}
 %\end{minipage} 
 
-The statement in listing~\ref{lst:agreementinxml} is shown in listing~\ref{lst:agreementExpressible} using the abstract syntax from~\cite{pucella2006}.
+The statement in listing~\ref{lst:agreementinxml} is shown in listing~\ref{lst:agreementinAST} using the abstract syntax from~\cite{pucella2006}.
+
+\lstset{language=Pucella2006}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[mathescape][frame=single, caption={First Agreement for Alice and Bob},label={lst:agreementinAST}]
+agreement
+ for Alice and Bob 
+ about The Report 
+ with True -> and[Alice, count[2]] =>$_{id1}$ print.
+\end{lstlisting}
+%\end{minipage} 
+
+
+\lstset{language=Coq, frame=single, caption={Expressing First Agreement for Alice and Bob in ACCPL}, label={lst:agreementincoq}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Definition ps_xml_p1prq1:primPreRequisite :=   (Constraint (Principal (Single Alice))).
+
+Definition ps_xml_p1prq2:primPreRequisite :=   (Constraint (Count 2)).
+
+Definition ps_xml_prq:preRequisite :=   (PreRequisite (NewList ps_xml_p1prq1 (Single ps_xml_p1prq2))).
+
+Definition ps_xml_p1:primPolicy :=   (PrimitivePolicy ps_xml_prq id1 Print).Definition ps_xml_p:policy :=   (Policy (Single ps_xml_p1)).Definition ps_xml:primPolicySet :=  PIPS (PrimitiveInclusivePolicySet    (makePreRequisite TruePrq) ps_xml_p).Definition Axml := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_xml).\end{lstlisting}
+\end{minipage} 
+
+\lstset{language=Coq, frame=single, caption={Fully Built First Agreement for Alice and Bob in ACCPL}, label={lst:agreementincoq2}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS               (PrimitiveInclusivePolicySet (PreRequisite [TruePrq])                  (Policy                     [PrimitivePolicy                        (PreRequisite                           (Constraint (Principal [Alice]),                            [Constraint (Count 2)])) id1 Print]))))
+
+\end{lstlisting}
+\end{minipage} 
+
+
+
+%While the statement in listing~\ref{lst:exampleone} is expressible in \ac{ACCPL}, the statement ``the asset TheReport may be printed a total of 5 times by either Alice or Bob and twice more by Alice only''~\cite{pucella2006} (shown in listing~\ref{lst:morethanonePS}) is not expressible in \ac{ACCPL}. This statement is fully expressible in \ac{odrl} and also in Pucella and Weissman's fragment of \ac{odrl}~\cite{pucella2006}. We discuss the design choices that leads to this limitation in expressive power for \ac{ACCPL} in section~\ref{sec:policysetcombo} but at a high-level we have traded off the possibility of combining policy sets (see section~\ref{lst:policySetast}) in exchange for a conflict-free policy language in \ac{ACCPL}.
+
+%\lstset{language=Pucella2006}
+%\begin{minipage}[c]{0.95\textwidth}
+%\begin{lstlisting}[frame=single, caption={More than One Policy Set},label={lst:morethanonePS}]
+%agreement
+% for Alice and Bob 
+% about The Report 
+% with and[True -> count[5] => print, True -> and[Alice, count[2]] => print].
+%\end{lstlisting}
+%\end{minipage}
+%% From here on, move to an Examples Chapter where 13-examples used to be. The below this part should be added to end of introduction
+
+
+
+\section{Other Examples (Still Expressible in ACCPL Only): Show Coq code}
+
+The statement in listing~\ref{lst:pucella21exampleAST} (from ~\cite{pucella2006}) expresses that ``the asset TheReport may be printed a total of five times by Alice or Bob'' by the first policy statement. The second policy statement is only allowing Alice to print twice more which means Bob is not allowed to use this policy to print at all.
+
+\lstset{language=Pucella2006}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[mathescape][frame=single, caption={Agreement Example 2.1},label={lst:pucella21exampleAST}]
+agreement
+ for Alice and Bob 
+ about The Report 
+ with True -> and[count[5] =>$_{id1}$ print, and[Alice, count[2]] =>$_{id2}$ print].
+\end{lstlisting}
+\end{minipage} 
+
+\lstset{language=Coq, frame=single, caption={Expressing Example 2.1 agreement in ACCPL}, label={lst:pucella21examplecoq}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Definition ps_21_p1:primPolicy :=   (PrimitivePolicy (makePreRequisite (Constraint (Count  5))) id1 Print).Definition ps_21_p2prq1:primPreRequisite :=   (Constraint (Principal (Single Alice))).
+
+Definition ps_21_p2prq2:primPreRequisite :=   (Constraint (Count 2)).
+
+Definition ps_21_prq:preRequisite :=   (PreRequisite (NewList ps_21_p2prq1 (Single ps_21_p2prq2))).Definition ps_21_p2:primPolicy :=   (PrimitivePolicy ps_21_prq id2 Print).Definition ps_21_p:policy :=   (Policy (NewList ps_21_p1 (Single ps_21_p2))).Definition ps_21:primPolicySet :=  PIPS (PrimitiveInclusivePolicySet    (makePreRequisite TruePrq) ps_21_p).Definition A21 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_21).
+\end{lstlisting}
+\end{minipage} 
+
+\lstset{language=Coq, frame=single, caption={Fully Built Example 2.1 agreement in ACCPL}, label={lst:pucella21examplecoq2}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+
+
+\end{lstlisting}
+\end{minipage} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\lstset{language=Pucella2006}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Expressible in ACCPL},label={lst:pucella21example}]
+agreement
+ for Alice and Bob 
+ about The Report 
+ with True -> and[Alice, count[2]] => print.
+\end{lstlisting}
 
 \lstset{language=Pucella2006}
 %\begin{minipage}[c]{0.95\textwidth}
@@ -32,16 +136,49 @@ agreement
  about The Report 
  with True -> and[Alice, count[2]] => print.
 \end{lstlisting}
-%\end{minipage} 
-
-While the statement in listing~\ref{lst:agreementExpressible} is expressible in \ac{ACCPL}, the statement ``the asset TheReport may be printed a total of 5 times by either Alice or Bob and twice more by Alice only''~\cite{pucella2006} is not expressible in \ac{ACCPL}. This statement is fully expressible in \ac{odrl} and also in Pucella and Weissman's fragment of \ac{odrl}~\cite{pucella2006}. We discuss the design choices that leads to this limitation in expressive power for \ac{ACCPL} in section~\ref{sec:policysetcombo} but at a high-level we have traded off the possibility of combining policy sets (see section~\ref{lst:policySetast}) in exchange for a conflict-free policy language in \ac{ACCPL}.
 
 \lstset{language=Pucella2006}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Not Expressible in ACCPL},label={lst:agreementNotExpressible}]
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Expressible in ACCPL},label={lst:agreementExpressible}]
 agreement
  for Alice and Bob 
  about The Report 
- with and[True -> count[5] => print, True -> and[Alice, count[2]] => print].
+ with True -> and[Alice, count[2]] => print.
 \end{lstlisting}
-\end{minipage}
+
+\lstset{language=Pucella2006}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Expressible in ACCPL},label={lst:agreementExpressible}]
+agreement
+ for Alice and Bob 
+ about The Report 
+ with True -> and[Alice, count[2]] => print.
+\end{lstlisting}
+
+\lstset{language=Pucella2006}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Expressible in ACCPL},label={lst:agreementExpressible}]
+agreement
+ for Alice and Bob 
+ about The Report 
+ with True -> and[Alice, count[2]] => print.
+\end{lstlisting}
+
+\lstset{language=Pucella2006}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Expressible in ACCPL},label={lst:agreementExpressible}]
+agreement
+ for Alice and Bob 
+ about The Report 
+ with True -> and[Alice, count[2]] => print.
+\end{lstlisting}
+
+\lstset{language=Pucella2006}
+%\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Expressible in ACCPL},label={lst:agreementExpressible}]
+agreement
+ for Alice and Bob 
+ about The Report 
+ with True -> and[Alice, count[2]] => print.
+\end{lstlisting}
+
