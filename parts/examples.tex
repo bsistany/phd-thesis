@@ -2,8 +2,7 @@
 \chapter{Examples}
 %======================================================================
 
-We will start this chapter by presenting an example policy statement expressed using \ac{odrl}'s XML-based syntax. The statement ``the asset TheReport may be printed a total of 2 times by Alice only'' is illustrated in listing~\ref{lst:agreementinxml} (A similar but more complex example is discussed in~\cite{pucella2006}). 
-
+We will start this chapter by presenting an example policy statement expressed using \ac{odrl}'s XML-based syntax. The statement ``the asset TheReport may be printed a total of 2 times by Alice only'' is illustrated in listing~\ref{lst:agreementinxml}. 
 
 \lstset{language=XML}
 %\begin{minipage}[c]{0.95\textwidth}
@@ -34,6 +33,7 @@ agreement
 \end{lstlisting}
 %\end{minipage} 
 
+We show how the ``First Agreement for Alice and Bob'' statement would be expressed in \ac{ACCPL} using Coq constructs, in listing~\ref{lst:agreementincoq}.
 
 \lstset{language=Coq, frame=single, caption={Expressing First Agreement for Alice and Bob in ACCPL}, label={lst:agreementincoq}}
 \begin{minipage}[c]{0.95\textwidth}
@@ -61,6 +61,8 @@ Definition Axml := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_xml)
 \end{lstlisting}
 \end{minipage} 
 
+We show how the ``First Agreement for Alice and Bob'' policy statement looks like as an \ac{ACCPL} construct, in listing~\ref{lst:agreementincoq2}.
+
 \lstset{language=Coq, frame=single, caption={Fully Built First Agreement for Alice and Bob in ACCPL}, label={lst:agreementincoq2}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
@@ -74,6 +76,38 @@ Agreement (Alice, [Bob]) TheReport
                            (Constraint (Principal [Alice]),
                             [Constraint (Count 2)])) id1 Print]))))
 
+\end{lstlisting}
+\end{minipage} 
+
+A similar but slightly more complex (than the one in~\ref{lst:agreementinxml}) example is discussed in~\cite{pucella2006} where the policy statement (shown both in XML-based syntax and in the abstract syntax style of the authors of~\cite{pucella2006} is not expressible in \ac{ACCPL}. What is missing from \ac{ACCPL} to express this policy statement is, not supporting two prerequisites. One is the ``prePay[n]'' prerequisite supported by Pucella and Weissman~\cite{pucella2006}'s fragment of \ac{odrl}. The second prerequisite mentioned in this statement, ``Mary's computer'', is some kind of location based condition that the authors of~\cite{pucella2006} refer to, but we don't find them defined anywhere. As we discuss later in this thesis (see sections~\ref{sec:missingreqs} and~\ref{sec:extendwithgeneralconditions}) both of these missing prerequisites (and others) could potentially be implemented to extend expressibility of \ac{ACCPL}.
+
+\lstset{language=XML}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[caption={Agreement for Alice and Bob in XML~\cite{pucella2006}}, label={lst:agreementinxmlfrompucella}]
+<agreement>
+ <asset> <context> <uid> Treasure Island </uid> </context> </asset>
+ <permission>
+   <display>
+    <constraint> <name> Mary's computer </name> </constraint>
+   </display>
+   <print>
+    <constraint> <count> 2 </count> </constraint>
+   </print>
+ </permission>
+ <party> <context> <name> Mary </name> </context> </party>
+</agreement>
+\end{lstlisting}
+\end{minipage} 
+
+The statement in listing~\ref{lst:agreementinxmlfrompucella} is shown in listing~\ref{lst:agreementinASTfrompucella} using the abstract syntax form.
+
+\lstset{language=Pucella2006}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Agreement for Alice and Bob~\cite{pucella2006}}, label={lst:agreementinASTfrompucella}, mathescape]
+agreement
+ for Mary 
+ about Treasure Island 
+ with prePay[5.00] -> and[[Mary's computer] =>$_{id1}$ display, count[2] =>$_{id2}$ print.
 \end{lstlisting}
 \end{minipage} 
 
@@ -91,188 +125,3 @@ Agreement (Alice, [Bob]) TheReport
 %\end{lstlisting}
 %\end{minipage}
 %% From here on, move to an Examples Chapter where 13-examples used to be. The below this part should be added to end of introduction
-
-
-
-\section{Other Examples (Still Expressible in ACCPL Only): Show Coq code}
-
-The statement in listing~\ref{lst:pucellatwooneexampleAST} (from~\cite{pucella2006}) expresses that ``the asset TheReport may be printed a total of five times by Alice or Bob'' by the first policy statement. The second policy statement is only allowing Alice to print twice more which means Bob is not allowed to use this policy to print at all.
-
-\lstset{language=Pucella2006}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Agreement of Example 2.1}, label={lst:pucellatwooneexampleAST}, mathescape]
-agreement
- for Alice and Bob 
- about The Report 
- with True -> and[count[5] =>$_{id1}$ print, and[Alice, count[2]] =>$_{id2}$ print].
-\end{lstlisting}
-\end{minipage} 
-
-\lstset{language=Coq, frame=single, caption={Expressing Agreement of Example 2.1 in ACCPL}, label={lst:pucella21examplecoq}}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
-Definition ps_21_p1:primPolicy := 
-  (PrimitivePolicy (makePreRequisite (Constraint (Count  5))) id1 Print).
-
-Definition ps_21_p2prq1:primPreRequisite := 
-  (Constraint (Principal (Single Alice))).
-
-Definition ps_21_p2prq2:primPreRequisite := 
-  (Constraint (Count 2)).
-
-Definition ps_21_prq:preRequisite := 
-  (PreRequisite (NewList ps_21_p2prq1 (Single ps_21_p2prq2))).
-
-Definition ps_21_p2:primPolicy := 
-  (PrimitivePolicy ps_21_prq id2 Print).
-
-Definition ps_21_p:policy := 
-  (Policy (NewList ps_21_p1 (Single ps_21_p2))).
-
-Definition ps_21:primPolicySet :=
-  PIPS (PrimitiveInclusivePolicySet
-    (makePreRequisite TruePrq) ps_21_p).
-
-Definition A21 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_21).
-\end{lstlisting}
-\end{minipage} 
-
-\lstset{language=Coq, frame=single, caption={Fully Built Agreement of Example 2.1 in ACCPL}, label={lst:pucella21examplecoq2}}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
-
-
-\end{lstlisting}
-\end{minipage} 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\section {Another Example}
-The statement in listing~\ref{lst:pucellatwotwoexampleAST} (from~\cite{pucella2006}) expresses that ``the asset TheReport may be printed AND displayed a total of five times by Alice or Bob''.
-
-
-\lstset{language=Pucella2006}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2}, label={lst:pucellatwotwoexampleAST}, mathescape]
-agreement
- for Alice and Bob 
- about The Report 
- with count[5] -> and[True =>$_{id1}$ print, True =>$_{id2}$ display].
-\end{lstlisting}
-\end{minipage} 
-%
-\section {Another Example}
-The statement in listing~\ref{lst:pucellatwothreeexampleAST} (from~\cite{pucella2006}) expresses that ``the asset TheReport may be printed by Alice 1 time; Bob is not restricted at all so Bob may print the asset any number of times".
-
-\lstset{language=Pucella2006}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Agreement of Example 2.3}, label={lst:pucellatwothreeexampleAST}, mathescape]
-agreement
- for Alice and Bob 
- about The Report 
- with True -> Alice <count[1]> =>$_{id1}$ print.
-\end{lstlisting}
-\end{minipage} 
-%
-
-\section {Another Example}
-The statement in listing~\ref{lst:pucellatwofourexampleAST} (from~\cite{pucella2006}) expresses that ``the asset TheReport may be printed and displayed by Alice and Bob only and with the restriction that Alice and Bob together may print and display the asset five times".
-
-\lstset{language=Pucella2006}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Agreement of Example 2.4}, label={lst:pucellatwofourexampleAST}, mathescape]
-agreement
- for Alice and Bob and Charlie
- about The Report 
- with and[{Alice, Bob}, {Alice, Bob}<count[5]>] -> and[True =>$_{id1}$ print, True =>$_{id2}$ display].
-\end{lstlisting}
-\end{minipage} 
-%
-
-\section {Another Example}
-The statement in listing~\ref{lst:pucellatwofiveexampleAST} (from~\cite{pucella2006}) expresses that ``the asset ebook may be displayed and printed by Alice AND Bob 10 times; under the first policy, Alice and Bob may each display the asset five times, and under the second policy, Alice and Bob may each print the asset 1 time".
-
-
-\lstset{language=Pucella2006}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Agreement of Example 2.5}, label={lst:pucellatwofiveexampleAST}, mathescape]
-agreement
- for Alice and Bob 
- about ebook 
- with count[10] -> and[forEachMember[{Alice, Bob}; count[5]] =>$_{id1}$ display, 
-                                forEachMember[{Alice, Bob}; count[1]] =>$_{id2}$ print].
-\end{lstlisting}
-\end{minipage} 
-%
-
-\section {Another Example}
-The statement in listing~\ref{lst:pucellatwosixexampleAST} (from~\cite{pucella2006}) expresses that ``the asset latestJingle may be played by Alice or Bob, on the condition that an amount of 5\$ was paid first and then an attribution to Charlie was made, in that order; the single policy further restricts Alice to only play the asset 10 times''. The statement in listing~\ref{lst:pucellatwosixexampleAST} is made up of an exclusive policy set, meaning that it restricts actions on assets to the users mentioned explicitly in the agreement, in this case, Alice and Bob.
-
-\lstset{language=Pucella2006}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Agreement of Example 2.6}, label={lst:pucellatwosixexampleAST}, mathescape]
-agreement
- for Alice and Bob 
- about latestJingle 
- with inSeq[prePay[5], attribution[Charlie]] $\mapsto$ (Alice <count[10]> =>$_{id1}$ play). 
-                                    
-\end{lstlisting}
-\end{minipage} 
-%
-%\section {Another Example}
-%\lstset{language=Pucella2006}
-%\begin{minipage}[c]{0.95\textwidth}
-%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2}, label={lst:pucellatwotwoexampleAST}, mathescape]
-%agreement
-% for Alice and Bob 
-% about The Report 
-% with True -> and[Alice, count[2]] =>$_{id1}$ print.
-%\end{lstlisting}
-%\end{minipage} 
-%
-%\section {Another Example}
-%\lstset{language=Pucella2006}
-%\begin{minipage}[c]{0.95\textwidth}
-%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2}, label={lst:pucellatwotwoexampleAST}, mathescape]
-%agreement
-% for Alice and Bob 
-% about The Report 
-% with True -> and[Alice, count[2]] =>$_{id1}$ print.
-%\end{lstlisting}
-%\end{minipage} 
-%
-%\section {Another Example}
-%\lstset{language=Pucella2006}
-%\begin{minipage}[c]{0.95\textwidth}
-%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2}, label={lst:pucellatwotwoexampleAST}, mathescape]
-%agreement
-% for Alice and Bob 
-% about The Report 
-% with True -> and[Alice, count[2]] =>$_{id1}$ print.
-%\end{lstlisting}
-%\end{minipage} 
-%
-%\section {Another Example}
-%\lstset{language=Pucella2006}
-%\begin{minipage}[c]{0.95\textwidth}
-%\begin{lstlisting}[frame=single, caption={Agreement of Example 2.2}, label={lst:pucellatwotwoexampleAST}, mathescape]
-%agreement
-% for Alice and Bob 
-% about The Report 
-% with True -> and[Alice, count[2]] =>$_{id1}$ print.
-%\end{lstlisting}
-%\end{minipage} 
-%
-%
-%
