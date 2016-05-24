@@ -179,7 +179,6 @@ Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS             
 
 %
 
-
 The statement in listing~\ref{lst:pucellatwofiveexampleAST} (from~\cite{pucella2006}) expresses that ``the asset ebook may be displayed and printed by Alice AND Bob 10 times; under the first policy, Alice and Bob may each display the asset five times, and under the second policy, Alice and Bob may each print the asset 1 time".
 
 
@@ -208,3 +207,7 @@ agreement
                                     
 \end{lstlisting}
 \end{minipage} 
+
+The last two policy statements (listed in~\ref{lst:pucellatwofiveexampleAST} and in~\ref{lst:pucellatwosixexampleAST}) are examples of what is not expressible in \ac{ACCPL} at present. We already covered the missing constructs from \ac{ACCPL} in section~\ref{sec:missingreqs}. In particular for these two examples, we are missing the following constructs: \syn{forEachMember}, \syn{inSeq}, \syn{prePay} and \syn{attribution}.
+
+
