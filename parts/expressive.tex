@@ -25,7 +25,7 @@ In the following we will list some example policies that are expressible in \ac{
 
 \section{Examples}
 
-The statement in listing~\ref{lst:pucellatwooneexampleAST} (from~\cite{pucella2006}) expresses that ``the asset TheReport may be printed a total of five times by Alice or Bob'' by the first policy statement. The second policy statement is only allowing Alice to print twice more which means Bob is not allowed to use this policy to print at all.
+The statement in listing~\ref{lst:pucellatwooneexampleAST} (from~\cite{pucella2006}) expresses that ``the asset TheReport may be printed a total of five times by Alice or Bob'' by the first policy statement. The second policy statement is only allowing Alice to print twice more which means Bob is not allowed to use this policy to print at all. 
 
 \lstset{language=Pucella2006}
 \begin{minipage}[c]{0.95\textwidth}
@@ -37,7 +37,9 @@ agreement
 \end{lstlisting}
 \end{minipage} 
 
-\lstset{language=Coq, frame=single, caption={Expressing Agreement of Example 2.1 in ACCPL}, label={lst:pucella21examplecoq}}
+We show how the policy statement in~\ref{lst:pucellatwooneexampleAST} would be expressed in \ac{ACCPL} using Coq constructs, in listing~\ref{lst:pucellatwooneexamplecoq}.
+
+\lstset{language=Coq, frame=single, caption={Expressing Agreement of Example 2.1 in ACCPL}, label={lst:pucellatwooneexamplecoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Definition ps_21_p1:primPolicy := 
@@ -66,27 +68,15 @@ Definition A21 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_21).
 \end{lstlisting}
 \end{minipage} 
 
-\lstset{language=Coq, frame=single, caption={Fully Built Agreement of Example 2.1 in ACCPL}, label={lst:pucella21examplecoq2}}
+We show how the policy statement in listing~\ref{lst:pucellatwooneexampleAST} looks like as an \ac{ACCPL} construct, in listing~\ref{lst:pucellatwooneexamplecoq2}.
+
+\lstset{language=Coq, frame=single, caption={Fully Built Agreement of Example 2.1 in ACCPL}, label={lst:pucellatwooneexamplecoq2}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS               (PrimitiveInclusivePolicySet (PreRequisite [TruePrq])                  (Policy                     (PrimitivePolicy (PreRequisite [Constraint (Count 5)])                        id1 Print,                      [PrimitivePolicy                         (PreRequisite                            (Constraint (Principal [Alice]),                             [Constraint (Count 2)])) id2 Print])))))
 
 \end{lstlisting}
 \end{minipage} 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 The statement in listing~\ref{lst:pucellatwotwoexampleAST} (from~\cite{pucella2006}) expresses that ``the asset TheReport may be printed AND displayed a total of five times by Alice or Bob''.
 
@@ -101,6 +91,7 @@ agreement
 \end{lstlisting}
 \end{minipage} 
 
+We show how the policy statement in~\ref{lst:pucellatwotwoexampleAST} would be expressed in \ac{ACCPL} using Coq constructs, in listing~\ref{lst:pucellatwotwoexamplecoq}.
 
 \lstset{language=Coq, frame=single, caption={Expressing Agreement of Example 2.2 in ACCPL}, label={lst:pucellatwotwoexamplecoq}}
 \begin{minipage}[c]{0.95\textwidth}
@@ -108,6 +99,8 @@ agreement
 Definition ps_22_p1:primPolicy :=   (PrimitivePolicy (makePreRequisite (TruePrq)) id1 Print).Definition ps_22_p2:primPolicy :=   (PrimitivePolicy (makePreRequisite (TruePrq)) id2 Display).Definition ps_22_p:policy :=   (Policy (NewList ps_22_p1 (Single ps_22_p2))).Definition ps_22_ps_prq1:primPreRequisite :=   (Constraint (Count 2)).Definition ps_22:primPolicySet :=  PIPS (PrimitiveInclusivePolicySet    (makePreRequisite ps_22_ps_prq1) ps_22_p).Definition A22 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_22).		
 \end{lstlisting}
 \end{minipage} 
+
+We show how the policy statement in listing~\ref{lst:pucellatwotwoexampleAST} looks like as an \ac{ACCPL} construct, in listing~\ref{lst:pucellatwotwoexamplecoq2}.
 
 \lstset{language=Coq, frame=single, caption={Fully Built Agreement of Example 2.2 in ACCPL}, label={lst:pucellatwotwoexamplecoq2}}
 \begin{minipage}[c]{0.95\textwidth}
@@ -132,6 +125,8 @@ agreement
 \end{lstlisting}
 \end{minipage} 
 
+We show how the policy statement in~\ref{lst:pucellatwothreeexampleAST} would be expressed in \ac{ACCPL} using Coq constructs, in listing~\ref{lst:pucellatwothreeexamplecoq}.
+
 \lstset{language=Coq, frame=single, caption={Expressing Agreement of Example 2.3 in ACCPL}, label={lst:pucellatwothreeexamplecoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
@@ -140,6 +135,8 @@ Definition ps_23_p1:primPolicy :=   (PrimitivePolicy     (makePreRequisite (Co
 Definition ps_23_p:policy :=   (Policy (Single ps_23_p1)).Definition ps_23:primPolicySet :=  PIPS (PrimitiveInclusivePolicySet    (makePreRequisite TruePrq) ps_23_p).Definition A23 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_23).
 \end{lstlisting}
 \end{minipage} 
+
+We show how the policy statement in listing~\ref{lst:pucellatwothreeexampleAST} looks like as an \ac{ACCPL} construct, in listing~\ref{lst:pucellatwothreeexamplecoq2}.
 
 \lstset{language=Coq, frame=single, caption={Fully Built Agreement of Example 2.3 in ACCPL}, label={lst:pucellatwothreeexamplecoq2}}
 \begin{minipage}[c]{0.95\textwidth}
@@ -163,11 +160,15 @@ agreement
 \end{lstlisting}
 \end{minipage} 
 
+We show how the policy statement in~\ref{lst:pucellatwofourexampleAST} would be expressed in \ac{ACCPL} using Coq constructs, in listing~\ref{lst:pucellatwofourexamplecoq}.
+
 \lstset{language=Coq, frame=single, caption={Expressing Agreement of Example 2.4 in ACCPL}, label={lst:pucellatwofourexamplecoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Definition ps_24_p1:primPolicy :=   (PrimitivePolicy (makePreRequisite (TruePrq)) id1 Print).Definition ps_24_p2:primPolicy :=   (PrimitivePolicy (makePreRequisite (TruePrq)) id2 Display).Definition ps_24_p:policy :=   (Policy (NewList ps_24_p1 (Single ps_24_p2))).Definition ps_24_prq1:primPreRequisite :=   (Constraint (Principal (NewList Alice (Single Bob)))).Definition ps_24_prq2:primPreRequisite :=   (Constraint (CountByPrin (NewList Alice (Single Bob)) 1)). Definition ps_24_prq:preRequisite :=   (PreRequisite (NewList ps_24_prq1 (Single ps_24_prq2))).Definition ps_24:primPolicySet :=  PIPS (PrimitiveInclusivePolicySet    ps_24_prq ps_24_p).Definition A24 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_24).\end{lstlisting}
 \end{minipage} 
+
+We show how the policy statement in listing~\ref{lst:pucellatwofourexampleAST} looks like as an \ac{ACCPL} construct, in listing~\ref{lst:pucellatwofourexamplecoq2}.
 
 \lstset{language=Coq, frame=single, caption={Fully Built Agreement of Example 2.4 in ACCPL}, label={lst:pucellatwofourexamplecoq2}}
 \begin{minipage}[c]{0.95\textwidth}
