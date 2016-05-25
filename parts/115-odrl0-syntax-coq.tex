@@ -84,21 +84,14 @@ End nonemptylist.
 \end{minipage}
 
 
-In listing~\ref{lst:preRequisitecoq} \syn{preRequisite} is defined as a new datatype with constructors \syn{TruePrq}, \syn{Constraint}, \syn{NotCons} and \syn{AndPrqs} (see listing~\ref{lst:preRequisiteast} for the abstract syntax equivalent).
-
-\syn{TruePrq} represents the always true prerequisite. The \syn{Constraint} constructor takes a value of type \syn{constraint} which we will describe below. Intuitively a constraint is a prerequisite to be satisfied that is outside the control of the user(s). For example, the constraint of being `Alice'. The constructor \syn{NotCons} is defined the same way the \syn{Constraint} constructor is. This constructor is defined as the type \syn{constraint} and it is meant to represent the negation of a \syn{constraint} as we shall see in the translation (see listing~\ref{lst:transnotConsCoq}). The remaining constructor \syn{AndPrqs} takes as parameters nonempty lists of prerequisites. This constructor represents the conjunction combining operator. 
+In listing~\ref{lst:preRequisitecoq} a \syn{preRequisite} is defined as a datatype with the constructor \syn{PreRequisite} which takes a nonempty list of primitive prerequisites, or \syn{primPreRequisite}s. A \\ \syn{primPreRequisite} is defined as a new datatype with constructors \syn{TruePrq}, \syn{Constraint} and \syn{NotCons} (see listing~\ref{lst:preRequisiteast} for the abstract syntax equivalent). \syn{TruePrq} represents the always true prerequisite. The \syn{Constraint} constructor takes a value of type \syn{constraint} which we will describe below. Intuitively a constraint is a prerequisite to be satisfied that is outside the control of the user(s). For example, the constraint of being `Alice'. The constructor \syn{NotCons} is defined the same way the \syn{Constraint} constructor is. This constructor is defined as the type \syn{constraint} and it is meant to represent the negation of a \syn{constraint} as we shall see in the translation (see listing~\ref{lst:transnotConsCoq}). In listing~\ref{lst:preRequisitecoq} we also show \syn{makePreRequisite} which is a convenience function that given a \syn{primPreRequisite}, builds a value of type \syn{preRequisite}.
 
 
 % prq
 \lstset{language=Coq}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}[frame=single, caption={preRequisite},label={lst:preRequisitecoq}]
-Inductive preRequisite : Set :=
-  | TruePrq : preRequisite
-  | Constraint : constraint -> preRequisite 
-  | NotCons : constraint -> preRequisite 
-  | AndPrqs : nonemptylist preRequisite -> preRequisite.
-  
+Inductive primPreRequisite : Set :=  | TruePrq : primPreRequisite  | Constraint : constraint -> primPreRequisite  | NotCons : constraint -> primPreRequisite. Inductive preRequisite : Set :=  | PreRequisite : nonemptylist primPreRequisite -> preRequisite.Definition makePreRequisite (prq:primPreRequisite) : preRequisite := (PreRequisite (Single prq)).
 \end{lstlisting}
 %\end{minipage}
 

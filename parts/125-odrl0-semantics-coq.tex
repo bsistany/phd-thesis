@@ -460,7 +460,6 @@ Translation of a \syn{prin} (called \syn{trans_prin} in listing~\ref{lst:transpr
 \lstset{language=Coq, frame=single, caption={Translation of Prin},label={lst:transprinCoq}}
 \begin{minipage}{\linewidth}
 \begin{lstlisting}
-
 Fixpoint trans_prin
   (x:subject)(p: prin): Prop :=
 
@@ -472,24 +471,17 @@ Fixpoint trans_prin
 \end{minipage}
 
 
-The translation of a \syn{prerequisite} (called \syn{trans_preRequisite} in listing~\ref{lst:transpreRequisiteCoq}) takes as input an environment \syn{e}, a subject \syn{x}, a \syn{preRequisite} \syn{prq} to translate, a set of policy identifiers \syn{IDs} (identifiers of policies implied by the \syn{prq}), the agreement's user(s) \syn{prin_u}, and proceeds by case analysis on the structure of the \syn{prerequisite}. A \syn{prerequisite} is either \syn{TruePrq}, \syn{Constraint},  \syn{NotCons}, or \syn{AndPrqs}. 
+The translation of a \syn{prerequisite} (called \syn{trans_preRequisite} in listing~\ref{lst:transpreRequisiteCoq}) takes as input an environment \syn{e}, a subject \syn{x}, a \syn{preRequisite} \syn{prq} to translate, a set of policy identifiers \syn{IDs} (identifiers of policies implied by the \syn{prq}), the agreement's user(s) \syn{prin_u}, and proceeds by case analysis on the structure of the \syn{prerequisite}. A \syn{prerequisite} can only have the constructor \syn{PreRequisite} however, which in turn causes the translation function \syn{trans_andPrqs} to be called on a nonempty list of \syn{primPreRequisite}s. Finally for each \syn{primPreRequisite}, the translation function \syn{trans_primPreRequisite} proceeds by case analysis on the structure of the primitive prerequisite. A primitive prerequisite is either \syn{TruePrq}, \syn{Constraint} or \syn{NotCons}.
 
-In listing~\ref{lst:transpreRequisiteCoq} the translation for \syn{TruePrq} is the proposition \syn{True}, the translations for \syn{Constraint}, \syn{NotCons} and \syn{AndPrqs} simply call respective translation functions for corresponding types namely \syn{trans_constraint} (see listing~\ref{lst:transconstraintCoq}) and \syn{trans_notCons} (see listing~\ref{lst:transnotConsCoq} and \syn{trans_andPrqs}. 
+In listing~\ref{lst:transpreRequisiteCoq} the translation for \syn{TruePrq} is the proposition \syn{True}, the translations for \syn{Constraint} and \syn{NotCons} simply call respective translation functions for corresponding types namely \syn{trans_constraint} (see listing~\ref{lst:transconstraintCoq}) and \syn{trans_notCons} (see listing~\ref{lst:transnotConsCoq}. 
 
 
 \lstset{language=Coq, frame=single, caption={Translation of Prerequisite},label={lst:transpreRequisiteCoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
+Definition trans_primPreRequisite  (e:environment)(x:subject)(prq:primPreRequisite)(IDs:nonemptylist policyId)  (prin_u:prin) : Prop :=   match prq with    | TruePrq => True    | Constraint const => trans_constraint e x const IDs prin_u    | NotCons const => trans_notCons e x const IDs prin_u   end.
 
-Definition trans_preRequisite
-  (e:environment)(x:subject)(prq:preRequisite)(IDs:nonemptylist policyId)(prin_u:prin) : Prop := 
-
-  match prq with
-    | TruePrq => True
-    | Constraint const => trans_constraint e x const IDs prin_u  
-    | NotCons const => trans_notCons e x const IDs prin_u 
-    | AndPrqs prqs =>  trans_andPrqs x prq IDs prin_u a
-  end.
+Fixpoint trans_andPrqs    (e:environment)(x:subject)    (prqs:nonemptylist primPreRequisite)    (IDs:nonemptylist policyId)(prin_u:prin) {struct prqs}: Prop :=      match prqs with     | Single prq => trans_primPreRequisite e x prq IDs prin_u      | NewList prq' rest_prqs =>          (trans_primPreRequisite e x prq' IDs prin_u) /\         (trans_andPrqs e x rest_prqs IDs prin_u)   end.Definition trans_preRequisite  (e:environment)(x:subject)(prq:preRequisite)(IDs:nonemptylist policyId)(prin_u:prin) : Prop :=  match prq with    | PreRequisite prqs => trans_andPrqs e x prqs IDs prin_u  end.
 \end{lstlisting}
 \end{minipage}
 

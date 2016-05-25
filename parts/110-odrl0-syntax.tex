@@ -134,17 +134,19 @@ A policy identifier (\syn{<policyId>}) is a unique identifier specified as (incr
 <policyId> ::= N
 \end{lstlisting}
 
-In \ac{ACCPL} a \syn{<prerequisite>} is either True or it is a \syn{<constraint>}. The True prerequisite always holds. A constraint is an intrinsic part of a policy and cannot be influenced by agreement's users. Minimum height requirements for popular attractions and rides are examples of what we would consider a constraint. A constraint can also be negative, specified by the keyword `not' in front of \syn{<constraint>}. Finally the set of prerequisites are closed under conjunction operator specified by the keyword `and' in front of the list of prerequisites separated by commas (see listing~\ref{lst:preRequisiteast}).
+In \ac{ACCPL} a \syn{<primPrerequisite>} is either True or it is a \syn{<constraint>}. The True prerequisite always holds. A constraint is an intrinsic part of a policy and cannot be influenced by agreement's users. Minimum height requirements for popular attractions and rides are examples of what we would consider a constraint. A constraint can also be negative, specified by the keyword `not' in front of \syn{<constraint>}. A \syn{<prerequisite>} is a set of primitive prerequisites which are closed under conjunction operator specified by the keyword `and' in front of the list of the primitive prerequisites separated by commas (see listing~\ref{lst:preRequisiteast}).
 
 % prq
 
 \lstset{mathescape, language=AST, escapechar=\&}  
 \begin{lstlisting}[frame=single, caption={prerequisite},label={lst:preRequisiteast}]
-<prerequisite> ::=  
+<primPrerequisite> ::=  
        'True' &\Comment{; always true}&
     |  <constraint>	 &\Comment{; constraint}&
     |  'not' [ <constraint> ] &\Comment{; suspending constraint}&
-    |  'and'[ <prerequisite$_{1}$>, ..., <prerequisite$_{m}$> ] &\Comment{; conjunction }&
+    
+<prerequisite> ::=    
+    |  'and'[ <primPrerequisite$_{1}$>, ..., <primPrerequisite$_{m}$> ] &\Comment{; conjunction }&
 \end{lstlisting}
 
 Constraints are either of the principal kind, the count kind, or the count by principle kind. Principal constraints require matching to the users listed following the keyword \syn{<prin>}. For example, the constraint of ``the user being Alice'' is a constraint of type principal. A count constraint refers to the number of times the user of an agreement has invoked policies to justify her actions. If the count constraint is part of a policy then the count refers to that single policy. In the case that the count constraint is part of a policy set or if the policy is a conjunction, then the count refers to the set of policies specified in the policy set or in the policy conjunction as the case may be (see listing~\ref{lst:constraintast}).
