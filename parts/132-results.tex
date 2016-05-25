@@ -1,5 +1,5 @@
 %======================================================================
-\chapter{Formal Proofs and Decidability}\label{chap:results}
+\chapter{Formal Proofs and Correctness}\label{chap:results}
 %======================================================================
 
                   
@@ -7,7 +7,7 @@
 The tension in designing a policy language is usually between how to make the language expressive enough, such that the design goals for the policy language may be expressed, and how to make the policies verifiable with respect to the stated goals. A central question or goal in policy language design is whether a permission is implied by a set of policy statements. This is referred to as the decidability problem in this thesis. For example, Halpern and Weissman~\cite{HalpernW08} show that in general determining whether a permission is implied by a set of policy statements in \ac{xrml} is undecidable whereas Pucella and Weissman show that answering such questions is decidable but NP-hard for \ac{odrl}~\cite{pucella2006}.
  
 
-We had set out to prove formally that the \ac{ACCPL} language was decidable. Recall that we specified the semantics of \ac{ACCPL} using a translation from policy statements together with an access request and an environment containing all relevant facts, to decisions. The goal was to use the translation algorithm to determine when a request for accessing a resource is implied by a given policy, when the request is not implied by the policy and finally when the request is not regulated by the given policy. More importantly we wanted to show that answering access requests always produced a decision and that the translation algorithm terminated on all input policies with a decision of \syn{Permitted}, \syn{NotPermitted} or \syn{Unregulated}. In this chapter we discuss the decidability proofs and other main results we had set out to accomplish. In doing so we will show that the translation algorithm meets its specified goal (as stated earlier), given a policy. 
+We had set out to prove formally that the \ac{ACCPL} language had certifiably correct semantics. Recall that we specified the semantics of \ac{ACCPL} using a translation from policy statements together with an access request and an environment containing all relevant facts, to decisions. The goal was to use the translation algorithm to determine when a request for accessing a resource is implied by a given policy, when the request is not implied by the policy and finally when the request is not regulated by the given policy. More explicitly we wanted to show that answering access requests always produced a decision and that the translation algorithm terminated on all input policies with either a decision of \syn{Permitted}, or a decision of\syn{NotPermitted} or a decision of neither \syn{Permitted} nor \syn{NotPermitted}. In this chapter we discuss the correctness proofs and other main results we had set out to accomplish. In doing so we will show that the translation algorithm meets its specified goal (as stated earlier), given a policy. 
 
 
 \ac{ACCPL} started out as a reduced version of Pucella and Weissman's subset of \ac{odrl}\\~\cite{pucella2006} but based on the direction of the proofs we were developing significant changes had to be made to Pucella and Weissman's language to make the proofs possible. An important lesson learned was that the process of designing a certifiably correct policy language cannot be done in isolation since while certifying correctness for the language derives the design one way, expressiveness requirements of the language usually drive it in the opposite direction. Certifying a policy language correct cannot be a post-design activity as the changes it will impose are often fundamental ones.
@@ -19,10 +19,10 @@ In the following section we will list the main theorems that we have proved and 
 The theorem \syn{trans_agreement_dec2} is the declaration of the main correctness result for \ac{ACCPL} (see listing~\ref{lst:agreementdecidablecoq}). Together with other theorems we will describe below, we have ``certified'' \ac{ACCPL} correct by proving this theorem. The nonempty list that the agreement translation function \syn{trans_agreement} returns will contain results one per each primitive policy (\syn{primPolicy}) found in the agreement. Specifically the predicate \syn{isResultInQueryResult} takes a \syn{result} and a nonempty list of \syn{result}'s which \syn{trans_agreement} produces, and calls the \syn{In} predicate. The \syn{In} predicate is adapted from the \syn{Coq.Lists.List} standard library and checks for the existence of the input \syn{result} in the nonempty list of results. Definitions for predicates \syn{isResultInQueryResult} and \syn{In} are listed in listing~\ref{lst:agreementdecidablecoq}. The definitions for \syn{answer} and \syn{result} are repeated in the same listing. 
 
 
-Note that by mentioning the agreement translation function directly in the statement of the theorem~\ref{lst:agreementdecidablecoq}, we tie the decidability property to how the translation functions work. To prove the theorem and with each successive subgoal during the interactive proof process, the definition of the translation function in scope gets unfolded and used so the translation functions have to be defined such that each subgoal is discharged and the proof is completed. This is quite different from trying to show a list has some property. 
+Note that by mentioning the agreement translation function directly in the statement of the theorem~\ref{lst:agreementdecidablecoq}, we tie the correcness property to how the translation functions work. To prove the theorem and with each successive subgoal during the interactive proof process, the definition of the translation function in scope gets unfolded and used so the translation functions have to be defined such that each subgoal is discharged and the proof is completed. This is quite different from trying to show a list has some property. 
 
 
-As an example and also a visual aid to understanding how queries are answered, see listing~\ref{lst:permittedcoq}. The \syn{isResultInQueryResult} predicate looks for a result with an answer of Permitted in the list that \syn{trans_agreement} has produced, for an agreement for three primitive policies (since the set contains three results). In words, we are asking whether \syn{Alice} is \syn{Permitted} to \syn{Print} the \syn{ebook} given a policy. 
+As an example and also a visual aid to understanding how queries are answered, see listing~\ref{lst:permittedcoq}. The \syn{isResultInQueryResult} predicate looks for a result with an answer of Permitted in the list that \syn{trans_agreement} has produced, for an agreement for three primitive policies (since the set contains three results). In words, we are asking whether Alice is allowed to print the asset ebook, given a policy. 
 
 \lstset{language=Coq, frame=single, caption={Access Request Resulting in Decision of \syn{Permitted}},label={lst:permittedcoq}}
 %\begin{minipage}[c]{0.95\textwidth}
@@ -36,7 +36,7 @@ isResultInQueryResult
 In the case where the whole set is not comprised of \syn{Unregulated} results, we have two mutually exclusive cases. The first case is when the set has a at least one \syn{Permitted} result; we answer the access query in this case with a result of \syn{Permitted} (this would be the case in the listing~\ref{lst:permittedcoq}). The second case is when the set has at least one \syn{NotPermitted}; we answer the access query in this case with a result of \syn{NotPermitted}. 
 
 
-\lstset{language=Coq, frame=single, caption={Agreement Translation is Decidable},label={lst:agreementdecidablecoq}}
+\lstset{language=Coq, frame=single, caption={Agreement Translation's Correctness Property},label={lst:agreementdecidablecoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Definition isResultInQueryResult (res:result)(results: nonemptylist result) : Prop :=
@@ -232,12 +232,12 @@ Inductive decidable : environment -> agreement -> act -> subject -> asset -> Pro
 \end{minipage}
 
 
-We declare and prove the decidability of \ac{ACCPL} in terms of the \syn{decidable} predicate as seen in listing~\ref{lst:decidabletypecoq}. The proof is made simple since we use the previously proven theorem \syn{trans_agreement_dec2}. The proof also makes use of two theorems we saw earlier in Section~\ref{sec:mutualexclusive}. Recall that the first theorem, \syn{trans_agreement_perm_implies_not_notPerm_dec}, says that the existence of a \syn{Permitted} result in the set of results returned by \syn{trans_agreement}, will exclude any \syn{NotPermitted} result and that the second theorem, \syn{trans_agreement_NotPerm_implies_not_Perm_dec}, shows that the existence of a \syn{NotPermitted} result in the set of results returned by \syn{trans_agreement}, will exclude a \syn{Permitted} result. The proof shows the series of tactics that were applied to 
+We declare and prove the correctness of the semantics for \ac{ACCPL} in terms of the \syn{decidable} predicate as seen in listing~\ref{lst:decidabletypecoq}. The proof is made simple since we use the previously proven theorem \syn{trans_agreement_dec2}. The proof also makes use of two theorems we saw earlier in Section~\ref{sec:mutualexclusive}. Recall that the first theorem, \syn{trans_agreement_perm_implies_not_notPerm_dec}, says that the existence of a \syn{Permitted} result in the set of results returned by \syn{trans_agreement}, will exclude any \syn{NotPermitted} result and that the second theorem, \syn{trans_agreement_NotPerm_implies_not_Perm_dec}, shows that the existence of a \syn{NotPermitted} result in the set of results returned by \syn{trans_agreement}, will exclude a \syn{Permitted} result. The proof shows the series of tactics that were applied to 
 complete the proof interactively. We do not explain the tactics here, but just show the proof to illustrate by example what proofs look like.
 
 We will list the intermediate theorems that we have declared and proved which are used in the proof of theorem \syn{trans_agreement_dec2} and subsequent proofs in Section~\ref{sec:intermediatetheorems}.
 
-\lstset{language=Coq, frame=single, caption={Decidability Of Agreement Translation},label={lst:decidabletypecoq}}
+\lstset{language=Coq, frame=single, caption={Correctness Of Agreement Translation},label={lst:decidabletypecoq}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
 Theorem trans_agreement_decidable:

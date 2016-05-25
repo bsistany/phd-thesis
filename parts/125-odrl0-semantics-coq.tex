@@ -140,7 +140,7 @@ Definition makeResult (ans:answer)(s:subject)(ac:act)(ass:asset) : result :=
 
 \section{Translations}\label{sec:translationfuncs}
 
-Intuitively a query or request asks the following question given an agreement: ``May subject \syn{s} perform an action \syn{ac} to asset \syn{a}?''. We represent a query by its components, namely the subject, action and asset that form the query question: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query}. While developing the proofs for the decidability of \ac{ACCPL} we realized we needed this query specific information deep in the translation functions to be able to render unambiguous decisions and ultimately make the proofs work. We therefore pass the query components to all the translation functions starting with the \syn{trans_agreement} function (see listing~\ref{lst:transagreement}). 
+Intuitively a query or request asks the following question given an agreement: ``May subject \syn{s} perform an action \syn{ac} to asset \syn{a}?''. We represent a query by its components, namely the subject, action and asset that form the query question: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query}. While developing the proofs for the correcness of \ac{ACCPL} we realized we needed this query specific information deep in the translation functions to be able to render unambiguous decisions and ultimately make the proofs work. We therefore pass the query components to all the translation functions starting with the \syn{trans_agreement} function (see listing~\ref{lst:transagreement}). 
 
 In the following paragraphs, we will describe each translation function in detail the \syn{trans_agreement} function, however a high-level description of how the main algorithm (encoded in these translation functions) works is now in order. We will show the main algorithm in two separate listings based on whether the policy set in question is inclusive or exclusive. 
 
@@ -664,7 +664,7 @@ Eval compute in (trans_agreement e_24 A24 Display Alice TheReport). =
 
 \section{Decision Procedures}\label{sec:decprocs}
 
-In the following we will list only the declaration of each decision procedure and the accompanying functions. The individual decision procedures were used as a building block to make the final decidability proofs for \ac{ACCPL} possible. We will refer to some of these listings later when we discuss the translations and/or proofs using the decision procedures. Please refer to the source code where the usage of a decision procedure in not mentioned in the following.
+In the following we will list only the declaration of each decision procedure and the accompanying functions. The individual decision procedures were used as a building block to make the final correcness proofs for \ac{ACCPL} possible. We will refer to some of these listings later when we discuss the translations and/or proofs using the decision procedures. Please refer to the source code where the usage of a decision procedure in not mentioned in the following.
 
 The decision procedure \syn{eq_nat_dec} takes two natural numbers, and declares that either there is a proof for their equality or there exists a proof for their inequality (see listing~\ref{lst:eqnatdeccoq}).
 

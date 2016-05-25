@@ -5,7 +5,7 @@
 %----------------------------------------------------------------------
 \section{Conclusions}
 
-In this thesis, we presented the design and implementation of \ac{ACCPL} as a small and certifiably correct policy language. \ac{ACCPL} is a \ac{pbac} system that can be used to express general access-control rules and policies. In addition we have defined formal semantics for \ac{ACCPL} where we have discovered and added all possible cases when answering a query on whether to allow or deny an action to be performed on an asset. We have subsequently used the Coq Proof Assistant to state theorems about the expected behaviour of \ac{ACCPL} when evaluating a request with respect to a given policy, to develop proofs for those theorems and to machine-check the proofs ensuring correctness guarantees are provided. We have in particular stated, developed and proved a decidability result for \ac{ACCPL}. 
+In this thesis, we presented the design and implementation of \ac{ACCPL} as a small and certifiably correct policy language. \ac{ACCPL} is a \ac{pbac} system that can be used to express general access-control rules and policies. In addition we have defined formal semantics for \ac{ACCPL} where we have discovered and added all possible cases when answering a query on whether to allow or deny an action to be performed on an asset. We have subsequently used the Coq Proof Assistant to state theorems about the expected behaviour of \ac{ACCPL} when evaluating a request with respect to a given policy, to develop proofs for those theorems and to machine-check the proofs ensuring correctness guarantees are provided. We have in particular stated, developed and proved a correctness result for the semantics of \ac{ACCPL}. 
 
 We have also studied \ac{ACCPL} in terms of Tschantz and Krishnamurthi's~\cite{Tschantz} reasonability properties which make policy languages more amenable to reasoning and concluded that, since \ac{ACCPL} supported these properties, \ac{ACCPL} was significantly more amenable to analysis and reasoning than other access-control policy languages. 
 
@@ -23,7 +23,7 @@ In chapter~\ref{chap:landscapechap} we presented a set of properties to analyze 
 
 \subsection{Additional Expressivity}
 
-A direction for future work is to explore different ways \ac{ACCPL} could be made more expressive. For example, we can add various policy combinators and their semantics to \ac{ACCPL} using the translation function framework. The translation function framework we have developed for \ac{ACCPL} is meant to keep the delicate balance between addition of expressiveness while maintaining provability of current and future results (e.g. decidability and results mentioned in~\ref{subsec:reasonprop} respectively).
+A direction for future work is to explore different ways \ac{ACCPL} could be made more expressive. For example, we can add various policy combinators and their semantics to \ac{ACCPL} using the translation function framework. The translation function framework we have developed for \ac{ACCPL} is meant to keep the delicate balance between addition of expressiveness while maintaining provability of current and future results (e.g. current correctness results and future ones mentioned in~\ref{subsec:reasonprop} respectively).
 
 This future work direction embodies an important lesson we learned while developing \ac{ACCPL}: the process of designing a certifiably correct policy language cannot be done in isolation since while certifying correctness of the language derives the design one way, expressiveness requirements of the language usually drive it in the opposite direction. Certifying a policy language correct cannot be a post-design activity as the changes it will impose are often fundamental ones.
 
@@ -129,9 +129,9 @@ $deny (T1, T2, C, P)$ $\lor$ $\lnot (E$ $consistent$ $wrt$ <T1, R1, U1> $\land$ 
 
 \end{lstlisting}
 
-%\section{Decidability of Queries in SELinux}
 
-Most policy based access-control languages use a two-valued decision set to indicate whether an access request is granted or denied. The literature for \ac{selinux} implies only these two outcomes are possible as well, however formally proving this conjecture in Coq would be an important future work to undertake. Investigating the question of decidability for answering queries given an \ac{selinux} policy would be another important and interesting future work, since as far as we know such results have not been formally proven elsewhere. 
+
+Most policy based access-control languages use a two-valued decision set to indicate whether an access request is granted or denied. The literature for \ac{selinux} implies only these two outcomes are possible as well, however formally proving this conjecture in Coq would be an important future work to undertake. Investigating and analyzing various properties when answering queries given an \ac{selinux} policy would be another important and interesting future work direction. 
 
 
 %----------------------------------------------------------------------
