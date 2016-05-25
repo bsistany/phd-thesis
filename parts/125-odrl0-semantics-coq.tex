@@ -672,7 +672,7 @@ Eval compute in (trans_agreement e_24 A24 Display Alice TheReport). =
 
 \section{Decision Procedures}\label{sec:decprocs}
 
-In the following we will list only the type declaration of each decision procedure and the accompanying functions. The individual decision procedures were used as a building block to make the final decidability proofs for \ac{ACCPL} possible. We will refer to these listings later when we discuss the translations and/or proofs using the decision procedures.
+In the following we will list only the declaration of each decision procedure and the accompanying functions. The individual decision procedures were used as a building block to make the final decidability proofs for \ac{ACCPL} possible. We will refer to some of these listings later when we discuss the translations and/or proofs using the decision procedures. Please refer to the source code where the usage of a decision procedure in not mentioned in the following.
 
 The decision procedure \syn{eq_nat_dec} takes two natural numbers, and declares that either there is a proof for their equality or there exists a proof for their inequality (see listing~\ref{lst:eqnatdeccoq}).
 
@@ -681,9 +681,9 @@ The decision procedure \syn{eq_nat_dec} takes two natural numbers, and declares 
 Theorem eq_nat_dec : forall n m, {n = m} + {n <> m}.
 \end{lstlisting}
 
-The decision procedure \syn{subject_in_prin_dec} declares that either there is a proof for the proposition \syn{is_subject_in_prin} (see listing~\ref{lst:issubjectinprincoq}) or there exists a proof for its negation (see listing~\ref{lst:issubjectinprincoq}). 
+The decision procedure \syn{subject_in_prin_dec} (see listing~\ref{lst:issubjectinprincoq}) declares that either there is a proof for the proposition \syn{is_subject_in_prin} (see listing~\ref{lst:issubjectinprincoq}) or there exists a proof for its negation. 
 
-\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{is_subject_in_prin}},label={lst:issubjectinprincoq}}
+\lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{subject_in_prin_dec}},label={lst:issubjectinprincoq}}
 \begin{lstlisting}
 Theorem subject_in_prin_dec :
     forall (a:subject) (l:prin), {is_subject_in_prin a l} + {~ is_subject_in_prin a l}.

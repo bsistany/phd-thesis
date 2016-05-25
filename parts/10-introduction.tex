@@ -86,7 +86,7 @@ Policy languages and the agreements written in those languages are meant to impl
 
 As stated earlier, an important part of fulfilling the verifiability goal is to have formal semantics defined for policy languages. For \ac{odrl}, authors of~\cite{pucella2006} have defined a formal semantics based on which they declare and prove a number of important theorems (their main focus is on stating and proving algorithm complexity results). However as with many paper-proofs, the language used to do the proofs while mathematical in nature, uses many intuitive justifications to show the proofs. As such these proofs are difficult to verify or more importantly to ``derive''. Furthermore the proofs can not be used directly to render a decision on a sample policy (e.g. whether to allow or deny access to an asset). Of course one may (carefully) construct a program based on these proofs for practical purposes but certifying such programs correct presents additional verification challenges, even assuming the original proofs were in fact correct.
 
-\section{Contributions}
+\section{Contributions}\label{sec:contribs}
 
 In this thesis we have built a language called \ac{ACCPL} based on \ac{odrl} and starting with definitions in~\cite{pucella2006}. The \ac{ACCPL} framework has been encoded in \emph{Coq}~\cite{BC04} which is both a programming language and a proof-assistant. We have declared and proved decidability results for \ac{ACCPL} in Coq which will allow us to extract programs from the proofs; the executable programs can be used on specific policies and a query, to render a specific decision such as ``a permission has been granted''. 
 
