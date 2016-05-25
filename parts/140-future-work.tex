@@ -42,7 +42,7 @@ The enforcement of \ac{selinux} policies are performed by the \emph{security ser
 
 The \ac{selinux} policy has four different kinds of statements: declarations, rules, constraints and assertions~\cite{ArcherLP03}. Assertions are compile time checks that the \syn{checkpolicy} tool performs at compile time. The other three kinds of statements however are evaluated at run-time. 
 
-Declaration statements are used to declare types, roles and users. Type declaration statements are used to introduce new types. Roles are declared and authorized for particular domains (types) through role declarations, and finally user declarations are used to define each user and to specify the set of authorized roles for each of these users (see~\ref{lst:declsselinux}). In the following listings we will present a simplified and modified version of the official \ac{selinux} syntax that accommodates better the use of the \ac{ACCPL} Coq framework.
+Declaration statements are used to declare types, roles and users. Type declaration statements are used to introduce new types. Roles are declared and authorized for particular domains (types) through role declarations, and finally user declarations are used to define each user and to specify the set of authorized roles for each of these users (see listing~\ref{lst:declsselinux}). In the following listings we will present a simplified and modified version of the official \ac{selinux} syntax that accommodates better the use of the \ac{ACCPL} Coq framework.
 
 \lstset{language=selinux}
 \begin{lstlisting}[frame=single, caption={Declaration Statements},label={lst:declsselinux}]
@@ -65,7 +65,7 @@ Rule statements define access vector rules. Access vector (AV) rules (see listin
 <avkind> ::= 'allow' | 'deny'
 \end{lstlisting}
 
-When a process changes security context, the role may change, assuming a ``role transition'' rule exists, relating the old and the new roles. There is a related AV rule called the ``type transition'' rule where a process with type \syn{T1} is allowed/denied to transition to type \syn{T2} when C=process and P=transition (see~\ref{lst:typeAndroletransselinux}).
+When a process changes security context, the role may change, assuming a ``role transition'' rule exists, relating the old and the new roles. There is a related AV rule called the ``type transition'' rule where a process with type \syn{T1} is allowed/denied to transition to type \syn{T2} when C=process and P=transition (see listing~\ref{lst:typeAndroletransselinux}).
 
 \lstset{mathescape, language=AST} 
 \begin{minipage}[c]{0.95\textwidth}
@@ -92,13 +92,14 @@ Constraints are additional conditions on permissions in the form of boolean expr
 
 %\section{Agreements in SELinux}
 
-We will start by limiting the \ac{selinux} policy language to only allow AV rules. As mentioned earlier an operation not covered by an allow rule is denied by default in \ac{selinux} proper. We will make up explicit deny rules, such that an agreement is defined to be a combination of allow and deny rules. Allow and deny rules as mappings are defined in listing~\ref{lst:allowmappingastselinux}.
+We will start by limiting the \ac{selinux} policy language to only allow AV rules. As mentioned earlier an operation not covered by an allow rule is denied by default in \ac{selinux} proper. We will make up explicit deny rules, such that an agreement is defined to be a combination of allow and deny rules. Allow and deny rules as mappings are defined in listing~\ref{lst:allowmappingastselinux}. 
 
 \lstset{language=AST}
 \begin{lstlisting}[frame=single, caption={'allow'/'deny' Rule as a Mapping},label={lst:allowmappingastselinux}]
 AV rule : $T \times (T \times C) \rightarrow 2^{P}$
 \end{lstlisting}
 
+Agreements in \ac{selinux} are made up of AV rules and other agreements (see listing~\ref{lst:agreementastselinux}).
 \lstset{language=AST}
 \begin{lstlisting}[frame=single, caption={\ac{selinux} Agreement},label={lst:agreementastselinux}]
 <agreement> ::= <avRule> ';' <agreement> 
