@@ -21,11 +21,11 @@ Policy sets in \ac{odrl} as specified by~\cite{pucella2006} may be combined usin
 
 Adding the conjunction operator to policy sets in \ac{ACCPL} should be straight forward in terms of the infrastructure we would needs to add. However, this addition would open the door to possibility of conflicts and additionally the current established results for \ac{ACCPL} would no longer hold. For conflict detection and reporting, we would add an extra identifier to each policy that signifies which policy set a basic policy belongs to. We would also enhance the \syn{result} data-structure to include both the policy set and policy identifiers in order to help the policy writers fix their policies in case the conflict was not intended. Since allowing policy set conjunction opens the door to conflicting decisions, we can envisage adding policy set combination algorithms such as permit-overrides or deny-overrides to resolve conflicts in the case that the policy writer wouldn't want to fix the policies. Note that conflict detection becomes significantly more difficult if in addition to the combining policy sets, we add requirements that are type dependent (such as \ac{odrl} requirements). The conflict detection algorithm would need to take into account overlapping time ranges when defining conflicts. We believe the conflict detection algorithm described by St-Martin and Felty~\cite{felty16} could be potentially adapted and used for \ac{ACCPL} specially given the authors' extensive proof libraries. 
 
-In the following we will list some example policies that are expressible in \ac{ACCPL} and some that are not. The examples are taken from~\cite{pucella2006} but we also show variations based on those examples as applicable.
+In the following we will list some example policies taken from~\cite{pucella2006} that are expressible in \ac{ACCPL} and some that are not. 
 
 \section{Examples}
 
-The statement in listing~\ref{lst:pucellatwooneexampleAST} (from~\cite{pucella2006}) expresses that ``the asset TheReport may be printed a total of five times by Alice or Bob'' by the first policy statement. The second policy statement is only allowing Alice to print twice more which means Bob is not allowed to use this policy to print at all. 
+The statement in listing~\ref{lst:pucellatwooneexampleAST} expresses that ``the asset TheReport may be printed a total of five times by Alice or Bob'' by the first policy statement. The second policy statement is only allowing Alice to print twice more which means Bob is not allowed to use this policy to print at all. 
 
 \lstset{language=Pucella2006}
 \begin{minipage}[c]{0.95\textwidth}
@@ -78,7 +78,7 @@ Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS             
 \end{lstlisting}
 \end{minipage} 
 
-The statement in listing~\ref{lst:pucellatwotwoexampleAST} (from~\cite{pucella2006}) expresses that ``the asset TheReport may be printed AND displayed a total of five times by Alice or Bob''.
+The statement in listing~\ref{lst:pucellatwotwoexampleAST}  expresses that ``the asset TheReport may be printed AND displayed a total of five times by Alice or Bob''.
 
 
 \lstset{language=Pucella2006}
@@ -113,7 +113,7 @@ Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS             
 
 %
 
-The statement in listing~\ref{lst:pucellatwothreeexampleAST} (from~\cite{pucella2006}) expresses that ``the asset TheReport may be printed by Alice 1 time; Bob is not restricted at all so Bob may print the asset any number of times".
+The statement in listing~\ref{lst:pucellatwothreeexampleAST}  expresses that ``the asset TheReport may be printed by Alice 1 time; Bob is not restricted at all so Bob may print the asset any number of times".
 
 \lstset{language=Pucella2006}
 \begin{minipage}[c]{0.95\textwidth}
@@ -151,7 +151,7 @@ Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS             
 
 %
 
-The statement in listing~\ref{lst:pucellatwofiveexampleAST} (from~\cite{pucella2006}) expresses that ``the asset ebook may be displayed and printed by Alice AND Bob 10 times; under the first policy, Alice and Bob may each display the asset five times, and under the second policy, Alice and Bob may each print the asset 1 time".
+The statement in listing~\ref{lst:pucellatwofiveexampleAST}  expresses that ``the asset ebook may be displayed and printed by Alice AND Bob 10 times; under the first policy, Alice and Bob may each display the asset five times, and under the second policy, Alice and Bob may each print the asset 1 time".
 
 
 \lstset{language=Pucella2006}
@@ -167,7 +167,7 @@ agreement
 %
 
 
-The statement in listing~\ref{lst:pucellatwosixexampleAST} (from~\cite{pucella2006}) expresses that ``the asset latestJingle may be played by Alice or Bob, on the condition that an amount of 5\$ was paid first and then an attribution to Charlie was made, in that order; the single policy further restricts Alice to only play the asset 10 times''. The statement in listing~\ref{lst:pucellatwosixexampleAST} is made up of an exclusive policy set, meaning that it restricts actions on assets to the users mentioned explicitly in the agreement, in this case, Alice and Bob.
+The statement in listing~\ref{lst:pucellatwosixexampleAST}  expresses that ``the asset latestJingle may be played by Alice or Bob, on the condition that an amount of 5\$ was paid first and then an attribution to Charlie was made, in that order; the single policy further restricts Alice to only play the asset 10 times''. The statement in listing~\ref{lst:pucellatwosixexampleAST} is made up of an exclusive policy set, meaning that it restricts actions on assets to the users mentioned explicitly in the agreement, in this case, Alice and Bob.
 
 \lstset{language=Pucella2006}
 \begin{minipage}[c]{0.95\textwidth}
