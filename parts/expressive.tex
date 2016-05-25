@@ -148,35 +148,6 @@ Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS             
 %
 
 
-The statement in listing~\ref{lst:pucellatwofourexampleAST} (from~\cite{pucella2006}) expresses that ``the asset TheReport may be printed and displayed by Alice and Bob only and with the restriction that Alice and Bob together may print and display the asset five times".
-
-\lstset{language=Pucella2006}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Agreement of Example 2.4}, label={lst:pucellatwofourexampleAST}, mathescape]
-agreement
- for Alice and Bob and Charlie
- about The Report 
- with and[{Alice, Bob}, {Alice, Bob}<count[5]>] -> and[True =>$_{id1}$ print, True =>$_{id2}$ display].
-\end{lstlisting}
-\end{minipage} 
-
-We show how the policy statement in~\ref{lst:pucellatwofourexampleAST} would be expressed in \ac{ACCPL} using Coq constructs, in listing~\ref{lst:pucellatwofourexamplecoq}.
-
-\lstset{language=Coq, frame=single, caption={Expressing Agreement of Example 2.4 in ACCPL}, label={lst:pucellatwofourexamplecoq}}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
-Definition ps_24_p1:primPolicy :=   (PrimitivePolicy (makePreRequisite (TruePrq)) id1 Print).Definition ps_24_p2:primPolicy :=   (PrimitivePolicy (makePreRequisite (TruePrq)) id2 Display).Definition ps_24_p:policy :=   (Policy (NewList ps_24_p1 (Single ps_24_p2))).Definition ps_24_prq1:primPreRequisite :=   (Constraint (Principal (NewList Alice (Single Bob)))).Definition ps_24_prq2:primPreRequisite :=   (Constraint (CountByPrin (NewList Alice (Single Bob)) 1)). Definition ps_24_prq:preRequisite :=   (PreRequisite (NewList ps_24_prq1 (Single ps_24_prq2))).Definition ps_24:primPolicySet :=  PIPS (PrimitiveInclusivePolicySet    ps_24_prq ps_24_p).Definition A24 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_24).\end{lstlisting}
-\end{minipage} 
-
-We show how the policy statement in listing~\ref{lst:pucellatwofourexampleAST} looks like as an \ac{ACCPL} construct, in listing~\ref{lst:pucellatwofourexamplecoq2}.
-
-\lstset{language=Coq, frame=single, caption={Fully Built Agreement of Example 2.4 in ACCPL}, label={lst:pucellatwofourexamplecoq2}}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
-Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS               (PrimitiveInclusivePolicySet                  (PreRequisite                     (Constraint (Principal (Alice, [Bob])),                      [Constraint (CountByPrin (Alice, [Bob]) 1)])                  (Policy                     (PrimitivePolicy (PreRequisite [TruePrq]) id1 Print,                      [PrimitivePolicy (PreRequisite [TruePrq]) id2 Display])))))
-
-\end{lstlisting}
-\end{minipage} 
 
 %
 

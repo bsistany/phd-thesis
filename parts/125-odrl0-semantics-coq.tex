@@ -336,7 +336,24 @@ Definition trans_policy_positive
 \end{lstlisting}
 \end{minipage}
 
-The function \syn{process_single_pp_trans_policy_positive} acting on a single \syn{primPolicy} (see listing~\ref{lst:transSinglePositivePolicyCoq}), first checks whether the prerequisite from the policy holds or not, by calling the decision procedure \syn{trans_preRequisite_dec}. If so the translation function checks that there is a proof for the equality of \syn{action_from_query} and \syn{action} (the \syn{action} from the agreement) by calling the decision procedure \syn{eq_nat_dec}. If so, the translation function finally returns a result of \syn{Permitted}. In all other cases, a result of \syn{Unregulated} is returned. Intuitively we are just explicitly stating that policies are not applicable to queries about actions that are not mentioned in the agreement. 
+The function \syn{trans_pp_list_trans_policy_positive} (see listing~\ref{lst:transListOfPositiveCoq}) handles the case of a single primitive policy by calling the handler function \syn{process_single_pp_trans_policy_positive} (see listing~\ref{lst:transSinglePositivePolicyCoq}). When there is more than a single primitive policy, the function \syn{trans_pp_list_trans_policy_positive} appends the results of processing a single primitive policy to the results for the rest of the set.
+
+\lstset{language=Coq, frame=single, caption={Translation of Primitive Positive Policies},
+    label={lst:transListOfPositiveCoq}}
+\begin{lstlisting}
+Fixpoint trans_pp_list_trans_policy_positive
+  (pp_list:nonemptylist primPolicy)(e:environment)(x:subject)
+  (prin_u:prin)(a:asset)(action_from_query: act){struct pp_list}:=
+   match pp_list with
+     | Single pp1 => process_single_pp_trans_policy_positive pp1 e x prin_u a action_from_query
+     | NewList pp pp_list' => app_nonempty
+	 (process_single_pp_trans_policy_positive pp e x prin_u a action_from_query) 
+	 (trans_pp_list_trans_policy_positive pp_list' e x prin_u a action_from_query)
+   end.
+\end{lstlisting}
+
+
+The function \syn{process_single_pp_trans_policy_positive} acting on a single \\ \syn{primPolicy} (see listing~\ref{lst:transSinglePositivePolicyCoq}), first checks whether the prerequisite from the policy holds or not, by calling the decision procedure \syn{trans_preRequisite_dec}. If so the translation function checks that there is a proof for the equality of \syn{action_from_query} and \syn{action} (the \syn{action} from the agreement) by calling the decision procedure \syn{eq_nat_dec}. If so, the translation function finally returns a result of \syn{Permitted}. In all other cases, a result of \syn{Unregulated} is returned. Intuitively we are just explicitly stating that policies are not applicable to queries about actions that are not mentioned in the agreement. 
 
 
 \lstset{language=Coq, frame=single, caption={Translation of a Primitive Positive Policy},
@@ -363,23 +380,6 @@ Definition process_single_pp_trans_policy_positive
   end.
 \end{lstlisting}
 \end{minipage}
-
-The function \syn{trans_pp_list_trans_policy_positive} (see listing~\ref{lst:transListOfPositiveCoq}) handles the case of a single primitive policy by calling the handler function \syn{process_single_pp_trans_policy_positive} (see listing~\ref{lst:transSinglePositivePolicyCoq}). When there is more than a single primitive policy, the function \syn{trans_pp_list_trans_policy_positive} appends the results of processing a single primitive policy to the results for the rest of the set.
-
-\lstset{language=Coq, frame=single, caption={Translation of Primitive Positive Policies},
-    label={lst:transListOfPositiveCoq}}
-\begin{lstlisting}
-Fixpoint trans_pp_list_trans_policy_positive
-  (pp_list:nonemptylist primPolicy)(e:environment)(x:subject)
-  (prin_u:prin)(a:asset)(action_from_query: act){struct pp_list}:=
-   match pp_list with
-     | Single pp1 => process_single_pp_trans_policy_positive pp1 e x prin_u a action_from_query
-     | NewList pp pp_list' => app_nonempty
-	 (process_single_pp_trans_policy_positive pp e x prin_u a action_from_query) 
-	 (trans_pp_list_trans_policy_positive pp_list' e x prin_u a action_from_query)
-   end.
-\end{lstlisting}
-%\end{minipage}
 
 
 The \syn{trans_policy_negative} translation function (see listing~\ref{lst:transNegativeCoq}) starts by calling the function \syn{trans_pp_list_trans_policy_negative} on a list of \syn{primPolicy}s. Note that \syn{trans_pp_list_trans_policy_negative} is not listed here since it follows the exact pattern as \syn{trans_pp_list_trans_policy_positive} (see listing~\ref{lst:transListOfPositiveCoq}).
@@ -593,6 +593,79 @@ Fixpoint trans_count_aux (e:environment)(ids_and_subjects : nonemptylist (Twos p
   end.
 \end{lstlisting}
 \end{minipage}
+
+
+At this point we have covered the semantics of \ac{ACCPL} in terms of translation functions starting with \syn{trans_agreement}. In the following listings we will show an example agreement from~\cite{pucella2006} expressed as abstract syntax and as \ac{ACCPL}. We will also show how the fully built agreement looks like as \ac{ACCPL} constructs and we will show how a number of queries can be asked and what the results would be and whether the results are as expected.
+
+The statement in listing~\ref{lst:pucellatwofourexampleAST} expresses that ``the asset TheReport may be printed and displayed by Alice and Bob only and with the restriction that Alice and Bob together may print and display the asset five times".
+
+\lstset{language=Pucella2006}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={Agreement of Example 2.4}, label={lst:pucellatwofourexampleAST}, mathescape]
+agreement
+ for Alice and Bob and Charlie
+ about The Report 
+ with and[{Alice, Bob}, {Alice, Bob}<count[5]>] -> and[True =>$_{id1}$ print, True =>$_{id2}$ display].
+\end{lstlisting}
+\end{minipage} 
+
+The policy statement in~\ref{lst:pucellatwofourexampleAST} is expressed in \ac{ACCPL} using Coq constructs, in listing~\ref{lst:pucellatwofourexamplecoq}.
+
+\lstset{language=Coq, frame=single, caption={Expressing Agreement of Example 2.4 in ACCPL}, label={lst:pucellatwofourexamplecoq}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Definition ps_24_p1:primPolicy :=   (PrimitivePolicy (makePreRequisite (TruePrq)) id1 Print).Definition ps_24_p2:primPolicy :=   (PrimitivePolicy (makePreRequisite (TruePrq)) id2 Display).Definition ps_24_p:policy :=   (Policy (NewList ps_24_p1 (Single ps_24_p2))).Definition ps_24_prq1:primPreRequisite :=   (Constraint (Principal (NewList Alice (Single Bob)))).Definition ps_24_prq2:primPreRequisite :=   (Constraint (CountByPrin (NewList Alice (Single Bob)) 1)). Definition ps_24_prq:preRequisite :=   (PreRequisite (NewList ps_24_prq1 (Single ps_24_prq2))).Definition ps_24:primPolicySet :=  PIPS (PrimitiveInclusivePolicySet    ps_24_prq ps_24_p).Definition A24 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_24).\end{lstlisting}
+\end{minipage} 
+
+The policy statement in listing~\ref{lst:pucellatwofourexampleAST} as an \ac{ACCPL} construct is shown, in listing~\ref{lst:pucellatwofourexamplecoq2}.
+
+\lstset{language=Coq, frame=single, caption={Fully Built Agreement of Example 2.4 in ACCPL}, label={lst:pucellatwofourexamplecoq2}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS               (PrimitiveInclusivePolicySet                  (PreRequisite                     (Constraint (Principal (Alice, [Bob])),                      [Constraint (CountByPrin (Alice, [Bob]) 1)])                  (Policy                     (PrimitivePolicy (PreRequisite [TruePrq]) id1 Print,                      [PrimitivePolicy (PreRequisite [TruePrq]) id2 Display])))))
+
+\end{lstlisting}
+\end{minipage} 
+
+The default environment for the example agreement is shown in listing~\ref{lst:pucellatwofourexamplecoq3}. We set all the counts to zero initially.
+
+\lstset{language=Coq, frame=single, caption={The Default Environment for Example 2.4 in ACCPL}, label={lst:pucellatwofourexamplecoq3}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Definition e_24 : environment := (ConsEnv (make_count_equality Bob id1 0)   (ConsEnv (make_count_equality Bob id2 0)     (ConsEnv (make_count_equality Alice id1 0)       (SingleEnv (make_count_equality Alice id2 0))))).\end{lstlisting}
+\end{minipage} 
+
+The query in listing~\ref{lst:pucellatwofourexamplecoq4}, asks whether Alice may print the asset TheReport. We expect the action to be allowed based on the first primitive policy. The second primitive policy mentions a different action (e.g. Display) so we expect the request is unregulated. 
+
+\lstset{language=Coq, frame=single, caption={Query: May Alice Print The Report for Example 2.4 in ACCPL}, label={lst:pucellatwofourexamplecoq4}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Eval compute in (trans_agreement e_24 A24 Print Alice TheReport). = 
+   Result Permitted Alice Print TheReport, [Result Unregulated Alice Print TheReport]
+\end{lstlisting}
+\end{minipage} 
+
+The query in listing~\ref{lst:pucellatwofourexamplecoq5}, asks whether Charlie may print the asset TheReport. We expect the action to be unregulated because Charlie fails to meet the prerequisites specified for the policy set. 
+
+\lstset{language=Coq, frame=single, caption={Query: May Charlie Print The Report for Example 2.4 in ACCPL}, label={lst:pucellatwofourexamplecoq5}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Eval compute in (trans_agreement e_24 A24 Print Charlie TheReport). = 
+   Result Unregulated Charlie Print TheReport, [Result Unregulated Charlie Print TheReport]
+\end{lstlisting}
+\end{minipage} 
+
+The query in listing~\ref{lst:pucellatwofourexamplecoq6}, asks whether Alice may display the asset TheReport. We expect the action to be allowed based on the second primitive policy. The first primitive policy mentions a different action (e.g. Print) so we expect the request is unregulated. 
+
+\lstset{language=Coq, frame=single, caption={Query: May Alice Display The Report for Example 2.4 in ACCPL}, label={lst:pucellatwofourexamplecoq6}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Eval compute in (trans_agreement e_24 A24 Display Alice TheReport). = 
+   Result Unregulated Alice Display TheReport, [Result Permitted Alice Display TheReport]
+\end{lstlisting}
+\end{minipage} 
+
+
 
 
 
