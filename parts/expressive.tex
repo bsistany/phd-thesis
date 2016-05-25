@@ -13,7 +13,22 @@ As mentioned in previous chapters, \ac{ACCPL} forgoes requirements completely an
 \section{General Conditions}\label{sec:extendwithgeneralconditions}
 
 One reason \ac{ACCPL} was started small was to establish the correctness proofs for the semantics (as described previously) before we could discuss various ways expressive power could be added to the language. However another reason for the compactness of \ac{ACCPL} was to keep it generic and suitable for various applications. For example, although we have kept many of the prerequisites from 
-\ac{odrl}~\cite{pucella2006}, and in general have treated digital rights as our main access-control application throughout the thesis, there is no reason why we cannot add other arbitrary conditions to \ac{ACCPL} provided they are provable. For example, prerequisites similar in expressive power to \ac{xacml} targets and/or conditions may be added in \ac{ACCPL} for a specific application (e.g. access-control in healthcare). Of course, adding new prerequisites would require additional translation functions, decision procedures and potentially new helper lemmas and theorems.
+\ac{odrl}~\cite{pucella2006}, and in general have treated digital rights as our main access-control application throughout the thesis, there is no reason why we cannot add other arbitrary conditions to \ac{ACCPL} provided they are provable. For example, prerequisites similar in expressive power to \ac{xacml} targets and/or conditions may be added in \ac{ACCPL} for a specific application (e.g. access-control in healthcare). Of course, adding new prerequisites would require additional translation functions, decision procedures and potentially new helper lemmas and theorems. 
+
+In the following (see listing~\ref{lst:pucellagencondAST}), we use abstract syntax to show how an \ac{ACCPL} policy with \ac{xacml} style conditions would look like; we have made up a new prerequisite called 'gender' with possible values 'male' and 'female'. One would also need to add the gender of users in the environment to enable the translation functions to evaluate whether the gender condition is satisfied or not.
+
+\lstset{language=Pucella2006}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}[frame=single, caption={ACCPL Policy Using a General Condition}, label={lst:pucellagencondAST}, mathescape]
+agreement
+ for Alice and Bob 
+ about The Report 
+ with True -> and[Alice, count[2], gender[female] =>$_{id1}$ print.
+\end{lstlisting}
+\end{minipage} 
+
+
+
 
 \section{PolicySet Combinators}\label{sec:policysetcombo}
 
