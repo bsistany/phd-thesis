@@ -33,51 +33,6 @@ agreement
 \end{lstlisting}
 %\end{minipage} 
 
-We show how the ``First Agreement for Alice and Bob'' statement would be expressed in \ac{ACCPL} using Coq constructs, in listing~\ref{lst:agreementincoq}.
-
-\lstset{language=Coq, frame=single, caption={Expressing First Agreement for Alice and Bob in ACCPL}, label={lst:agreementincoq}}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
-Definition ps_xml_p1prq1:primPreRequisite := 
-  (Constraint (Principal (Single Alice))).
-
-Definition ps_xml_p1prq2:primPreRequisite := 
-  (Constraint (Count 2)).
-
-Definition ps_xml_prq:preRequisite := 
-  (PreRequisite (NewList ps_xml_p1prq1 (Single ps_xml_p1prq2))).
-
-Definition ps_xml_p1:primPolicy := 
-  (PrimitivePolicy ps_xml_prq id1 Print).
-
-Definition ps_xml_p:policy := 
-  (Policy (Single ps_xml_p1)).
-
-Definition ps_xml:primPolicySet :=
-  PIPS (PrimitiveInclusivePolicySet
-    (makePreRequisite TruePrq) ps_xml_p).
-
-Definition Axml := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_xml).
-\end{lstlisting}
-\end{minipage} 
-
-We show how the ``First Agreement for Alice and Bob'' policy statement looks like as an \ac{ACCPL} construct, in listing~\ref{lst:agreementincoq2}.
-
-\lstset{language=Coq, frame=single, caption={Fully Built First Agreement for Alice and Bob in ACCPL}, label={lst:agreementincoq2}}
-\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}
-Agreement (Alice, [Bob]) TheReport
-         (PPS
-            (PIPS
-               (PrimitiveInclusivePolicySet (PreRequisite [TruePrq])
-                  (Policy
-                     [PrimitivePolicy
-                        (PreRequisite
-                           (Constraint (Principal [Alice]),
-                            [Constraint (Count 2)])) id1 Print]))))
-
-\end{lstlisting}
-\end{minipage} 
 
 A similar but slightly more complex (than the one in~\ref{lst:agreementinxml}) example is discussed in~\cite{pucella2006} where the policy statement (shown both in XML-based syntax and in the abstract syntax style of the authors of~\cite{pucella2006} is not expressible in \ac{ACCPL}. What is missing from \ac{ACCPL} to express this policy statement is, not supporting two prerequisites. One is the ``prePay[n]'' prerequisite supported by Pucella and Weissman~\cite{pucella2006}'s fragment of \ac{odrl}. The second prerequisite mentioned in this statement, ``Mary's computer'', is some kind of location based condition that the authors of~\cite{pucella2006} refer to, but we don't find them defined anywhere. As we discuss later in this thesis (see sections~\ref{sec:missingreqs} and~\ref{sec:extendwithgeneralconditions}) both of these missing prerequisites (and others) could potentially be implemented to extend expressibility of \ac{ACCPL}.
 

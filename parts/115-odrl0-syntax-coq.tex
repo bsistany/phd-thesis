@@ -124,32 +124,50 @@ Inductive constraint : Set :=
 \end{minipage}
 
 
-We started with the encoding of the agreement for \syn{Alice} and \syn{Bob} in chapter~\ref{chap:odrl0syntax} but we deferred the definition of the Coq constructs used to encode that agreement. All the definitions needed to encode the agreement for \syn{Alice} and \syn{Bob} have now been defined so we now show how that agreement looks like as encodings of \ac{ACCPL} constructs in Coq in the listing~\ref{lst:agreementAliceAndBob}. Recall the listing~\ref{lst:agreementpucella2006} for \syn{<agreement>} which used the syntax taken from~\cite{pucella2006}.
+We started with the encoding of the policy statement for ``First Agreement for Alice and Bob'' in chapter~\ref{chap:odrl0syntax} but we deferred the definition of the Coq constructs used to encode that agreement. All the definitions needed to encode the agreement for Alice and Bob have now been defined so we now show how that agreement looks like as encodings of \ac{ACCPL} constructs in Coq in the listing~\ref{lst:agreementincoq}. Recall the listing~\ref{lst:agreementinAST} for the abstract syntax form of the statement.
 
+We show how the ``First Agreement for Alice and Bob'' statement would be expressed in \ac{ACCPL} using Coq constructs, in listing~\ref{lst:agreementincoq}.
 
+\lstset{language=Coq, frame=single, caption={Expressing First Agreement for Alice and Bob in ACCPL}, label={lst:agreementincoq}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Definition ps_xml_p1prq1:primPreRequisite := 
+  (Constraint (Principal (Single Alice))).
 
-\lstset{language=Coq}
-%\begin{minipage}[c]{0.95\textwidth}
-\begin{lstlisting}[frame=single, caption={Agreement for Alice and Bob in ACCPL},label={lst:agreementAliceAndBob}]
+Definition ps_xml_p1prq2:primPreRequisite := 
+  (Constraint (Count 2)).
 
-Definition p1A1:primPolicySet :=
+Definition ps_xml_prq:preRequisite := 
+  (PreRequisite (NewList ps_xml_p1prq1 (Single ps_xml_p1prq2))).
+
+Definition ps_xml_p1:primPolicy := 
+  (PrimitivePolicy ps_xml_prq id1 Print).
+
+Definition ps_xml_p:policy := 
+  (Policy (Single ps_xml_p1)).
+
+Definition ps_xml:primPolicySet :=
   PIPS (PrimitiveInclusivePolicySet
-    TruePrq
-    (Policy (Single (PrimitivePolicy (Constraint (Count  5)) id1 Print)))).
+    (makePreRequisite TruePrq) ps_xml_p).
 
-Definition p2A1prq1:preRequisite := (Constraint (Principal (Single Alice))).
-Definition p2A1prq2:preRequisite := (Constraint (Count 2)).
+Definition Axml := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_xml).
+\end{lstlisting}
+\end{minipage} 
 
-Definition p2A1:primPolicySet :=
-  PIPS (PrimitiveInclusivePolicySet
-    TruePrq
-    (Policy 
-      (Single 
-        (PrimitivePolicy (AndPrqs (NewList p2A1prq1 (Single p2A1prq2))) id2 Print)))).
+We show how the ``First Agreement for Alice and Bob'' policy statement looks like as an \ac{ACCPL} construct, in listing~\ref{lst:agreementincoq2}.
 
+\lstset{language=Coq, frame=single, caption={Fully Built First Agreement for Alice and Bob in ACCPL}, label={lst:agreementincoq2}}
+\begin{minipage}[c]{0.95\textwidth}
+\begin{lstlisting}
+Agreement (Alice, [Bob]) TheReport
+         (PPS
+            (PIPS
+               (PrimitiveInclusivePolicySet (PreRequisite [TruePrq])
+                  (Policy
+                     [PrimitivePolicy
+                        (PreRequisite
+                           (Constraint (Principal [Alice]),
+                            [Constraint (Count 2)])) id1 Print]))))
 
-Definition A1 := Agreement (NewList Alice (Single Bob)) TheReport (PPS p1A1).
-\end{lstlisting}	
-%\end{minipage}	
-
-
+\end{lstlisting}
+\end{minipage} 
