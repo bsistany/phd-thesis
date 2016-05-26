@@ -9,7 +9,7 @@ In this thesis, we presented the design and implementation of \ac{ACCPL} as a sm
 
 We have also studied \ac{ACCPL} in terms of Tschantz and Krishnamurthi's~\cite{Tschantz} reasonability properties which make policy languages more amenable to reasoning and concluded that, since \ac{ACCPL} supported these properties, \ac{ACCPL} was significantly more amenable to analysis and reasoning than other access-control policy languages. 
 
-We additionally described why certain design choices were made and how they contributed to the ease of reasoning for \ac{ACCPL}. Admittedly some expressive power present in other access-control policy languages was omitted from \ac{ACCPL} in order to achieve the reported correctness proofs. For example, in \ac{ACCPL} we only support base policy sets (policy sets that are not composed of other policy sets) i.e. no combining of base policy sets using conjunctions or other combining operators are supported in \ac{ACCPL}. 
+We additionally described why certain design choices were made and how they contributed to the ease of reasoning for \ac{ACCPL}. Admittedly some expressive power present in other access-control policy languages was omitted from \ac{ACCPL} in order to achieve the reported correctness proofs. For example, in \ac{ACCPL} we only support base policy sets (policy sets that are not composed of other policy sets) i.e. no combining of base policy sets using conjunctions or other combining operators are supported. 
 
 
 \section{Future Work}
@@ -132,7 +132,7 @@ $deny (T1, T2, C, P)$ $\lor$ $\lnot (E$ $consistent$ $wrt$ <T1, R1, U1> $\land$ 
 
 
 
-Most policy based access-control languages use a two-valued decision set to indicate whether an access request is granted or denied. The literature for \ac{selinux} implies only these two outcomes are possible as well, however formally proving this conjecture in Coq would be an important future work to undertake. Investigating and analyzing various properties when answering queries given an \ac{selinux} policy would be another important and interesting future work direction. 
+Most policy based access-control languages use a two-valued decision set to indicate whether an access request is granted or denied. The literature for \ac{selinux} implies only these two outcomes are possible as well, however formally proving this conjecture in Coq would be an important future work to undertake. Investigating and analyzing various properties (e.g. safety) when answering queries given an \ac{selinux} policy would be another important and interesting future work direction. 
 
 
 %----------------------------------------------------------------------
