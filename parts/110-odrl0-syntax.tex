@@ -5,25 +5,25 @@
 
 \section{Introduction}
 
-We follow the style of~\cite{pucella2006} by using abstract syntax to express policy statements in \ac{ACCPL}. Abstract syntax is a more compact representation than XML which is what all the XML-based policy languages such \ac{odrl} use. Furthermore abstract syntax simplifies specifying the semantics as we shall see later. 
+We follow the style of~\cite{pucella2006} by using abstract syntax to express policy statements in \ac{ACCPL}. Abstract syntax is a more compact representation than XML which is what all the XML-based policy languages such as \ac{odrl} use. Furthermore abstract syntax simplifies specifying the semantics as we shall see later. 
 
-In the following we will cover the abstract syntax of \ac{ACCPL} that we later implement in Coq using constructs such as inductive types and definitions. 
+In the following we will cover the abstract syntax of \ac{ACCPL} that we later implement in Coq using constructs such as inductive types and function definitions. 
 
 
 \section{Environmental Facts}\label{sec:odrl0}
 To determine the outcome of policies, specified conditions in those policies are evaluated but to do so environmental facts are often needed. In the \ac{drm} realm with its focus on usage control, certain facts are typically tracked in the environment. The count of how many times an asset has been accessed, the amount a user has paid to access an asset and finally whether a user has made an attribution (e.g. mentioning the content owner by name) are examples of the kind of facts environments hold.
 
-In \ac{ACCPL}, agreements and facts (i.e. environments) will refer to a count of how many times each policy should be used and has been used respectively, to justify an action. This is the only fact that \ac{ACCPL} will cover although we conjecture adding other simple facts such as attributions and ``amounts paid'' and the machinery to support those facts should not change the verification goals and results so far of \ac{ACCPL}. We will defer to later in the thesis (see section~\ref{sec:missingreqs}), the discussion of how and whether more general and complex facts in the environment will impact \ac{ACCPL} and our verification results.   
+In \ac{ACCPL}, agreements and facts (i.e. environments) will refer to a count of how many times each policy should be used and has been used respectively, to justify an action. This is the only fact that \ac{ACCPL} will cover although we conjecture adding other simple facts such as attributions and ``amounts paid'' and the machinery to support those facts should not change the verification goals for \ac{ACCPL} and the established results in a significant way. We will defer to later in the thesis (see section~\ref{sec:missingreqs}), the discussion of how and whether more general and complex facts in the environment will impact \ac{ACCPL} and our verification results.   
 
-In \ac{ACCPL} a prerequisite is either True, a constraint, the negation of a constraint or a conjunction of prerequisites. True is the prerequisite that always holds. Constraints are facts that are outside of control of users. For example, there is nothing Alice can do to satisfy the constraint ``user must be Bob''. 
+%In \ac{ACCPL} a prerequisite is either True, a constraint, the negation of a constraint or a conjunction of prerequisites. True is the prerequisite that always holds and constraints are facts that are outside of control of users. For example, there is nothing Alice can do to satisfy the constraint ``user must be Bob''. 
 
 
-We will describe \ac{ACCPL} in a \emph{BNF} grammar that looks more like Pucella and Weissman's subset grammar~\cite{pucella2006}. BNF style grammars are more abstract as they only give suggestions about the surface syntax of expressions without getting into lexical analysis and parsing related aspects such as precedence order of operators~\cite{piercesf2011}. The Coq version in contrast is the encodings of the BNF definitions which is tyically used for building compilers and interpreters. We will present both the BNF definition and its Coq encoding for each construct of \ac{ACCPL}. 
+We will describe \ac{ACCPL} in a \emph{BNF} grammar that looks more like Pucella and Weissman's subset grammar~\cite{pucella2006}. BNF style grammars are more abstract as they only give suggestions about the surface syntax of expressions without getting into lexical analysis and parsing related aspects such as precedence order of operators~\cite{piercesf2011}. The Coq version in contrast is the encodings of the BNF definitions which is typically used for building compilers and interpreters. We will present both the BNF definition and its Coq encoding for each construct of \ac{ACCPL}. 
 
 
 \section{Productions} \label{sec:productionast}
 
-The top level \ac{ACCPL} production is the \syn{<agreement>}. An agreement expresses what actions a set of subjects may perform on an object and under what conditions. Syntactically an agreement is composed of a set of subjects/users called a principal or \syn{<prin>}, an \syn{<asset>} and a \syn{<policySet>} (see listing~\ref{lst:agreementast}).
+The top level \ac{ACCPL} production is the \syn{<agreement>}. An agreement expresses what actions a set of subjects may perform on an object and under what conditions. Syntactically an agreement is composed of a set of subjects called a principal or \syn{<prin>}, an \syn{<asset>} and a \syn{<policySet>} (see listing~\ref{lst:agreementast}).
 
 % agreement
 \lstset{language=AST}
@@ -50,7 +50,7 @@ Assets are also application specific and we will continue using specific ones fo
 <asset> ::= TheReport | ebook | latestJingle | ...
 \end{lstlisting}
 
-Subjects are treated similarly to assets. We will use specific and application specific assets like \syn{Alice} and \syn{Bob} (see listing~\ref{lst:subjectast}).
+Subjects are treated similarly to assets. We will use specific subjects like \syn{Alice} and \syn{Bob} (see listing~\ref{lst:subjectast}).
 
 % subject
 \lstset{mathescape, language=AST}  
@@ -58,7 +58,7 @@ Subjects are treated similarly to assets. We will use specific and application s
 <subject> ::= Alice | Bob | ...
 \end{lstlisting}
 
-Agreements express who may perform an action on an asset. They include a set of subjects (i.e. a principal), an asset and a policy set. A policy set is a primitive policy set implying non-nested policy sets. Note that we could define various combining operators for policy sets such as conjunctions and disjunctions but we keep \ac{ACCPL}'s policy sets limited to the primitive kind. We do however, use a policy combining operator when it comes to dealing with policies later on. Each primitive policy set specifies a \syn{<prerequisite>} and a \syn{<policy>}. Intuitively if the prerequisite ``holds'' the policy is taken into consideration. Otherwise the policy will not be looked at (see listing~\ref{lst:policySetast}).
+Agreements express who may perform an action on an asset. They include a set of subjects (in the form of a principal), an asset and a policy set. A policy set is a primitive policy set implying non-nested policy sets. Note that we could define various combining operators for policy sets such as conjunctions and disjunctions but we keep \ac{ACCPL}'s policy sets limited to the primitive kind and their conjunctions. We do however, use a combining operator when it comes to dealing with policies later on. Each primitive policy set specifies a \syn{<prerequisite>} and a \syn{<policy>}. Intuitively if the prerequisite ``holds'' the policy is taken into consideration. Otherwise the policy will not be looked at (see listing~\ref{lst:policySetast}).
 
 
 % policySet
@@ -134,7 +134,7 @@ A policy identifier (\syn{<policyId>}) is a unique identifier specified as (incr
 <policyId> ::= N
 \end{lstlisting}
 
-In \ac{ACCPL} a \syn{<primPrerequisite>} is either True or it is a \syn{<constraint>}. The True prerequisite always holds. A constraint is an intrinsic part of a policy and cannot be influenced by agreement's users. Minimum height requirements for popular attractions and rides are examples of what we would consider a constraint. A constraint can also be negative, specified by the keyword `not' in front of \syn{<constraint>}. A \syn{<prerequisite>} is a set of primitive prerequisites which are closed under conjunction operator specified by the keyword `and' in front of the list of the primitive prerequisites separated by commas (see listing~\ref{lst:preRequisiteast}).
+In \ac{ACCPL} a \syn{<primPrerequisite>} is either True or it is a \syn{<constraint>}. The True prerequisite always holds. A constraint is an intrinsic part of a policy and cannot be influenced by agreement's users. Minimum height requirements for popular attractions and rides are examples of what we would consider a constraint (although not supported in \ac{ACCPL}). A constraint can also be negative, specified by the keyword `not' in front of \syn{<constraint>}. A \syn{<prerequisite>} is a set of primitive prerequisites which are closed under conjunction operator specified by the keyword `and' in front of the list of the primitive prerequisites separated by commas (see listing~\ref{lst:preRequisiteast}).
 
 % prq
 
