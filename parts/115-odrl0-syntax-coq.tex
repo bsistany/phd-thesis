@@ -70,7 +70,6 @@ The data type \syn{nonemptylist} reflects the definition of ``policy conjunction
 \lstset{language=Coq, frame=single, caption={nonemptylist},label={lst:nonemptylistcoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-
 Section nonemptylist.
 
 Variable X : Set.
@@ -91,7 +90,16 @@ In listing~\ref{lst:preRequisitecoq} a \syn{preRequisite} is defined as a dataty
 \lstset{language=Coq}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}[frame=single, caption={preRequisite},label={lst:preRequisitecoq}]
-Inductive primPreRequisite : Set :=  | TruePrq : primPreRequisite  | Constraint : constraint -> primPreRequisite  | NotCons : constraint -> primPreRequisite. Inductive preRequisite : Set :=  | PreRequisite : nonemptylist primPreRequisite -> preRequisite.Definition makePreRequisite (prq:primPreRequisite) : preRequisite := (PreRequisite (Single prq)).
+Inductive primPreRequisite : Set :=
+  | TruePrq : primPreRequisite
+  | Constraint : constraint -> primPreRequisite
+  | NotCons : constraint -> primPreRequisite.
+ 
+Inductive preRequisite : Set :=
+  | PreRequisite : nonemptylist primPreRequisite -> preRequisite.
+
+Definition makePreRequisite (prq:primPreRequisite) : preRequisite :=
+ (PreRequisite (Single prq)).
 \end{lstlisting}
 %\end{minipage}
 
@@ -100,19 +108,16 @@ Finally a \syn{constraint} (see  listing~\ref{lst:constraintast} for the abstrac
 \lstset{language=Coq}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}[frame=single, caption={Constraint Definition and the Three Kinds of Constraints},label={lst:exampleconst}]
-
 Inductive constraint : Set :=
   | Principal : prin  -> constraint 
   | Count : nat -> constraint 
   | CountByPrin : prin -> nat -> constraint.
-
 
 (Constraint (Principal (Single Alice))).
 
 (Constraint (Count 10)).
 
 (Constraint (CountByPrin (Single Alice) 10)).
-
 \end{lstlisting}
 \end{minipage}
 
