@@ -9,10 +9,10 @@ We specify the semantics of \ac{ACCPL} as a translation function from an agreeme
 % COQ
 The translation functions plus the auxiliary types and infrastructure which implement the semantics for \ac{ACCPL} have been encoded in Coq. The Coq code implementing the semantics is high-level enough to be readable as a specification of the semantics. This is one reason why we do not use abstract syntax to describe the semantics as we did for the syntax of \ac{ACCPL} (see chapter~\ref{chap:odrl0syntax}). The other reason not to use abstract syntax the way Pucella and Weissman~\cite{pucella2006} do for their semantics, is the difficulty of coming up with abstract syntax that is intuitive and equivalent to the translation functions implemented in Coq and listed in this chapter.
 
-Whether an agreement and the accompanying access request or query is translated into a decision indicating a permission is granted or denied depends on the agreement in question and the specifics of the request, but also on the facts recorded in the environment (e.g. time of day). For \ac{ACCPL} those facts revolve around the number of times a policy has been used to justify an action. We encode this information in Coq as a new inductive type representing the environment. An \syn{environment} (see listing~\ref{lst:environmentcoq}) is a conjunction of equalities of the form \syn{count(s, policyId) = n} which are called ``count equalities'' (see Section~\ref{sec:odrl0} for background on environments).
+Whether an agreement and the accompanying access request or query is translated into a decision indicating a permission is granted or denied depends on the agreement in question and the specifics of the request, but also on the facts recorded in the environment. For \ac{ACCPL} those facts revolve around the number of times a policy has been used to justify an action. We encode this information in Coq as a new inductive type representing the environment. An \syn{environment} (see listing~\ref{lst:environmentcoq}) is a conjunction of equalities of the form \syn{count(s, policyId) = n} which are called ``count equalities'' (see Section~\ref{sec:odrl0} for background on environments).
 
 % COQ
-The Coq version of a count equality is a new inductive type called \syn{count_equality}. An environment is defined to be a non-empty list of \syn{count_equality} objects (see listing~\ref{lst:environmentcoq}). Function \syn{make_count_equality} in listing~\ref{lst:environmentcoq} is simply a convenience function that builds \syn{count_equality} objects. 
+The Coq version of a count equality is a new inductive type called \syn{count_equality}. An environment is defined to be a nonempty list of \syn{count_equality} objects (see listing~\ref{lst:environmentcoq}). Function \syn{make_count_equality} in listing~\ref{lst:environmentcoq} is simply a convenience function that builds \syn{count_equality} objects. 
 
 \lstset{language=Coq, frame=single, caption={Environments and Counts},label={lst:environmentcoq}}
 \begin{minipage}[c]{0.95\textwidth}
@@ -27,21 +27,18 @@ Definition make_count_equality
 Inductive environment : Set := 
   | SingleEnv : count_equality -> environment
   | ConsEnv :  count_equality ->  environment -> environment.
-
 \end{lstlisting}
 \end{minipage}
 
 For an example of how environments are created see listing~\ref{lst:environmentusagecoq}.
 
 \lstset{language=Coq, frame=single, caption={Defining Environments},label={lst:environmentusagecoq}}
-%\begin{minipage}[c]{0.95\textwidth}
+\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-
 Definition e1 : environment := 
   (SingleEnv (make_count_equality Alice id1 8)).
-
 \end{lstlisting}
-%\end{minipage}
+\end{minipage}
   
 
 We also define a \syn{getCount} function that given a pair consisting of a subject and policy id, looks for a corresponding count in the environment. The \syn{getCount} function assumes the given environment is consistent (meaning it won't return two different counts for the same pair of subject and policy id), so it returns the first matched \syn{count} it sees for a \syn{(subject, id)} pair. If a \syn{count} for a \syn{(subject, id)} pair is not found it returns 0. 
@@ -53,7 +50,6 @@ We have defined the necessary representations in Coq in the form of an inductive
 \lstset{language=Coq, frame=single, caption={Consistency of Environments},label={lst:envsConsistentcoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-
 Inductive env_consistent : environment -> Prop :=
  | consis_1 : forall f, env_consistent (SingleEnv f)
  | consis_2 : forall f g, ~(inconsistent f g) -> env_consistent (ConsEnv f (SingleEnv g))
@@ -78,7 +74,7 @@ Fixpoint formula_inconsistent_with_env (f: count_equality)
 
 \section{The \syn{sumbool} Type}\label{sec:sumboolsection}
 
-\syn{sumbool} is a boolean type defined in the Coq standard library module \syn{Coq.Init.Specif}. The \syn{sumbool} type captures the idea of program values that indicate which of two propositions is true~\cite{chlipalacpdt2011}. The \syn{sumbool} type is equipped with the justification of their value~\cite{Coq:manual} which help with proofs. Using a tactic like \syn{destruct}~\cite{Coq:manual} two subgoals are generated, one for each form of the \syn{sumbool} instance, however the justifications also show up as hypothesis helping with discharging of the subgoals. The definition of \syn{sumbool} from Coq library module \syn{Coq.Init.Specif} is listed in listing~\ref{lst:sumbooltypeCoq}; notice the use of the \syn{where} clause in this listing, which allows notation to be simultaneously defined (and used) when presenting a new inductive definition.
+The \syn{sumbool} type is a boolean type defined in the Coq standard library module \syn{Coq.Init.Specif}. The \syn{sumbool} type captures the idea of program values that indicate which of two propositions is true~\cite{chlipalacpdt2011}. The \syn{sumbool} type is equipped with the justification of their value~\cite{Coq:manual} which help with proofs. Using a tactic like \syn{destruct}~\cite{Coq:manual} two subgoals are generated, one for each form of the \syn{sumbool} instance, however the justifications also show up as hypothesis helping with discharging of the subgoals. The definition of \syn{sumbool} from Coq library module \syn{Coq.Init.Specif} is listed in listing~\ref{lst:sumbooltypeCoq}; notice the use of the \syn{where} clause in this listing, which allows notation to be simultaneously defined (and used) when presenting a new inductive definition.
 
 \lstset{language=Coq, frame=single, caption={\syn{sumbool} type},label={lst:sumbooltypeCoq}}
 %\begin{minipage}[c]{0.95\textwidth}
@@ -123,7 +119,6 @@ A \syn{Permitted} answer signifies that the access request has been granted. The
 \lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{answer} and \syn{result} types},label={lst:answercoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-
 Inductive answer : Set :=
   | Permitted : answer
   | Unregulated : answer
@@ -134,15 +129,14 @@ Inductive result : Set :=
  
 Definition makeResult (ans:answer)(s:subject)(ac:act)(ass:asset) : result := 
  (Result ans s ac ass).
- 
 \end{lstlisting}
 \end{minipage}
 
 \section{Translations}\label{sec:translationfuncs}
 
-Intuitively a query or request asks the following question given an agreement: ``May subject \syn{s} perform an action \syn{ac} to asset \syn{a}?''. We represent a query by its components, namely the subject, action and asset that form the query question: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query}. While developing the proofs for the correcness of \ac{ACCPL} we realized we needed this query specific information deep in the translation functions to be able to render unambiguous decisions and ultimately make the proofs work. We therefore pass the query components to all the translation functions starting with the \syn{trans_agreement} function (see listing~\ref{lst:transagreement}). 
+Intuitively a query or request asks the following question given an agreement: ``May subject \syn{s} perform an action \syn{ac} to asset \syn{a}?''. We represent a query by its components, namely the subject, action and asset that form the query question: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query}. While developing the proofs for the correctness of \ac{ACCPL} we realized we needed this query specific information deep in the translation functions to be able to render unambiguous decisions and ultimately make the proofs work. We therefore pass the query components to all the translation functions starting with the \syn{trans_agreement} function (see listing~\ref{lst:transagreement}). 
 
-In the following paragraphs, we will describe each translation function in detail the \syn{trans_agreement} function, however a high-level description of how the main algorithm (encoded in these translation functions) works is now in order. We will show the main algorithm in two separate listings based on whether the policy set in question is inclusive or exclusive. 
+In the following paragraphs, we will describe each translation function in detail starting with the \syn{trans_agreement} function, however a high-level description of how the main algorithm (encoded in these translation functions) works is now in order. We will show the main algorithm in two separate listings based on whether the policy set in question is inclusive or exclusive. 
 
 The first listing (Algorithm~\ref{inclusivePS}) for inclusive policy sets, shows how a positive answer to a query in the form of a \syn{Permitted} decision is reached. All cases when a decision of \syn{Unregulated} is rendered are explicitly captured and shown. The second listing (Algorithm~\ref{exclusivePS}) for exclusive policy sets, shows how a negative answer to a query in the form of a \syn{NotPermitted} decision is reached. This listing also shows that a positive decision of \syn{Permitted} is reached in exactly the same way as the case for inclusive policy sets. All cases when a decision of \syn{Unregulated} is rendered are explicitly captured and shown.
 
@@ -233,7 +227,7 @@ Translation of a policy set (called \syn{trans_ps} in listing~\ref{lst:transpsCo
 
 The translation starts with checking that there is a proof for the equality of \syn{asset_from_query} and \syn{a} (the asset from the agreement). This is done by using the decision procedure \syn{eq_nat_dec} (see listing~\ref{lst:eqnatdeccoq}). If so, the translation function recurses on the composing \syn{primPolicySet} and calls the local function \syn{process_single_ps}. Otherwise, the \syn{Unregulated} answer is wrapped along with the subject, action and asset coming from a query: \syn{action_from_query}, \syn{subject_from_query} and \syn{asset_from_query} by calling the \syn{makeResult} helper function. Intuitively we are just explicitly stating that policies are not applicable to queries about assets that are not mentioned in the agreement. 
 
-The \syn{primPolicySet} which was passed to \syn{process_single_ps} was either constructed by a \syn{PIPS} constructor or by a \syn{PEPS} constructor, which distinguish between \syn{primInclusive}--\syn{PolicySet} and \syn{primExclusivePolicySet} types. The translation functions \syn{trans_policy_PIPS} (see listing~\ref{lst:transpipsCoq}) and \syn{trans_policy_PEPS} (see listing~\ref{lst:transpepsCoq}) are called in turn as the case may be.
+The \syn{primPolicySet} which was passed to \syn{process_single_ps} was either constructed by a \syn{PIPS} constructor or by a \syn{PEPS} constructor, which distinguish between \syn{primInclusivePolicySet} and \syn{primExclusivePolicySet} types. The translation functions \syn{trans_policy_PIPS} (see listing~\ref{lst:transpipsCoq}) and \syn{trans_policy_PEPS} (see listing~\ref{lst:transpepsCoq}) are called in turn as the case may be.
 
 
 \lstset{language=Coq, frame=single, caption={Translation of Policy Set},label={lst:transpsCoq}}
@@ -300,7 +294,6 @@ The \syn{trans_policy_PEPS} translation function for a \syn{primExclusivePolicyS
     label={lst:transpepsCoq}}
 \begin{minipage}{\linewidth}
 \begin{lstlisting}
-
 Definition trans_policy_PEPS
   (e:environment)(prq: preRequisite)(p:policy)(x:subject)
   (prin_u:prin)(a:asset)(action_from_query:act) : nonemptylist result :=
@@ -314,7 +307,6 @@ Definition trans_policy_PEPS
       (trans_policy_unregulated e x p a action_from_query)
   else (* ~prin *)
     (trans_policy_negative e x p a action_from_query).
-
 \end{lstlisting}
 \end{minipage}
 
@@ -440,7 +432,6 @@ The function \syn{process_single_pp_trans_policy_unregulated} acting on a single
 
 \lstset{language=Coq, frame=single, caption={Translation of an Unregulated Policy},
     label={lst:transSingleUnregulatedPolicyCoq}}
-%\begin{minipage}{\linewidth}
 \begin{lstlisting}
 Definition process_single_pp_trans_policy_unregulated
    (pp: primPolicy)(x:subject)
@@ -471,7 +462,7 @@ Fixpoint trans_prin
 \end{minipage}
 
 
-The translation of a \syn{prerequisite} (called \syn{trans_preRequisite} in listing~\ref{lst:transpreRequisiteCoq}) takes as input an environment \syn{e}, a subject \syn{x}, a \syn{preRequisite} \syn{prq} to translate, a set of policy identifiers \syn{IDs} (identifiers of policies implied by the \syn{prq}), the agreement's user(s) \syn{prin_u}, and proceeds by case analysis on the structure of the \syn{prerequisite}. A \syn{prerequisite} can only have the constructor \syn{PreRequisite} however, which in turn causes the translation function \syn{trans_andPrqs} to be called on a nonempty list of \syn{primPreRequisite}s. Finally for each \syn{primPreRequisite}, the translation function \syn{trans_primPreRequisite} proceeds by case analysis on the structure of the primitive prerequisite. A primitive prerequisite is either \syn{TruePrq}, \syn{Constraint} or \syn{NotCons}.
+The translation of a \syn{prerequisite} (called \syn{trans_preRequisite} in listing~\ref{lst:transpreRequisiteCoq}) takes as input an environment \syn{e}, a subject \syn{x}, a prerequisite \syn{prq} to translate, a set of policy identifiers \syn{IDs} (identifiers of policies implied by the \syn{prq}), the agreement's user(s) \syn{prin_u}, and proceeds by case analysis on the structure of the \syn{prerequisite}. A \syn{prerequisite} can only have the constructor \syn{PreRequisite} however, which in turn causes the translation function \syn{trans_andPrqs} to be called on a nonempty list of \syn{primPreRequisite}s. Finally for each \syn{primPreRequisite}, the translation function \syn{trans_primPreRequisite} proceeds by case analysis on the structure of the primitive prerequisite. A primitive prerequisite is either \syn{TruePrq}, \syn{Constraint} or \syn{NotCons}.
 
 In listing~\ref{lst:transpreRequisiteCoq} the translation for \syn{TruePrq} is the proposition \syn{True}, the translations for \syn{Constraint} and \syn{NotCons} simply call respective translation functions for corresponding types namely \syn{trans_constraint} (see listing~\ref{lst:transconstraintCoq}) and \syn{trans_notCons} (see listing~\ref{lst:transnotConsCoq}. 
 
@@ -479,9 +470,32 @@ In listing~\ref{lst:transpreRequisiteCoq} the translation for \syn{TruePrq} is t
 \lstset{language=Coq, frame=single, caption={Translation of Prerequisite},label={lst:transpreRequisiteCoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Definition trans_primPreRequisite  (e:environment)(x:subject)(prq:primPreRequisite)(IDs:nonemptylist policyId)  (prin_u:prin) : Prop :=   match prq with    | TruePrq => True    | Constraint const => trans_constraint e x const IDs prin_u    | NotCons const => trans_notCons e x const IDs prin_u   end.
+Definition trans_primPreRequisite
+  (e:environment)(x:subject)(prq:primPreRequisite)(IDs:nonemptylist policyId)
+  (prin_u:prin) : Prop :=
+   match prq with
+    | TruePrq => True
+    | Constraint const => trans_constraint e x const IDs prin_u
+    | NotCons const => trans_notCons e x const IDs prin_u
+   end.
 
-Fixpoint trans_andPrqs    (e:environment)(x:subject)    (prqs:nonemptylist primPreRequisite)    (IDs:nonemptylist policyId)(prin_u:prin) {struct prqs}: Prop :=      match prqs with     | Single prq => trans_primPreRequisite e x prq IDs prin_u      | NewList prq' rest_prqs =>          (trans_primPreRequisite e x prq' IDs prin_u) /\         (trans_andPrqs e x rest_prqs IDs prin_u)   end.Definition trans_preRequisite  (e:environment)(x:subject)(prq:preRequisite)(IDs:nonemptylist policyId)(prin_u:prin) : Prop :=  match prq with    | PreRequisite prqs => trans_andPrqs e x prqs IDs prin_u  end.
+Fixpoint trans_andPrqs
+    (e:environment)(x:subject)
+    (prqs:nonemptylist primPreRequisite)
+    (IDs:nonemptylist policyId)(prin_u:prin) {struct prqs}: Prop :=
+   
+   match prqs with
+     | Single prq => trans_primPreRequisite e x prq IDs prin_u 
+     | NewList prq' rest_prqs => 
+         (trans_primPreRequisite e x prq' IDs prin_u) /\
+         (trans_andPrqs e x rest_prqs IDs prin_u)
+   end.
+
+Definition trans_preRequisite
+  (e:environment)(x:subject)(prq:preRequisite)(IDs:nonemptylist policyId)(prin_u:prin) : Prop :=
+  match prq with
+    | PreRequisite prqs => trans_andPrqs e x prqs IDs prin_u
+  end.
 \end{lstlisting}
 \end{minipage}
 
@@ -492,7 +506,6 @@ an environment \syn{e}, a subject \syn{x}, a \syn{constraint} \syn{const} to tra
 \lstset{language=Coq, frame=single, caption={Translation of Constraint},label={lst:transconstraintCoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-
 Fixpoint trans_constraint 
   (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)
   (prin_u:prin){struct const} : Prop := 
@@ -502,18 +515,15 @@ Fixpoint trans_constraint
     | Count n => trans_count e n IDs prin_u
 
     | CountByPrin prn n => trans_count e n IDs prn 
-
-  end.
-  
+  end.  
 \end{lstlisting}
 \end{minipage}
 
 The translation of a \syn{NotCons} (called \syn{trans_notCons} in listing~\ref{lst:transnotConsCoq}) takes as input 
-an environment \syn{e}, a subject \syn{x}, a \syn{constraint} \syn{const} to translate, a set of policy identifiers \syn{IDs} (identifiers of policies implied by the parent prerequisite), the agreement's user(s) \syn{prin_u} and proceeds to return the negation of the proposition \syn{trans_constraint} (see listing~\ref{lst:transconstraintCoq}).
+an environment \syn{e}, a subject \syn{x}, a constraint \syn{const} to translate, a set of policy identifiers \syn{IDs} (identifiers of policies implied by the parent prerequisite), the agreement's user(s) \syn{prin_u} and proceeds to return the negation of the proposition \syn{trans_constraint} (see listing~\ref{lst:transconstraintCoq}).
 
 \lstset{language=Coq, frame=single, caption={Translation of Negation of Constraint},label={lst:transnotConsCoq}}
 \begin{lstlisting}
-
 Definition trans_notCons
   (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin) : Prop :=
   ~ (trans_constraint e x const IDs prin_u).
@@ -545,14 +555,11 @@ To implement the translation for a \syn{Count} or a \syn{CountByPrin} we start b
 \lstset{language=Coq, frame=single, caption={Count Helper: Cross-Product of Two Lists, \syn{process_two_lists}},label={lst:transcountprocesstwolistsCoq}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-
 Section Process_Lists.
-
 Variable X : Set.
 Variable Y : Set.
 
 Fixpoint process_two_lists (l1 : nonemptylist X) (l2 : nonemptylist Y) :  nonemptylist (Twos X Y) :=
-
 let process_element_list := (fix process_element_list (e1 : X) (l2 : nonemptylist Y) :	nonemptylist (Twos X Y) :=
   match l2 with
     | Single s => Single (mkTwos e1 s)
@@ -563,9 +570,7 @@ let process_element_list := (fix process_element_list (e1 : X) (l2 : nonemptylis
     | Single s => process_element_list s l2
     | NewList s rest => app_nonempty (process_element_list s l2) (process_two_lists rest l2)
   end.
-
 End Process_Lists.
-
 \end{lstlisting}
 %\end{minipage}
 
@@ -575,7 +580,6 @@ The function \syn{trans_count_aux} (see listing~\ref{lst:transcountauxCoq}) retu
 \lstset{language=Coq, frame=single, caption={Count Helper: \syn{trans_count_aux}},label={lst:transcountauxCoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-
 Fixpoint trans_count_aux (e:environment)(ids_and_subjects : nonemptylist (Twos policyId subject)) : nat :=
   match ids_and_subjects with
 	| Single pair1 => getCount e (right pair1) (left pair1)
@@ -606,7 +610,30 @@ The policy statement in~\ref{lst:pucellatwofourexampleAST} is expressed in \ac{A
 \lstset{language=Coq, frame=single, caption={Expressing Agreement of Example 2.4 in ACCPL}, label={lst:pucellatwofourexamplecoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Definition ps_24_p1:primPolicy :=   (PrimitivePolicy (makePreRequisite (TruePrq)) id1 Print).Definition ps_24_p2:primPolicy :=   (PrimitivePolicy (makePreRequisite (TruePrq)) id2 Display).Definition ps_24_p:policy :=   (Policy (NewList ps_24_p1 (Single ps_24_p2))).Definition ps_24_prq1:primPreRequisite :=   (Constraint (Principal (NewList Alice (Single Bob)))).Definition ps_24_prq2:primPreRequisite :=   (Constraint (CountByPrin (NewList Alice (Single Bob)) 1)). Definition ps_24_prq:preRequisite :=   (PreRequisite (NewList ps_24_prq1 (Single ps_24_prq2))).Definition ps_24:primPolicySet :=  PIPS (PrimitiveInclusivePolicySet    ps_24_prq ps_24_p).Definition A24 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_24).\end{lstlisting}
+Definition ps_24_p1:primPolicy := 
+  (PrimitivePolicy (makePreRequisite (TruePrq)) id1 Print).
+
+Definition ps_24_p2:primPolicy := 
+  (PrimitivePolicy (makePreRequisite (TruePrq)) id2 Display).
+
+Definition ps_24_p:policy := 
+  (Policy (NewList ps_24_p1 (Single ps_24_p2))).
+
+Definition ps_24_prq1:primPreRequisite := 
+  (Constraint (Principal (NewList Alice (Single Bob)))).
+
+Definition ps_24_prq2:primPreRequisite := 
+  (Constraint (CountByPrin (NewList Alice (Single Bob)) 1)).
+ 
+Definition ps_24_prq:preRequisite := 
+  (PreRequisite (NewList ps_24_prq1 (Single ps_24_prq2))).
+
+Definition ps_24:primPolicySet :=
+  PIPS (PrimitiveInclusivePolicySet
+    ps_24_prq ps_24_p).
+
+Definition A24 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_24).
+\end{lstlisting}
 \end{minipage} 
 
 The policy statement in listing~\ref{lst:pucellatwofourexampleAST} as an \ac{ACCPL} construct is shown, in listing~\ref{lst:pucellatwofourexamplecoq2}.
@@ -614,8 +641,16 @@ The policy statement in listing~\ref{lst:pucellatwofourexampleAST} as an \ac{ACC
 \lstset{language=Coq, frame=single, caption={Fully Built Agreement of Example 2.4 in ACCPL}, label={lst:pucellatwofourexamplecoq2}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS               (PrimitiveInclusivePolicySet                  (PreRequisite                     (Constraint (Principal (Alice, [Bob])),                      [Constraint (CountByPrin (Alice, [Bob]) 1)])                  (Policy                     (PrimitivePolicy (PreRequisite [TruePrq]) id1 Print,                      [PrimitivePolicy (PreRequisite [TruePrq]) id2 Display])))))
-
+Agreement (Alice, [Bob]) TheReport
+         (PPS
+            (PIPS
+               (PrimitiveInclusivePolicySet
+                  (PreRequisite
+                     (Constraint (Principal (Alice, [Bob])),
+                      [Constraint (CountByPrin (Alice, [Bob]) 1)])
+                  (Policy
+                     (PrimitivePolicy (PreRequisite [TruePrq]) id1 Print,
+                      [PrimitivePolicy (PreRequisite [TruePrq]) id2 Display])))))
 \end{lstlisting}
 \end{minipage} 
 
@@ -624,7 +659,12 @@ The default environment for the example agreement is shown in listing~\ref{lst:p
 \lstset{language=Coq, frame=single, caption={The Default Environment for Example 2.4 in ACCPL}, label={lst:pucellatwofourexamplecoq3}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Definition e_24 : environment := (ConsEnv (make_count_equality Bob id1 0)   (ConsEnv (make_count_equality Bob id2 0)     (ConsEnv (make_count_equality Alice id1 0)       (SingleEnv (make_count_equality Alice id2 0))))).\end{lstlisting}
+Definition e_24 : environment :=
+ (ConsEnv (make_count_equality Bob id1 0)
+   (ConsEnv (make_count_equality Bob id2 0)
+     (ConsEnv (make_count_equality Alice id1 0)
+       (SingleEnv (make_count_equality Alice id2 0))))).
+\end{lstlisting}
 \end{minipage} 
 
 The query in listing~\ref{lst:pucellatwofourexamplecoq4}, asks whether Alice may print the asset TheReport. We expect the action to be allowed based on the first primitive policy. The second primitive policy mentions a different action (e.g. Display) so we expect the request is unregulated. 
@@ -664,7 +704,7 @@ Eval compute in (trans_agreement e_24 A24 Display Alice TheReport). =
 
 \section{Decision Procedures}\label{sec:decprocs}
 
-In the following we will list only the declaration of each decision procedure and the accompanying functions. The individual decision procedures were used as a building block to make the final correcness proofs for \ac{ACCPL} possible. We will refer to some of these listings later when we discuss the translations and/or proofs using the decision procedures. Please refer to the source code at~\cite{BahmanSistany2015} whenever the usage of a decision procedure in not mentioned in the following.
+In the following we will list only the declaration of each decision procedure and the accompanying functions. The individual decision procedures were used as a building block to make the final correctness proofs for \ac{ACCPL} possible. We will refer to some of these listings later when we discuss the translations and/or proofs using the decision procedures. Please refer to the source code at~\cite{BahmanSistany2015} whenever the usage of a decision procedure in not mentioned in the following (declarations only will be shown for some).
 
 The decision procedure \syn{eq_nat_dec} takes two natural numbers, and declares that either there is a proof for their equality or there exists a proof for their inequality (see listing~\ref{lst:eqnatdeccoq}).
 
@@ -728,8 +768,7 @@ Theorem double_neg_constraint:
   
 Theorem trans_negation_constraint_dec :
     forall (e:environment)(x:subject)(const:constraint)(IDs:nonemptylist policyId)(prin_u:prin),
-       {~trans_constraint e x const IDs prin_u} + {~~trans_constraint e x const IDs prin_u}.
-       
+       {~trans_constraint e x const IDs prin_u} + {~~trans_constraint e x const IDs prin_u}.       
 \end{lstlisting}
 
 \lstset{language=Coq, frame=single, caption={Decision Procedures: \syn{trans_notCons_dec}},label={lst:transnotConsdeccoq}}
