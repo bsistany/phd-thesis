@@ -8,7 +8,7 @@ We have mentioned previously about the trade-offs we have made in the design of 
 
 Policies in \ac{odrl} as specified by~\cite{pucella2006} are composed of a prerequisite, an action and a unique identifier. A prerequisite is either true, a constraint, a requirement or a condition. Constraints are facts that users don't control such as the constraint that ``user must be Bob'' (users other than Bob cannot satisfy this constraint). Requirements are facts that users have control over. For example, ``Alice has paid 5 dollars" can come true if Alice pays 5 dollars. \ac{odrl} also includes constraints that must not hold in the form of conditions. 
 
-As mentioned in previous chapters, \ac{ACCPL} forgoes requirements completely and moves the condition ``the negation of a constraint'' as a syntactic element under the <constraint> production (see~\ref{lst:preRequisiteast} and~\ref{lst:constraintast} in chapter~\ref{chap:odrl0syntax}). In addition \ac{ACCPL} excludes the ``forEachMember'' constraint specified by~\cite{pucella2006}. Requirements in \ac{odrl} as specified by~\cite{pucella2006} have a significantly different and more complex translation than other prerequisites because of their dependence on time. For example, the ``inSeq[req1, req2]'' requirement holds only if ``req1'' is met before ``req2'' requirement. The translation for ``forEachMember'' is a formula that holds if each sub-constraint in ``forEachMember'' is met by each member mentioned in the constraint. We acknowledge that by removing requirements and the forEachMember constraint, expressive power may have been significantly reduced, however it is not clear how much expressive power is lost when \ac{ACCPL} is considered as a general purpose access-control language as opposed to a \ac{drm} specific policy language. We also anticipate that adding these specific constructs or similar ones to \ac{ACCPL} or trying to implement them in terms of existing \ac{ACCPL} constructs would add significant complexity to the semantics and derivation of proofs.
+As mentioned in previous chapters, \ac{ACCPL} forgoes requirements completely and moves the condition ``the negation of a constraint'' as a syntactic element under the \syn{<constraint>} production (see~\ref{lst:preRequisiteast} and~\ref{lst:constraintast} in chapter~\ref{chap:odrl0syntax}). In addition \ac{ACCPL} excludes the ``forEachMember'' constraint specified by~\cite{pucella2006}. Requirements in \ac{odrl} as specified by~\cite{pucella2006} have a significantly different and more complex translation than other prerequisites because of their dependence on time. For example, the ``inSeq[req1, req2]'' requirement holds only if ``req1'' is met before ``req2'' requirement. The translation for ``forEachMember'' is a formula that holds if each sub-constraint in ``forEachMember'' is met by each member mentioned in the constraint. We acknowledge that by removing requirements and the forEachMember constraint, expressive power may have been reduced, however it is not clear how much expressive power is lost when \ac{ACCPL} is considered as a general purpose access-control language as opposed to a \ac{drm} specific policy language. We also anticipate that adding these specific constructs or similar ones to \ac{ACCPL} or trying to implement them in terms of existing \ac{ACCPL} constructs would add significant complexity to the semantics and derivation of proofs.
 
 \section{General Conditions}\label{sec:extendwithgeneralconditions}
 
@@ -34,7 +34,7 @@ agreement
 
 Policy sets in \ac{odrl} as specified by~\cite{pucella2006} may be combined using the conjunction operator. This possibility certainly adds to the expressive power of a language, similar to the case of basic policies when they are combined. In \ac{ACCPL} we have only retained basic policy sets that don't contain other policy sets. While this means \ac{ACCPL} is less expressive this design decision was made to make the language respect the ``independent composition'' property (see section~\ref{sec:indepcompos}) and as a consequence be conflict-free (the answer to a access query will be either granting or denying but not both). 
 
-Adding the conjunction operator to policy sets in \ac{ACCPL} should be straight forward in terms of the infrastructure we would needs to add. However, this addition would open the door to possibility of conflicts and additionally the current established results for \ac{ACCPL} would no longer hold. For conflict detection and reporting, we would add an extra identifier to each policy that signifies which policy set a basic policy belongs to. We would also enhance the \syn{result} data-structure to include both the policy set and policy identifiers in order to help the policy writers fix their policies in case the conflict was not intended. Since allowing policy set conjunction opens the door to conflicting decisions, we can envisage adding policy set combination algorithms such as permit-overrides or deny-overrides to resolve conflicts in the case that the policy writer wouldn't want to fix the policies. Note that conflict detection becomes significantly more difficult if in addition to the combining policy sets, we add requirements that are type dependent (such as \ac{odrl} requirements). The conflict detection algorithm would need to take into account overlapping time ranges when defining conflicts. We believe the conflict detection algorithm described by St-Martin and Felty~\cite{felty16} could be potentially adapted and used for \ac{ACCPL} specially given the authors' extensive proof libraries. 
+Adding the conjunction operator to policy sets in \ac{ACCPL} should be straight forward in terms of the infrastructure we would needs to add. However, this addition would open the door to possibility of conflicts and additionally the current established results for \ac{ACCPL} would no longer hold. For conflict detection and reporting, we would add an extra identifier to each policy that signifies which policy set a basic policy belongs to. We would also enhance the \syn{result} data-structure to include both the policy set and policy identifiers in order to help the policy writers fix their policies in case the conflict was not intended. Since allowing policy set conjunction opens the door to conflicting decisions, we can envisage adding policy set combination algorithms such as permit-overrides or deny-overrides to resolve conflicts in the case that the policy writer wouldn't want to fix the policies. Note that conflict detection becomes significantly more difficult if in addition to the combining policy sets, we add requirements that are time dependent (such as \ac{odrl} requirements). The conflict detection algorithm would need to take into account overlapping time ranges when defining conflicts. We believe the conflict detection algorithm described by St-Martin and Felty~\cite{felty16} could be potentially adapted and used for \ac{ACCPL} specially given the authors' extensive proof libraries. 
 
 In the following we will list some example policies taken from~\cite{pucella2006} that are expressible in \ac{ACCPL} and some that are not. 
 
@@ -88,7 +88,17 @@ We show how the policy statement in listing~\ref{lst:pucellatwooneexampleAST} lo
 \lstset{language=Coq, frame=single, caption={Fully Built Agreement of Example 2.1 in ACCPL}, label={lst:pucellatwooneexamplecoq2}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS               (PrimitiveInclusivePolicySet (PreRequisite [TruePrq])                  (Policy                     (PrimitivePolicy (PreRequisite [Constraint (Count 5)])                        id1 Print,                      [PrimitivePolicy                         (PreRequisite                            (Constraint (Principal [Alice]),                             [Constraint (Count 2)])) id2 Print])))))
+Agreement (Alice, [Bob]) TheReport
+         (PPS
+            (PIPS
+               (PrimitiveInclusivePolicySet (PreRequisite [TruePrq])
+                  (Policy
+                     (PrimitivePolicy (PreRequisite [Constraint (Count 5)])
+                        id1 Print,
+                      [PrimitivePolicy
+                         (PreRequisite
+                            (Constraint (Principal [Alice]),
+                             [Constraint (Count 2)])) id2 Print])))))
 
 \end{lstlisting}
 \end{minipage} 
@@ -111,7 +121,24 @@ We show how the policy statement in~\ref{lst:pucellatwotwoexampleAST} would be e
 \lstset{language=Coq, frame=single, caption={Expressing Agreement of Example 2.2 in ACCPL}, label={lst:pucellatwotwoexamplecoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Definition ps_22_p1:primPolicy :=   (PrimitivePolicy (makePreRequisite (TruePrq)) id1 Print).Definition ps_22_p2:primPolicy :=   (PrimitivePolicy (makePreRequisite (TruePrq)) id2 Display).Definition ps_22_p:policy :=   (Policy (NewList ps_22_p1 (Single ps_22_p2))).Definition ps_22_ps_prq1:primPreRequisite :=   (Constraint (Count 2)).Definition ps_22:primPolicySet :=  PIPS (PrimitiveInclusivePolicySet    (makePreRequisite ps_22_ps_prq1) ps_22_p).Definition A22 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_22).		
+Definition ps_22_p1:primPolicy := 
+  (PrimitivePolicy (makePreRequisite (TruePrq)) id1 Print).
+
+Definition ps_22_p2:primPolicy := 
+  (PrimitivePolicy (makePreRequisite (TruePrq)) id2 Display).
+
+Definition ps_22_p:policy := 
+  (Policy (NewList ps_22_p1 (Single ps_22_p2))).
+
+Definition ps_22_ps_prq1:primPreRequisite := 
+  (Constraint (Count 2)).
+
+Definition ps_22:primPolicySet :=
+  PIPS (PrimitiveInclusivePolicySet
+    (makePreRequisite ps_22_ps_prq1) ps_22_p).
+
+Definition A22 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_22).
+		
 \end{lstlisting}
 \end{minipage} 
 
@@ -120,7 +147,14 @@ We show how the policy statement in listing~\ref{lst:pucellatwotwoexampleAST} lo
 \lstset{language=Coq, frame=single, caption={Fully Built Agreement of Example 2.2 in ACCPL}, label={lst:pucellatwotwoexamplecoq2}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS               (PrimitiveInclusivePolicySet                  (PreRequisite [Constraint (Count 2)])                  (Policy                     (PrimitivePolicy (PreRequisite [TruePrq]) id1 Print,                      [PrimitivePolicy (PreRequisite [TruePrq]) id2 Display])))))
+Agreement (Alice, [Bob]) TheReport
+         (PPS
+            (PIPS
+               (PrimitiveInclusivePolicySet
+                  (PreRequisite [Constraint (Count 2)])
+                  (Policy
+                     (PrimitivePolicy (PreRequisite [TruePrq]) id1 Print,
+                      [PrimitivePolicy (PreRequisite [TruePrq]) id2 Display])))))
 
 \end{lstlisting}
 \end{minipage} 
@@ -145,9 +179,18 @@ We show how the policy statement in~\ref{lst:pucellatwothreeexampleAST} would be
 \lstset{language=Coq, frame=single, caption={Expressing Agreement of Example 2.3 in ACCPL}, label={lst:pucellatwothreeexamplecoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Definition ps_23_p1:primPolicy :=   (PrimitivePolicy     (makePreRequisite (Constraint (CountByPrin (Single Alice) 1))) id1 Print).
+Definition ps_23_p1:primPolicy := 
+  (PrimitivePolicy 
+    (makePreRequisite (Constraint (CountByPrin (Single Alice) 1))) id1 Print).
 
-Definition ps_23_p:policy :=   (Policy (Single ps_23_p1)).Definition ps_23:primPolicySet :=  PIPS (PrimitiveInclusivePolicySet    (makePreRequisite TruePrq) ps_23_p).Definition A23 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_23).
+Definition ps_23_p:policy := 
+  (Policy (Single ps_23_p1)).
+
+Definition ps_23:primPolicySet :=
+  PIPS (PrimitiveInclusivePolicySet
+    (makePreRequisite TruePrq) ps_23_p).
+
+Definition A23 := Agreement (NewList Alice (Single Bob)) TheReport (PPS ps_23).
 \end{lstlisting}
 \end{minipage} 
 
@@ -156,7 +199,14 @@ We show how the policy statement in listing~\ref{lst:pucellatwothreeexampleAST} 
 \lstset{language=Coq, frame=single, caption={Fully Built Agreement of Example 2.3 in ACCPL}, label={lst:pucellatwothreeexamplecoq2}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-Agreement (Alice, [Bob]) TheReport         (PPS            (PIPS               (PrimitiveInclusivePolicySet (PreRequisite [TruePrq])                  (Policy                     [PrimitivePolicy                        (PreRequisite [Constraint (CountByPrin [Alice] 1)]) id1                        Print]))))
+Agreement (Alice, [Bob]) TheReport
+         (PPS
+            (PIPS
+               (PrimitiveInclusivePolicySet (PreRequisite [TruePrq])
+                  (Policy
+                     [PrimitivePolicy
+                        (PreRequisite [Constraint (CountByPrin [Alice] 1)]) id1
+                        Print]))))
 \end{lstlisting}
 \end{minipage} 
 
