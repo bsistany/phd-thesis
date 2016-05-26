@@ -7,7 +7,7 @@ Policies in some \ac{pbac} languages such as \ac{xacml} and \ac{odrl} are expres
 
 Authors of~\cite{ArdagnaDVS04} argue that \ac{xml}-based \ac{pbac} systems are well suitable for the Internet context where simplicity and easy integration with existing technology and tools must be ensured. \ac{xml}-based languages are also well suited for the easy interchange of policies~\cite{ArdagnaDVS04}. 
 
-While policies in \ac{xml}-based languages are expressed using \ac{xml}, the meaning of the policy statements in such languages are expressed using fragments of a natural language like English, resulting in ambiguity with regards to the intended behaviour of the system encoded in these policy statements. The ambiguity in semantics of these languages may lead to implementations varying in their interpretations of the access-control language and ultimately making real the possibility of security breaches (e.g. access granted to unauthorized subjects). 
+While policies in \ac{xml}-based languages are expressed using \ac{xml}, the meaning of the policy statements in such languages are expressed using fragments of a natural language like English, resulting in ambiguity with regards to the intended behaviour of the system encoded in these policy statements. The ambiguity in semantics of these languages may lead to implementations varying in their interpretations of the access-control language and ultimately making real the possibility of security breaches (e.g. access granted to unauthorized users). 
 
 In the following sections we will review related work and approaches to define semantics for \ac{pbac} based languages such that one can determine without any ambiguity whether a permission or prohibition follows from a set of policy statements.
  
@@ -23,7 +23,7 @@ Halpern and Weissman~\cite{Halpern2008} focus on satisfying three requirements i
 \end{enumerate}
 \end{quote}
 
-In contrast, our main goal was designing a core policy language with certifiably correct semantics such that it could be extended in different ways to add expressiveness as long as the semantics would remain certifiably correct with respect to various results established for \ac{ACCPL} (e.g. correctness results). However, we note that ACCPL may be a good candidate to satisfy the first goal. We have not (yet) considered the other Lithium design goals.
+In contrast, our main goal was designing a core policy language with certifiably correct semantics such that it could be extended in different ways to add expressiveness as long as the semantics would remain certifiably correct with respect to established results for \ac{ACCPL}. We note that \ac{ACCPL} may not be a good candidate to satisfy the first goal. We have not (yet) considered the other Lithium design goals.
 
 
 \section{Trace-based Semantics}
