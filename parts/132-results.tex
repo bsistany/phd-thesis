@@ -1,5 +1,5 @@
 %======================================================================
-\chapter{Formal Proofs and Correctness}\label{chap:results}
+\chapter{Formal Proofs and Correctness Results}\label{chap:results}
 %======================================================================
 
                   
@@ -16,7 +16,7 @@ In the following section we will list the main theorems that we have proved and 
 
 \section{Correctness of ACCPL}\label{sec:maintheorems}
 
-The theorem \syn{trans_agreement_dec2} is the declaration of the main correctness result for \ac{ACCPL} (see listing~\ref{lst:agreementdecidablecoq}). Together with other theorems we will describe below, we have ``certified'' \ac{ACCPL} correct by proving this theorem. The nonempty list that the agreement translation function \syn{trans_agreement} returns will contain results one per each primitive policy (\syn{primPolicy}) found in the agreement. Specifically the predicate \syn{isResultInQueryResult} takes a \syn{result} and a nonempty list of \syn{result}'s which \syn{trans_agreement} produces, and calls the \syn{In} predicate. The \syn{In} predicate is adapted from the \syn{Coq.Lists.List} standard library and checks for the existence of the input \syn{result} in the nonempty list of results. Definitions for predicates \syn{isResultInQueryResult} and \syn{In} are listed in listing~\ref{lst:agreementdecidablecoq}. The definitions for \syn{answer} and \syn{result} are repeated in the same listing. 
+The theorem \syn{trans_agreement_dec2} is the declaration of the main correctness result for \ac{ACCPL} (see listing~\ref{lst:agreementdecidablecoq}). Together with other theorems we will describe below, we have ``certified'' \ac{ACCPL} correct by proving this theorem. The nonempty list that the agreement translation function \syn{trans_agreement} returns will contain results one per each primitive policy (\syn{primPolicy}) found in the agreement. Specifically the predicate \\ \syn{isResultInQueryResult} takes a \syn{result} and a nonempty list of \syn{result}'s which \syn{trans_agreement} produces, and calls the \syn{In} predicate. The \syn{In} predicate is adapted from the \syn{Coq.Lists.List} standard library and checks for the existence of the input \syn{result} in the nonempty list of results. Definitions for predicates \syn{isResultInQueryResult} and \syn{In} are listed in listing~\ref{lst:agreementdecidablecoq}. The definitions for \syn{answer} and \syn{result} are repeated in the same listing. 
 
 
 Note that by mentioning the agreement translation function directly in the statement of the theorem~\ref{lst:agreementdecidablecoq}, we tie the correcness property to how the translation functions work. To prove the theorem and with each successive subgoal during the interactive proof process, the definition of the translation function in scope gets unfolded and used so the translation functions have to be defined such that each subgoal is discharged and the proof is completed. This is quite different from trying to show a list has some property. 
@@ -78,7 +78,6 @@ Theorem trans_agreement_dec2:
   ~(isResultInQueryResult 
     (Result NotPermitted subject_from_query action_from_query asset_from_query)
     (trans_agreement e ag action_from_query subject_from_query asset_from_query))).
-
 \end{lstlisting}
 \end{minipage}
 
@@ -140,16 +139,13 @@ Theorem trans_agreement_not_Perm_and_NotPerm_at_once:
   (e:environment)(ag:agreement)(action_from_query:act)
    (subject_from_query:subject)(asset_from_query:asset),
 
-
  ~((isResultInQueryResult 
     (Result Permitted subject_from_query action_from_query asset_from_query)
     (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
 /\
-
  (isResultInQueryResult 
     (Result NotPermitted subject_from_query action_from_query asset_from_query)
     (trans_agreement e ag action_from_query subject_from_query asset_from_query))).
-
 \end{lstlisting}
 %\end{minipage}
 
@@ -158,7 +154,6 @@ The proof for the next theorem \syn{trans_agreement_not_NotPerm_and_not_Perm \ne
 \lstset{language=Coq, frame=single, caption={Not (\syn{Permitted} and \syn{NotPermitted}) Implies \syn{Unregulated}},label={lst:notpermandnotpermimpliesunregulated}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-
 Theorem trans_agreement_not_NotPerm_and_not_Perm_implies_Unregulated_dec:
   forall
     (e:environment)(ag:agreement)(action_from_query:act)
@@ -186,7 +181,6 @@ We encode the cases discussed in Section~\ref{sec:maintheorems} in an inductivel
 \lstset{language=Coq, frame=single, caption={Inductive Predicate decidable},label={lst:inductivepredicatedecidablecoq}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-
 Inductive decidable : environment -> agreement -> act -> subject -> asset -> Prop :=
 
      | Denied : forall
@@ -233,7 +227,7 @@ Inductive decidable : environment -> agreement -> act -> subject -> asset -> Pro
 
 
 We declare and prove the correctness of the semantics for \ac{ACCPL} in terms of the \syn{decidable} predicate as seen in listing~\ref{lst:decidabletypecoq}. The proof is made simple since we use the previously proven theorem \syn{trans_agreement_dec2}. The proof also makes use of two theorems we saw earlier in Section~\ref{sec:mutualexclusive}. Recall that the first theorem, \syn{trans_agreement_perm_implies_not_notPerm_dec}, says that the existence of a \syn{Permitted} result in the set of results returned by \syn{trans_agreement}, will exclude any \syn{NotPermitted} result and that the second theorem, \syn{trans_agreement_NotPerm_implies_not_Perm_dec}, shows that the existence of a \syn{NotPermitted} result in the set of results returned by \syn{trans_agreement}, will exclude a \syn{Permitted} result. The proof shows the series of tactics that were applied to 
-complete the proof interactively. We do not explain the tactics here, but just show the proof to illustrate by example what proofs look like.
+complete the proof interactively. We do not explain the tactics here, but just show the proof to illustrate by example what such proofs look like.
 
 We will list the intermediate theorems that we have declared and proved which are used in the proof of theorem \syn{trans_agreement_dec2} and subsequent proofs in Section~\ref{sec:intermediatetheorems}.
 
@@ -284,14 +278,12 @@ Theorem trans_agreement_dec_sb_Permitted:
   (e:environment)(ag:agreement)(action_from_query:act)
    (subject_from_query:subject)(asset_from_query:asset),
 
-
  {(isResultInQueryResult 
     (Result Permitted subject_from_query action_from_query asset_from_query)
     (trans_agreement e ag action_from_query subject_from_query asset_from_query))} +
  {~(isResultInQueryResult 
     (Result Permitted subject_from_query action_from_query asset_from_query)
     (trans_agreement e ag action_from_query subject_from_query asset_from_query))}.
-
 \end{lstlisting}
 %\end{minipage}
 
@@ -311,7 +303,6 @@ Theorem trans_agreement_dec_sb_NotPermitted:
  {~(isResultInQueryResult 
     (Result NotPermitted subject_from_query action_from_query asset_from_query)
     (trans_agreement e ag action_from_query subject_from_query asset_from_query))}.
-
 \end{lstlisting}
 %\end{minipage}
 
@@ -336,20 +327,17 @@ Theorem trans_agreement_not_Perm_and_NotPerm_at_once:
   (e:environment)(ag:agreement)(action_from_query:act)
    (subject_from_query:subject)(asset_from_query:asset),
 
-
  ~((isResultInQueryResult 
     (Result Permitted subject_from_query action_from_query asset_from_query)
     (trans_agreement e ag action_from_query subject_from_query asset_from_query)) 
 /\
-
  (isResultInQueryResult 
     (Result NotPermitted subject_from_query action_from_query asset_from_query)
     (trans_agreement e ag action_from_query subject_from_query asset_from_query))).
-
 \end{lstlisting}
 %\end{minipage}
 
-The theorem \syn{trans_policy_PIPS_dec_not} states that the translation function \syn{trans_policy_PIPS} produces a nonempty list of results that will not have a \syn{NotPermitted} result. This makes intuitive sense as \syn{trans_policy_PIPS} is called for inclusive policy sets only (see listing~\ref{lst:pipsdecnot}).
+The theorem \syn{trans_policy_PIPS_dec_not} states that the translation function \syn{trans_policy_PIPS} produces a nonempty list of results that will not have a \\ \syn{NotPermitted} result. This makes intuitive sense as \syn{trans_policy_PIPS} is called for inclusive policy sets only (see listing~\ref{lst:pipsdecnot}).
 \lstset{language=Coq, frame=single, caption={Translation Function for PIPS will not return a \syn{NotPermitted} result},label={lst:pipsdecnot}}
 %\begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
@@ -361,7 +349,6 @@ Theorem trans_policy_PIPS_dec_not:
  ~(isResultInQueryResult 
     (Result NotPermitted subject_from_query action_from_query a)
     (trans_policy_PIPS e prq p subject_from_query prin_u a action_from_query)).
-
 \end{lstlisting}
 %\end{minipage}
 
@@ -378,11 +365,9 @@ Theorem trans_policy_PEPS_perm_implies_not_notPerm_dec:
     (isResultInQueryResult 
       (Result Permitted subject_from_query action_from_query a)
         (trans_policy_PEPS e prq p subject_from_query prin_u a action_from_query)) ->
-
    ~(isResultInQueryResult 
       (Result NotPermitted subject_from_query action_from_query a)
        (trans_policy_PEPS e prq p subject_from_query prin_u a action_from_query)).
-
 \end{lstlisting}
 \end{minipage}
 
@@ -393,17 +378,15 @@ The theorem \syn{AnswersNotEqual} states that two answers not being equal implie
 \begin{lstlisting}
 Theorem AnswersNotEqual: forall (ans1:answer)(ans2:answer)(s:subject)(ac:act)(ass:asset),
   (ans1<>ans2) -> ((Result ans1 s ac ass) <> (Result ans2 s ac ass)).
-
 \end{lstlisting}
 %\end{minipage}
 
-The theorem \syn{trans_policy_positive_dec_not} states that the translation function \syn{trans_policy_positive} produces a nonempty list of results that will not have a \syn{NotPermitted} result (see listing~\ref{lst:positivedecnot}).
+The theorem \syn{trans_policy_positive_dec_not} states that the translation function \syn{trans_policy_positive} produces a nonempty list of results that will not have a \\ \syn{NotPermitted} result (see listing~\ref{lst:positivedecnot}).
 
 
 \lstset{language=Coq, frame=single, caption={Translation Function for Permitting Policies will not return a \syn{NotPermitted} result},label={lst:positivedecnot}}
 \begin{minipage}[c]{0.95\textwidth}
 \begin{lstlisting}
-
 Theorem trans_policy_positive_dec_not:
   forall 
 (e:environment)(s:subject)(p:policy)(prin_u:prin)(a:asset)
@@ -428,7 +411,6 @@ Theorem trans_policy_negative_dec_not:
   ~(isResultInQueryResult 
     (Result Permitted s action_from_query a)
     (trans_policy_negative e s p a action_from_query)).
-
 \end{lstlisting}
 \end{minipage}
 
@@ -446,7 +428,6 @@ Theorem trans_policy_unregulated_dec_not:
   ~(isResultInQueryResult 
     (Result Permitted s action_from_query a)
     (trans_policy_unregulated e s p a action_from_query)) /\
-  
   ~(isResultInQueryResult 
     (Result NotPermitted s action_from_query a)
     (trans_policy_unregulated e s p a action_from_query)).
